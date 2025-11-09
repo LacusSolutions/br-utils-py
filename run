@@ -13,181 +13,18 @@ Usage:
 """
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
-
-PACKAGES = [
-    "cnpj-fmt",
-    "cnpj-gen",
-    "cnpj-val",
-    "cnpj-utils",
-    "cpf-fmt",
-    "cpf-gen",
-    "cpf-val",
-    "cpf-utils",
-    "br-utils",
-]
-
-ROOT_DIR = Path(__file__).parent
-PACKAGES_DIR = ROOT_DIR / "packages"
+from scripts import build
+from scripts import clean
+from scripts import common
+from scripts import install_dev
+from scripts import publish
+from scripts import test
 
 
-def run_command(cmd, cwd=None, check=True):
-    """Execute a command and return the result."""
-    print(f"Running: {' '.join(cmd)}")
-
-    try:
-        result = subprocess.run(cmd, cwd=cwd, check=check)
-        return result.returncode == 0
-    except subprocess.CalledProcessError:
-        return False
-
-
-def install_dev():
-    """Install development dependencies."""
-    print("Installing development dependencies...")
-
-    # Install monorepo development dependencies
-    run_command([sys.executable, "-m", "pip", "install",
-                "-r", str(ROOT_DIR / "requirements-dev.txt")])
-
-    # Install dependencies for each package
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-        req_file = pkg_path / "requirements-dev.txt"
-
-        if req_file.exists():
-            print(f"Installing development dependencies for {pkg}...")
-            run_command([sys.executable, "-m", "pip", "install",
-                        "-r", str(req_file)], check=False)
-
-    # Install build tools
-    run_command([sys.executable, "-m", "pip", "install", "build", "twine"])
-
-
-def test_package(pkg_path):
-    """Run tests for a package."""
-    print(f"Running tests for {pkg_path.name}...")
-
-    return run_command([sys.executable, "-m", "pytest"], cwd=pkg_path)
-
-
-def test_all():
-    """Run tests for all packages."""
-    print("Running tests for all packages...")
-    failed = []
-
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-
-        if not test_package(pkg_path):
-            failed.append(pkg)
-
-    if failed:
-        print(
-            f"\n⚠️  Tests failed for the following packages: {', '.join(failed)}")
-        sys.exit(1)
-    else:
-        print("\n✅ All tests passed!")
-
-
-def build_package(pkg_path):
-    """Build a package."""
-    print(f"Building {pkg_path.name}...")
-
-    return run_command([sys.executable, "-m", "build"], cwd=pkg_path)
-
-
-def build_all():
-    """Build all packages."""
-    print("Building all packages...")
-    failed = []
-
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-
-        if not build_package(pkg_path):
-            failed.append(pkg)
-
-    if failed:
-        print(f"\n⚠️  Build failed for the following packages: {', '.join(failed)}")
-        sys.exit(1)
-    else:
-        print("\n✅ All packages built successfully!")
-
-
-def publish_package(pkg_path):
-    """Publish a package to PyPI."""
-    print(f"Publishing {pkg_path.name}...")
-
-    # First build the package
-    if not build_package(pkg_path):
-        print(f"Error: Failed to build {pkg_path.name}")
-
-        return False
-
-    # Then publish
-    return run_command([sys.executable, "-m", "twine", "upload", "dist/*"], cwd=pkg_path)
-
-
-def publish_all():
-    """Publish all packages to PyPI."""
-    print("Publishing all packages...")
-    print("⚠️  Make sure PyPI credentials are configured!")
-    failed = []
-
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-
-        if not publish_package(pkg_path):
-            failed.append(pkg)
-
-    if failed:
-        print(
-            f"\n⚠️  Publication failed for the following packages: {', '.join(failed)}")
-        sys.exit(1)
-    else:
-        print("\n✅ All packages published successfully!")
-
-
-def clean():
-    """Remove build files."""
-    print("Cleaning build files...")
-
-    patterns_to_remove = [
-        "__pycache__",
-        "*.pyc",
-        "*.pyo",
-        "*.egg-info",
-        "build",
-        "dist",
-        ".pytest_cache",
-        "htmlcov",
-    ]
-
-    removed_count = 0
-
-    for pattern in patterns_to_remove:
-        for path in ROOT_DIR.rglob(pattern):
-            if path.is_dir():
-                print(f"Removing directory: {path}")
-                subprocess.run(["rm", "-rf", str(path)], check=False)
-                removed_count += 1
-            elif path.is_file():
-                print(f"Removing file: {path}")
-                path.unlink()
-                removed_count += 1
-
-    # Handle .coverage file (typically at root level)
-    coverage_file = ROOT_DIR / ".coverage"
-
-    if coverage_file.exists() and coverage_file.is_file():
-        print(f"Removing file: {coverage_file}")
-        coverage_file.unlink()
-        removed_count += 1
-
-    print(f"✅ Cleanup completed. {removed_count} items removed.")
+PACKAGES = common.PACKAGES
+PACKAGES_DIR = common.PACKAGES_DIR
 
 
 def main():
@@ -203,44 +40,32 @@ python run build-all
 python run publish cnpj-fmt
 python run publish-all
 python run clean
-      """
+      """,
     )
 
-    subparsers = parser.add_subparsers(
-        dest="command", help="Command to execute")
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
-    # install-dev
-    subparsers.add_parser(
-        "install-dev", help="Install development dependencies")
+    subparsers.add_parser("install-dev", help="Install development dependencies")
 
-    # test
     test_parser = subparsers.add_parser("test", help="Run tests")
-    test_parser.add_argument("package", nargs="?",
-                             help="Specific package (optional)")
+    test_parser.add_argument("package", nargs="?", help="Specific package (optional)")
 
-    # test-all
-    subparsers.add_parser(
-        "test-all", help="Run tests for all packages")
+    subparsers.add_parser("test-all", help="Run tests for all packages")
 
-    # build
     build_parser = subparsers.add_parser("build", help="Build package(s)")
     build_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)")
+        "package", nargs="?", help="Specific package (leave empty for all)"
+    )
 
-    # build-all
     subparsers.add_parser("build-all", help="Build all packages")
 
-    # publish
-    publish_parser = subparsers.add_parser(
-        "publish", help="Publish package(s) to PyPI")
+    publish_parser = subparsers.add_parser("publish", help="Publish package(s) to PyPI")
     publish_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)")
+        "package", nargs="?", help="Specific package (leave empty for all)"
+    )
 
-    # publish-all
-    subparsers.add_parser(
-        "publish-all", help="Publish all packages to PyPI")
+    subparsers.add_parser("publish-all", help="Publish all packages to PyPI")
 
-    # clean
     subparsers.add_parser("clean", help="Remove build files")
 
     args = parser.parse_args()
@@ -250,7 +75,7 @@ python run clean
         sys.exit(1)
 
     if args.command == "install-dev":
-        install_dev()
+        install_dev.install_dev()
 
     elif args.command == "test":
         if args.package:
@@ -260,14 +85,12 @@ python run clean
                 sys.exit(1)
             pkg_path = PACKAGES_DIR / args.package
 
-            if not test_package(pkg_path):
+            if not test.test_package(pkg_path):
                 sys.exit(1)
         else:
-            # Test the current package (if inside a package)
             cwd = Path.cwd()
 
             if PACKAGES_DIR in cwd.parents:
-                # Find the package root directory
                 pkg_name = None
                 current = cwd
 
@@ -278,18 +101,20 @@ python run clean
                     current = current.parent
 
                 if pkg_name and pkg_name in PACKAGES:
-                    test_package(PACKAGES_DIR / pkg_name)
+                    test.test_package(PACKAGES_DIR / pkg_name)
                 else:
                     print(
-                        "Error: Current directory is not a valid package. Specify the package or use 'test-all'")
+                        "Error: Current directory is not a valid package. Specify the package or use 'test-all'"
+                    )
                     sys.exit(1)
             else:
                 print(
-                    "Error: Not inside a package. Specify the package or use 'test-all'")
+                    "Error: Not inside a package. Specify the package or use 'test-all'"
+                )
                 sys.exit(1)
 
     elif args.command == "test-all":
-        test_all()
+        test.test_all()
 
     elif args.command == "build":
         if args.package:
@@ -299,13 +124,13 @@ python run clean
                 sys.exit(1)
             pkg_path = PACKAGES_DIR / args.package
 
-            if not build_package(pkg_path):
+            if not build.build_package(pkg_path):
                 sys.exit(1)
         else:
-            build_all()
+            build.build_all()
 
     elif args.command == "build-all":
-        build_all()
+        build.build_all()
 
     elif args.command == "publish":
         if args.package:
@@ -315,14 +140,12 @@ python run clean
                 sys.exit(1)
             pkg_path = PACKAGES_DIR / args.package
 
-            if not publish_package(pkg_path):
+            if not publish.publish_package(pkg_path):
                 sys.exit(1)
         else:
-            # Try to publish the current package
             cwd = Path.cwd()
 
             if PACKAGES_DIR in cwd.parents:
-                # Find the package root directory
                 pkg_name = None
                 current = cwd
 
@@ -333,21 +156,22 @@ python run clean
                     current = current.parent
 
                 if pkg_name and pkg_name in PACKAGES:
-                    if not publish_package(PACKAGES_DIR / pkg_name):
+                    if not publish.publish_package(PACKAGES_DIR / pkg_name):
                         sys.exit(1)
                 else:
                     print(f"Error: Current directory is not a valid package.")
                     sys.exit(1)
             else:
                 print(
-                    "Error: Not inside a package. Specify the package or use 'publish-all'")
+                    "Error: Not inside a package. Specify the package or use 'publish-all'"
+                )
                 sys.exit(1)
 
     elif args.command == "publish-all":
-        publish_all()
+        publish.publish_all()
 
     elif args.command == "clean":
-        clean()
+        clean.clean()
 
     else:
         parser.print_help()

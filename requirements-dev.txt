@@ -3,5 +3,6 @@ pytest>=8.4.0
 pytest-cov>=7.0.0
 setuptools>=80.9.0
 setuptools-scm>=9.2.0
+tomli>=2.0.0; python_version < "3.11"
 twine>=6.2.0
 wheel>=0.45.1
