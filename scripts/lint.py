@@ -1,0 +1,151 @@
+"""Linting and formatting commands for packages."""
+
+__all__ = ["check_format", "check_format_all", "format", "format_all", "lint", "lint_all"]
+
+import sys
+from pathlib import Path
+
+from .common import PACKAGES, PACKAGES_DIR, ROOT_DIR, run_command
+
+
+def lint(pkg_path: Path | None = None) -> bool:
+    """Run linting on a specific package or the root project."""
+    if pkg_path is None:
+        pkg_path = ROOT_DIR
+
+    print(f"Running linting for {pkg_path.name}...")
+    ruff_cmd = [
+        sys.executable,
+        "-m",
+        "ruff",
+        "check",
+        str(pkg_path),
+    ]
+
+    return run_command(ruff_cmd, cwd=ROOT_DIR)
+
+
+def lint_all() -> bool:
+    """Run linting on all packages and root."""
+    print("Running linting for all packages...")
+    failed = []
+
+    if not lint(ROOT_DIR):
+        failed.append("root")
+
+    for pkg in PACKAGES:
+        pkg_path = PACKAGES_DIR / pkg
+
+        if not lint(pkg_path):
+            failed.append(pkg)
+
+    if failed:
+        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
+
+        return False
+    print("\n✅ All linting passed!")
+
+    return True
+
+
+def format(pkg_path: Path | None = None) -> bool:
+    """Format code for a specific package or the root project."""
+    if pkg_path is None:
+        pkg_path = ROOT_DIR
+
+    print(f"Formatting code for {pkg_path.name}...")
+    ruff_format_cmd = [
+        sys.executable,
+        "-m",
+        "ruff",
+        "format",
+        str(pkg_path),
+    ]
+
+    if not run_command(ruff_format_cmd, cwd=ROOT_DIR):
+        return False
+
+    black_cmd = [
+        sys.executable,
+        "-m",
+        "black",
+        "--fix",
+        str(pkg_path),
+    ]
+
+    return run_command(black_cmd, cwd=ROOT_DIR)
+
+
+def format_all() -> bool:
+    """Format code for all packages and root."""
+    print("Formatting code for all packages...")
+    failed = []
+
+    if not format(ROOT_DIR):
+        failed.append("root")
+
+    for pkg in PACKAGES:
+        pkg_path = PACKAGES_DIR / pkg
+
+        if not format(pkg_path):
+            failed.append(pkg)
+
+    if failed:
+        print(f"\n⚠️  Formatting failed for: {', '.join(failed)}")
+
+        return False
+    print("\n✅ All formatting completed!")
+
+    return True
+
+
+def check_format(pkg_path: Path | None = None) -> bool:
+    """Check if code is formatted correctly without making changes."""
+    if pkg_path is None:
+        pkg_path = ROOT_DIR
+
+    print(f"Checking formatting for {pkg_path.name}...")
+    ruff_check_cmd = [
+        sys.executable,
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        str(pkg_path),
+    ]
+
+    if not run_command(ruff_check_cmd, cwd=ROOT_DIR):
+        return False
+
+    black_check_cmd = [
+        sys.executable,
+        "-m",
+        "black",
+        "--check",
+        str(pkg_path),
+    ]
+
+    return run_command(black_check_cmd, cwd=ROOT_DIR)
+
+
+def check_format_all() -> bool:
+    """Check if all code is formatted correctly without making changes."""
+    print("Checking formatting for all packages...")
+    failed = []
+
+    if not check_format(ROOT_DIR):
+        failed.append("root")
+
+    for pkg in PACKAGES:
+        pkg_path = PACKAGES_DIR / pkg
+
+        if not check_format(pkg_path):
+            failed.append(pkg)
+
+    if failed:
+        print(f"\n⚠️  Formatting check failed for: {', '.join(failed)}")
+
+        return False
+    print("\n✅ All formatting checks passed!")
+
+    return True

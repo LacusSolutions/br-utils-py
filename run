@@ -10,6 +10,11 @@ Usage:
     python run build [pkg]       # Build specified package or all
     python run publish [pkg]     # Publish specified package or all
     python run clean             # Remove build files
+    python run lint [pkg]        # Run linting for current package or all
+    python run lint-all          # Run linting for all packages
+    python run format [pkg]      # Format code for current package or all
+    python run format-all        # Format code for all packages
+    python run format-check      # Check if code is formatted correctly
     python run hooks install     # Install Git hooks
     python run hooks uninstall   # Uninstall Git hooks
     python run hooks list        # List configured Git hooks
@@ -23,6 +28,7 @@ from scripts import clean
 from scripts import common
 from scripts import hooks
 from scripts import install_dev
+from scripts import lint
 from scripts import publish
 from scripts import test
 
@@ -44,6 +50,11 @@ python run build-all
 python run publish cnpj-fmt
 python run publish-all
 python run clean
+python run lint
+python run lint-all
+python run format
+python run format-all
+python run format-check
 python run hooks install
 python run hooks list
       """,
@@ -59,20 +70,28 @@ python run hooks list
     subparsers.add_parser("test-all", help="Run tests for all packages")
 
     build_parser = subparsers.add_parser("build", help="Build package(s)")
-    build_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)"
-    )
+    build_parser.add_argument("package", nargs="?", help="Specific package (leave empty for all)")
 
     subparsers.add_parser("build-all", help="Build all packages")
 
     publish_parser = subparsers.add_parser("publish", help="Publish package(s) to PyPI")
-    publish_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)"
-    )
+    publish_parser.add_argument("package", nargs="?", help="Specific package (leave empty for all)")
 
     subparsers.add_parser("publish-all", help="Publish all packages to PyPI")
 
     subparsers.add_parser("clean", help="Remove build files")
+
+    lint_parser = subparsers.add_parser("lint", help="Run linting")
+    lint_parser.add_argument("package", nargs="?", help="Specific package (optional)")
+
+    subparsers.add_parser("lint-all", help="Run linting for all packages")
+
+    format_parser = subparsers.add_parser("format", help="Format code")
+    format_parser.add_argument("package", nargs="?", help="Specific package (optional)")
+
+    subparsers.add_parser("format-all", help="Format code for all packages")
+
+    subparsers.add_parser("format-check", help="Check if code is formatted correctly")
 
     hooks_parser = subparsers.add_parser("hooks", help="Manage Git hooks")
     hooks_subparsers = hooks_parser.add_subparsers(dest="hooks_command", help="Hooks command")
@@ -120,9 +139,7 @@ python run hooks list
                     )
                     sys.exit(1)
             else:
-                print(
-                    "Error: Not inside a package. Specify the package or use 'test-all'"
-                )
+                print("Error: Not inside a package. Specify the package or use 'test-all'")
                 sys.exit(1)
 
     elif args.command == "test-all":
@@ -174,9 +191,7 @@ python run hooks list
                     print(f"Error: Current directory is not a valid package.")
                     sys.exit(1)
             else:
-                print(
-                    "Error: Not inside a package. Specify the package or use 'publish-all'"
-                )
+                print("Error: Not inside a package. Specify the package or use 'publish-all'")
                 sys.exit(1)
 
     elif args.command == "publish-all":
@@ -184,6 +199,89 @@ python run hooks list
 
     elif args.command == "clean":
         clean.clean()
+
+    elif args.command == "lint":
+        if args.package:
+            if args.package not in PACKAGES:
+                print(f"Error: Package '{args.package}' not found.")
+                print(f"Available packages: {', '.join(PACKAGES)}")
+                sys.exit(1)
+
+            pkg_path = PACKAGES_DIR / args.package
+
+            if not lint.lint(pkg_path):
+                sys.exit(1)
+        else:
+            cwd = Path.cwd()
+
+            if PACKAGES_DIR in cwd.parents:
+                pkg_name = None
+                current = cwd
+
+                while current != PACKAGES_DIR.parent:
+                    if current.parent == PACKAGES_DIR:
+                        pkg_name = current.name
+                        break
+                    current = current.parent
+
+                if pkg_name and pkg_name in PACKAGES:
+                    if not lint.lint(PACKAGES_DIR / pkg_name):
+                        sys.exit(1)
+                else:
+                    print(
+                        "Error: Current directory is not a valid package. Specify the package or use 'lint-all'"
+                    )
+                    sys.exit(1)
+            else:
+                if not lint.lint():
+                    sys.exit(1)
+
+    elif args.command == "lint-all":
+        if not lint.lint_all():
+            sys.exit(1)
+
+    elif args.command == "format":
+        if args.package:
+            if args.package not in PACKAGES:
+                print(f"Error: Package '{args.package}' not found.")
+                print(f"Available packages: {', '.join(PACKAGES)}")
+                sys.exit(1)
+            pkg_path = PACKAGES_DIR / args.package
+
+            if not lint.format(pkg_path):
+                sys.exit(1)
+        else:
+            cwd = Path.cwd()
+
+            if PACKAGES_DIR in cwd.parents:
+                pkg_name = None
+                current = cwd
+
+                while current != PACKAGES_DIR.parent:
+                    if current.parent == PACKAGES_DIR:
+                        pkg_name = current.name
+                        break
+                    current = current.parent
+
+                if pkg_name and pkg_name in PACKAGES:
+                    if not lint.format(PACKAGES_DIR / pkg_name):
+                        sys.exit(1)
+                else:
+                    print(
+                        "Error: Current directory is not a valid package. Specify the package or use 'format-all'"
+                    )
+                    sys.exit(1)
+            else:
+                if not lint.format():
+                    sys.exit(1)
+
+    elif args.command == "format-all":
+        if not lint.format_all():
+            sys.exit(1)
+
+    elif args.command == "format-check":
+        if not lint.check_format_all():
+            sys.exit(1)
 
     elif args.command == "hooks":
         if not args.hooks_command:
