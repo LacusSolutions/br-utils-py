@@ -15,6 +15,7 @@ def test_dependencies_available():
     """Testa se as dependências estão disponíveis."""
     try:
         from lacus import cpf_fmt, cpf_gen, cpf_val
+
         assert cpf_fmt is not None
         assert cpf_gen is not None
         assert cpf_val is not None
