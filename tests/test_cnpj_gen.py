@@ -2,7 +2,6 @@
 Testes unitários para lacus-cnpj-gen.
 """
 
-import pytest
 from lacus.cnpj_gen import hello_world
 
 
