@@ -1,12 +1,12 @@
 """Git Hooks management for Python projects."""
 
-__all__ = ["install_hooks", "uninstall_hooks", "list_hooks"]
+__all__ = ["install_hooks", "list_hooks", "uninstall_hooks"]
 
 import json
 import stat
-from typing import Any, Dict, List
-from .common import ROOT_DIR, run_command
+from typing import Any
 
+from .common import ROOT_DIR
 
 GITHOOKS_CONFIG = ROOT_DIR / ".githooks.json"
 GITHOOKS_DIR = ROOT_DIR / ".githooks"
@@ -43,33 +43,33 @@ SUPPORTED_HOOKS = [
 ]
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load Git hooks configuration from .githooks.json."""
     if not GITHOOKS_CONFIG.exists():
         return {}
 
     try:
-        with open(GITHOOKS_CONFIG, "r", encoding="utf-8") as f:
+        with open(GITHOOKS_CONFIG, encoding="utf-8") as f:
             return json.load(f)
-    except (json.JSONDecodeError, IOError) as e:
+    except (OSError, json.JSONDecodeError) as e:
         print(f"Error loading .githooks.json: {e}")
         return {}
 
 
-def save_config(config: Dict[str, Any]) -> bool:
+def save_config(config: dict[str, Any]) -> bool:
     """Save Git hooks configuration to .githooks.json."""
     try:
         with open(GITHOOKS_CONFIG, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
 
         return True
-    except IOError as e:
+    except OSError as e:
         print(f"Error saving .githooks.json: {e}")
 
         return False
 
 
-def get_hook_script(hook_name: str, actions: List[str]) -> str:
+def get_hook_script(hook_name: str, actions: list[str]) -> str:
     """Generate a Git hook script that executes the configured actions."""
     script_lines = [
         "#!/usr/bin/env python3",
@@ -115,7 +115,7 @@ def get_hook_script(hook_name: str, actions: List[str]) -> str:
     return "\n".join(script_lines)
 
 
-def create_hook_file(hook_name: str, actions: List[str]) -> bool:
+def create_hook_file(hook_name: str, actions: list[str]) -> bool:
     """Create a Git hook file in .git/hooks/."""
     if not GIT_HOOKS_DIR.exists():
         print(f"Error: {GIT_HOOKS_DIR} does not exist. Is this a Git repository?")
@@ -133,7 +133,7 @@ def create_hook_file(hook_name: str, actions: List[str]) -> bool:
         print(f"✅ Installed hook: {hook_name}")
 
         return True
-    except IOError as e:
+    except OSError as e:
         print(f"Error creating hook {hook_name}: {e}")
 
         return False
@@ -151,7 +151,7 @@ def remove_hook_file(hook_name: str) -> bool:
         print(f"✅ Removed hook: {hook_name}")
 
         return True
-    except IOError as e:
+    except OSError as e:
         print(f"Error removing hook {hook_name}: {e}")
 
         return False
@@ -226,7 +226,7 @@ def uninstall_hooks() -> bool:
     print("Uninstalling Git hooks...")
     success = True
 
-    for hook_name in config.keys():
+    for hook_name in config:
         if hook_name not in SUPPORTED_HOOKS:
             continue
 

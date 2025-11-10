@@ -2,7 +2,6 @@
 Testes unitários para lacus-cpf-val.
 """
 
-import pytest
 from lacus.cpf_val import hello_world
 
 

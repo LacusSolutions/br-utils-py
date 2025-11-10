@@ -15,6 +15,7 @@ def test_dependencies_available():
     """Testa se as dependências estão disponíveis."""
     try:
         from lacus import cnpj_fmt, cnpj_gen, cnpj_val
+
         assert cnpj_fmt is not None
         assert cnpj_gen is not None
         assert cnpj_val is not None

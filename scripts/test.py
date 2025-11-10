@@ -1,8 +1,9 @@
 """Test commands for packages."""
 
-__all__ = ["test_package", "test_all"]
+__all__ = ["test_all", "test_package"]
 
 import sys
+
 from .common import PACKAGES, PACKAGES_DIR, run_command
 
 

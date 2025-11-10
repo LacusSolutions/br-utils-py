@@ -2,7 +2,6 @@
 Testes unitários para lacus-cnpj-fmt.
 """
 
-import pytest
 from lacus.cnpj_fmt import hello_world
 
 

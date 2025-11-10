@@ -1,7 +1,10 @@
 {
   "pre-commit": {
-    "enabled": false,
-    "actions": []
+    "enabled": true,
+    "actions": [
+      "python run format-check",
+      "python run lint"
+    ]
   },
   "commit-msg": {
     "enabled": false,

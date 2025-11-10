@@ -1,8 +1,9 @@
 """Build commands for packages."""
 
-__all__ = ["build_package", "build_all"]
+__all__ = ["build_all", "build_package"]
 
 import sys
+
 from .common import PACKAGES, PACKAGES_DIR, run_command
 
 

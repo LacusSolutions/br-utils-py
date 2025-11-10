@@ -1,6 +1,13 @@
 """Linting and formatting commands for packages."""
 
-__all__ = ["check_format", "check_format_all", "format", "format_all", "lint", "lint_all"]
+__all__ = [
+    "check_format",
+    "check_format_all",
+    "format",
+    "format_all",
+    "lint",
+    "lint_all",
+]
 
 import sys
 from pathlib import Path
@@ -69,7 +76,6 @@ def format(pkg_path: Path | None = None) -> bool:
         sys.executable,
         "-m",
         "black",
-        "--fix",
         str(pkg_path),
     ]
 

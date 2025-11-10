@@ -2,7 +2,6 @@
 Testes unitários para lacus-cnpj-val.
 """
 
-import pytest
 from lacus.cnpj_val import hello_world
 
 
