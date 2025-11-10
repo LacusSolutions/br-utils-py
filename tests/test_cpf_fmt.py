@@ -2,7 +2,6 @@
 Testes unitários para lacus-cpf-fmt.
 """
 
-import pytest
 from lacus.cpf_fmt import hello_world
 
 
