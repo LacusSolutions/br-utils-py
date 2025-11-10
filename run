@@ -4,12 +4,15 @@
 Monorepo management scripts.
 
 Usage:
-    python run install-dev    # Install development dependencies
-    python run test           # Run tests for current package
-    python run test-all       # Run tests for all packages
-    python run build [pkg]   # Build specified package or all
-    python run publish [pkg] # Publish specified package or all
-    python run clean          # Remove build files
+    python run install-dev       # Install development dependencies
+    python run test              # Run tests for current package
+    python run test-all          # Run tests for all packages
+    python run build [pkg]       # Build specified package or all
+    python run publish [pkg]     # Publish specified package or all
+    python run clean             # Remove build files
+    python run hooks install     # Install Git hooks
+    python run hooks uninstall   # Uninstall Git hooks
+    python run hooks list        # List configured Git hooks
 """
 
 import argparse
@@ -18,6 +21,7 @@ from pathlib import Path
 from scripts import build
 from scripts import clean
 from scripts import common
+from scripts import hooks
 from scripts import install_dev
 from scripts import publish
 from scripts import test
@@ -40,6 +44,8 @@ python run build-all
 python run publish cnpj-fmt
 python run publish-all
 python run clean
+python run hooks install
+python run hooks list
       """,
     )
 
@@ -67,6 +73,12 @@ python run clean
     subparsers.add_parser("publish-all", help="Publish all packages to PyPI")
 
     subparsers.add_parser("clean", help="Remove build files")
+
+    hooks_parser = subparsers.add_parser("hooks", help="Manage Git hooks")
+    hooks_subparsers = hooks_parser.add_subparsers(dest="hooks_command", help="Hooks command")
+    hooks_subparsers.add_parser("install", help="Install Git hooks")
+    hooks_subparsers.add_parser("uninstall", help="Uninstall Git hooks")
+    hooks_subparsers.add_parser("list", help="List configured Git hooks")
 
     args = parser.parse_args()
 
@@ -172,6 +184,23 @@ python run clean
 
     elif args.command == "clean":
         clean.clean()
+
+    elif args.command == "hooks":
+        if not args.hooks_command:
+            hooks_parser.print_help()
+            sys.exit(1)
+
+        if args.hooks_command == "install":
+            if not hooks.install_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "uninstall":
+            if not hooks.uninstall_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "list":
+            hooks.list_hooks()
+        else:
+            hooks_parser.print_help()
+            sys.exit(1)
 
     else:
         parser.print_help()
