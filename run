@@ -6,8 +6,9 @@ Monorepo management scripts.
 Usage:
     python run test              # Run tests for current package
     python run test-all          # Run tests for all packages
-    python run build [pkg]       # Build specified package or all
-    python run publish [pkg]     # Publish specified package or all
+    python run build             # Build all packages
+    python run build [pkg] [-i]  # Build specified package
+    python run publish [pkg]     # Publish specified package
     python run clean             # Remove build files
     python run lint              # Run linting for all packages
     python run lint [pkg|path]   # Run linting for package, path, or file
@@ -73,6 +74,7 @@ def main():
 Examples:
 python run test-all
 python run build cnpj-fmt
+python run build cnpj-fmt --install-afterwards
 python run build-all
 python run publish cnpj-fmt
 python run publish-all
@@ -94,6 +96,12 @@ python run hooks run
 
     build_parser = subparsers.add_parser("build", help="Build package(s)")
     build_parser.add_argument("package", nargs="?", help="Specific package (leave empty for all)")
+    build_parser.add_argument(
+        "--install-afterwards",
+        "-i",
+        action="store_true",
+        help="Install the package locally via pip after building",
+    )
 
     subparsers.add_parser("build-all", help="Build all packages")
 
@@ -168,10 +176,10 @@ python run hooks run
                 sys.exit(1)
             pkg_path = PACKAGES_DIR / args.package
 
-            if not build.build_package(pkg_path):
+            if not build.build_package(pkg_path, install_afterwards=args.install_afterwards):
                 sys.exit(1)
         else:
-            build.build_all()
+            build.build_all(install_afterwards=args.install_afterwards)
 
     elif args.command == "build-all":
         build.build_all()
