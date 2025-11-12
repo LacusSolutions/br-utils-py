@@ -16,7 +16,9 @@ def publish_package(pkg_path):
         print(f"Error: Failed to build {pkg_path.name}")
         return False
 
-    return run_command([sys.executable, "-m", "twine", "upload", "dist/*"], cwd=pkg_path)
+    return run_command(
+        [sys.executable, "-m", "twine", "upload", "dist/*"], cwd=pkg_path
+    )
 
 
 def publish_all():
@@ -32,7 +34,9 @@ def publish_all():
             failed.append(pkg)
 
     if failed:
-        print(f"\n⚠️  Publication failed for the following packages: {', '.join(failed)}")
+        print(
+            f"\n⚠️  Publication failed for the following packages: {', '.join(failed)}"
+        )
         sys.exit(1)
     else:
         print("\n✅ All packages published successfully!")

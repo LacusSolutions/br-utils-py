@@ -1,6 +1,12 @@
 """Common utilities and constants for monorepo management scripts."""
 
-__all__ = ["PACKAGES", "PACKAGES_DIR", "ROOT_DIR", "run_command"]
+__all__ = [
+    "PACKAGES",
+    "PACKAGES_DIR",
+    "ROOT_DIR",
+    "SCRIPTS_DIR",
+    "run_command",
+]
 
 import subprocess
 from pathlib import Path
@@ -10,6 +16,7 @@ from .discover import get_sorted_packages
 ROOT_DIR = Path(__file__).parent.parent
 PACKAGES_DIR = ROOT_DIR / "packages"
 PACKAGES = get_sorted_packages()
+SCRIPTS_DIR = ROOT_DIR / "scripts"
 
 
 def run_command(cmd, cwd=None, check=True):

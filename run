@@ -14,10 +14,10 @@ Usage:
     python run lint-all          # Run linting for all packages
     python run format [pkg]      # Format code for current package or all
     python run format-all        # Format code for all packages
-    python run format-check      # Check if code is formatted correctly
-    python run hooks install     # Install Git hooks
-    python run hooks uninstall   # Uninstall Git hooks
-    python run hooks list        # List configured Git hooks
+    python run hooks install     # Install `pre-commit` hooks
+    python run hooks uninstall   # Uninstall `pre-commit` hooks
+    python run hooks update      # Update `pre-commit` hooks
+    python run hooks run         # Run `pre-commit` hooks on all files
 """
 
 import argparse
@@ -54,9 +54,9 @@ python run lint
 python run lint-all
 python run format
 python run format-all
-python run format-check
 python run hooks install
-python run hooks list
+python run hooks update
+python run hooks run
       """,
     )
 
@@ -91,13 +91,12 @@ python run hooks list
 
     subparsers.add_parser("format-all", help="Format code for all packages")
 
-    subparsers.add_parser("format-check", help="Check if code is formatted correctly")
-
-    hooks_parser = subparsers.add_parser("hooks", help="Manage Git hooks")
+    hooks_parser = subparsers.add_parser("hooks", help="Manage pre-commit hooks")
     hooks_subparsers = hooks_parser.add_subparsers(dest="hooks_command", help="Hooks command")
-    hooks_subparsers.add_parser("install", help="Install Git hooks")
-    hooks_subparsers.add_parser("uninstall", help="Uninstall Git hooks")
-    hooks_subparsers.add_parser("list", help="List configured Git hooks")
+    hooks_subparsers.add_parser("install", help="Install pre-commit hooks")
+    hooks_subparsers.add_parser("uninstall", help="Uninstall pre-commit hooks")
+    hooks_subparsers.add_parser("update", help="Update pre-commit hooks to latest versions")
+    hooks_subparsers.add_parser("run", help="Run pre-commit hooks on all files")
 
     args = parser.parse_args()
 
@@ -279,10 +278,6 @@ python run hooks list
         if not lint.format_all():
             sys.exit(1)
 
-    elif args.command == "format-check":
-        if not lint.check_format_all():
-            sys.exit(1)
-
     elif args.command == "hooks":
         if not args.hooks_command:
             hooks_parser.print_help()
@@ -294,8 +289,12 @@ python run hooks list
         elif args.hooks_command == "uninstall":
             if not hooks.uninstall_hooks():
                 sys.exit(1)
-        elif args.hooks_command == "list":
-            hooks.list_hooks()
+        elif args.hooks_command == "update":
+            if not hooks.update_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "run":
+            if not hooks.run_hooks():
+                sys.exit(1)
         else:
             hooks_parser.print_help()
             sys.exit(1)
