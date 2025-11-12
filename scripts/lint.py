@@ -1,8 +1,6 @@
 """Linting and formatting commands for packages."""
 
 __all__ = [
-    "format",
-    "format_all",
     "lint",
     "lint_all",
 ]
@@ -20,7 +18,7 @@ from .common import (
 
 
 def lint(pkg_path: Path | None = None) -> bool:
-    """Run linting on a specific directory or the entire repository."""
+    """Run linting and formatting on a specific directory or the entire repository."""
     if pkg_path is None:
         pkg_path = ROOT_DIR
 
@@ -30,40 +28,12 @@ def lint(pkg_path: Path | None = None) -> bool:
         "-m",
         "ruff",
         "check",
+        "--fix-only",
         str(pkg_path),
     ]
 
-    return run_command(ruff_cmd, cwd=ROOT_DIR)
-
-
-def lint_all() -> bool:
-    """Run linting on all packages and root."""
-    print("Running linting for all packages...")
-    failed = []
-
-    if not lint(SCRIPTS_DIR):
-        failed.append("scripts")
-
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-
-        if not lint(pkg_path):
-            failed.append(pkg)
-
-    if failed:
-        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
-
+    if not run_command(ruff_cmd, cwd=ROOT_DIR):
         return False
-
-    print("\n✅ All linting passed!")
-
-    return True
-
-
-def format(pkg_path: Path | None = None) -> bool:
-    """Format code for a specific directory or the entire repository."""
-    if pkg_path is None:
-        pkg_path = ROOT_DIR
 
     print(f"Formatting code for {pkg_path.name}...")
     ruff_format_cmd = [
@@ -87,24 +57,25 @@ def format(pkg_path: Path | None = None) -> bool:
     return run_command(black_cmd, cwd=ROOT_DIR)
 
 
-def format_all() -> bool:
-    """Format code for all packages and root."""
-    print("Formatting code for all packages...")
+def lint_all() -> bool:
+    """Run linting and formatting on all packages and root."""
+    print("Running linting for all packages...")
     failed = []
 
-    if not format(SCRIPTS_DIR):
+    if not lint(SCRIPTS_DIR):
         failed.append("scripts")
 
     for pkg in PACKAGES:
         pkg_path = PACKAGES_DIR / pkg
 
-        if not format(pkg_path):
+        if not lint(pkg_path):
             failed.append(pkg)
 
     if failed:
-        print(f"\n⚠️  Formatting failed for: {', '.join(failed)}")
+        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
 
         return False
-    print("\n✅ All formatting completed!")
+
+    print("\n✅ All linting passed!")
 
     return True
