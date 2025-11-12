@@ -45,8 +45,8 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cnpj-utils>=1.0.0",
-  "cpf-utils>=1.0.0",
+  "cnpj-utils>=0.0.1",
+  "cpf-utils>=0.0.1",
 ]
 
   [[project.authors]]
