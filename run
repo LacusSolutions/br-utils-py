@@ -108,7 +108,7 @@ python run hooks run
     subparsers.add_parser("clean", help="Remove build files")
 
     lint_parser = subparsers.add_parser("lint", help="Run linting and formatting")
-    lint_parser.add_argument("package", nargs="?", help="Specific package (optional)")
+    lint_parser.add_argument("package", nargs="*", help="Specific package (optional)")
 
     hooks_parser = subparsers.add_parser("hooks", help="Manage pre-commit hooks")
     hooks_subparsers = hooks_parser.add_subparsers(
@@ -227,13 +227,16 @@ python run hooks run
 
     elif args.command == "lint":
         if args.package:
-            resolved_path = resolve_path(args.package)
-            if resolved_path is None:
-                print(f"Error: '{args.package}' is not a valid package, path, or file.")
-                print(f"Available packages: {', '.join(PACKAGES)}")
-                sys.exit(1)
+            resolved_paths = []
+            for pkg_arg in args.package:
+                resolved_path = resolve_path(pkg_arg)
+                if resolved_path is None:
+                    print(f"Error: '{pkg_arg}' is not a valid package, path, or file.")
+                    print(f"Available packages: {', '.join(PACKAGES)}")
+                    sys.exit(1)
+                resolved_paths.append(resolved_path)
 
-            if not lint.lint(resolved_path):
+            if not lint.lint_files(resolved_paths):
                 sys.exit(1)
         else:
             if not lint.lint_all():

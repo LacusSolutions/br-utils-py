@@ -27,16 +27,23 @@ repos:
       - id: check-toml
       - id: check-yaml
 
+  # sync LICENSE to all packages
+  - repo: local
+    hooks:
+      - id: sync-license
+        name: sync-license
+        entry: python -m scripts.sync_license
+        language: unsupported
+        files: LICENSE
+        pass_filenames: false
+
   # lint and format source code before committing
   - repo: local
     hooks:
       - id: lint
         name: lint
         entry: python run lint
-        args: []
-        language: system
-        pass_filenames: false
-        always_run: true
+        language: unsupported
 
   # conventional-pre-commit
   - repo: https://github.com/compilerla/conventional-pre-commit
@@ -56,6 +63,6 @@ repos:
         id: test-all
         name: Run All Tests
         entry: python run test-all
-        language: system
+        language: unsupported
         pass_filenames: false
         always_run: true

@@ -3,6 +3,7 @@
 __all__ = [
     "lint",
     "lint_all",
+    "lint_files",
 ]
 
 import sys
@@ -55,6 +56,27 @@ def lint(pkg_path: Path | None = None) -> bool:
     ]
 
     return run_command(black_cmd, cwd=ROOT_DIR)
+
+
+def lint_files(paths: list[Path]) -> bool:
+    """Run linting and formatting on a list of files or directories."""
+    failed = []
+    python_extensions = {".py"}
+
+    for path in paths:
+        # Skip non-Python files (only lint .py files or directories)
+        if path.is_file() and path.suffix not in python_extensions:
+            continue
+
+        if not lint(path):
+            failed.append(str(path))
+
+    if failed:
+        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
+        return False
+
+    print("\n✅ All linting passed!")
+    return True
 
 
 def lint_all() -> bool:
