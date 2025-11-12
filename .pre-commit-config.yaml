@@ -32,13 +32,13 @@ repos:
     hooks:
       - id: lint
         name: lint
-        entry: python run lint-all
+        entry: python run lint
         language: system
         pass_filenames: false
         always_run: true
       - id: format
         name: format
-        entry: python run format-all
+        entry: python run format
         language: system
         pass_filenames: false
         always_run: true

@@ -1,0 +1,29 @@
+"""Install monorepo dependencies."""
+
+import sys
+import subprocess
+
+
+def install_dependencies():
+    """Run a system command and return the result."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            "requirements-dev.txt",
+        ]
+    )
+
+    if result.returncode == 0:
+        print(result.stdout)
+        print("✅ Dependencies installed successfully.")
+    else:
+        print(result.stderr)
+        print("❌ Failed to install dependencies.")
+
+
+if __name__ == "__main__":
+    install_dependencies()

@@ -10,15 +10,10 @@ try:
 
     TOMLDecodeError = tomllib.TOMLDecodeError
 except ImportError:
-    try:
-        import tomli
-        import tomli as tomllib
+    import tomli
+    import tomli as tomllib
 
-        TOMLDecodeError = tomli.TOMLDecodeError
-    except ImportError:
-        raise ImportError(
-            "tomli is required for Python < 3.11. Install it with: pip install tomli"
-        ) from None
+    TOMLDecodeError = tomli.TOMLDecodeError
 
 
 ROOT_DIR = Path(__file__).parent.parent
