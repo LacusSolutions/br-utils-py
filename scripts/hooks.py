@@ -1,4 +1,4 @@
-"""`p`re-commit` hooks management."""
+"""`pre-commit` hooks management."""
 
 __all__ = ["install_hooks", "run_hooks", "uninstall_hooks", "update_hooks"]
 
