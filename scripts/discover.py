@@ -10,10 +10,9 @@ try:
 
     TOMLDecodeError = tomllib.TOMLDecodeError
 except ImportError:
-    import tomli
     import tomli as tomllib
 
-    TOMLDecodeError = tomli.TOMLDecodeError
+    TOMLDecodeError = tomllib.TOMLDecodeError
 
 
 ROOT_DIR = Path(__file__).parent.parent
