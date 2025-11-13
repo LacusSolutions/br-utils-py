@@ -2,6 +2,7 @@
 
 __all__ = ["build_all", "build_package"]
 
+import shutil
 import sys
 
 from .common import PACKAGES, PACKAGES_DIR, run_command
@@ -16,7 +17,9 @@ def build_package(pkg_path, install_afterwards=False):
 
     if install_afterwards:
         dist_dir = pkg_path / "dist"
-        if not dist_dir.exists():
+        if dist_dir.exists():
+            shutil.rmtree(dist_dir)
+        else:
             print(f"Error: dist/ directory not found in {pkg_path.name}")
             return False
 
