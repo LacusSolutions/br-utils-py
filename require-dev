@@ -21,11 +21,11 @@ def install_dependencies():
 
     if result.returncode == 0:
         if result.stdout:
-          print(result.stdout)
+            print(result.stdout)
         print("✅ Dependencies installed successfully.")
     else:
         if result.stderr:
-          print(result.stderr)
+            print(result.stderr)
         print("❌ Failed to install dependencies.")
         sys.exit(result.returncode)
 
