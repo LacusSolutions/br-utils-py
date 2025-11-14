@@ -31,7 +31,7 @@ jobs:
         python-version: '3.11'
 
     - run: python -m pip install --upgrade pip
-    - run: python require-dev
+    - run: python require
 
     - name: Determine packages to publish
       id: packages
