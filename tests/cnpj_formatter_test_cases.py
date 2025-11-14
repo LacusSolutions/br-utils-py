@@ -9,7 +9,6 @@ class CnpjFormatterTestCases(ABC):
     def format(
         self,
         cnpj_string: str,
-        escape: bool | None = None,
         hidden: bool | None = None,
         hidden_key: str | None = None,
         hidden_start: int | None = None,
@@ -17,6 +16,7 @@ class CnpjFormatterTestCases(ABC):
         dot_key: str | None = None,
         slash_key: str | None = None,
         dash_key: str | None = None,
+        escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> str:
         pass
