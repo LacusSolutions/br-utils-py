@@ -1,6 +1,6 @@
 [project]
 name = "cnpj-fmt"
-version = "0.0.1"
+version = "1.0.0"
 # dynamic = [ "version" ]
 description = "Utility function to format CNPJ (Brazilian employer ID)"
 license = "MIT"
