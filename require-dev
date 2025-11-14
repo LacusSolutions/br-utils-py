@@ -5,7 +5,7 @@ import sys
 
 
 def install_dependencies():
-    """Run a system command and return the result."""
+    """Install development dependencies from requirements-dev.txt."""
     result = subprocess.run(
         [
             sys.executable,
