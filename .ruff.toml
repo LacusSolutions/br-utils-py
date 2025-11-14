@@ -54,7 +54,7 @@ ignore = [
 
 [lint.per-file-ignores]
 "__init__.py" = ["F401"]  # unused imports
-"tests/**/*.py" = ["ARG", "S101"]  # allow assert in tests, unused arguments
+"tests/**/*.py" = ["ARG"]  # allow assert in tests, unused arguments
 
 [lint.isort]
 known-first-party = ["scripts"]
