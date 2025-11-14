@@ -39,13 +39,13 @@ select = [
   "UP",  # pyupgrade
   "ARG", # flake8-unused-arguments
   "SIM", # flake8-simplify
+  "SLF", # flake8-self
   "TCH", # flake8-type-checking
   "PIE", # flake8-pie
   "PT",  # flake8-pytest-style
   "RET", # flake8-return
   "RUF", # Ruff-specific rules
 ]
-
 ignore = [
   "E501",  # line too long (handled by ruff formatter)
   "B008",  # do not perform function calls in argument defaults
