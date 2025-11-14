@@ -4,27 +4,58 @@
 Monorepo management scripts.
 
 Usage:
-    python run install-dev    # Install development dependencies
-    python run test           # Run tests for current package
-    python run test-all       # Run tests for all packages
-    python run build [pkg]   # Build specified package or all
-    python run publish [pkg] # Publish specified package or all
-    python run clean          # Remove build files
+    python run test              # Run tests for current package
+    python run test-all          # Run tests for all packages
+    python run build             # Build all packages
+    python run build [pkg] [-i]  # Build specified package
+    python run publish [pkg]     # Publish specified package
+    python run clean             # Remove build files
+    python run lint              # Run linting and formatting for all packages
+    python run lint [pkg|path]   # Run linting and formatting for package, path, or file
+    python run hooks install     # Install `pre-commit` hooks
+    python run hooks uninstall   # Uninstall `pre-commit` hooks
+    python run hooks update      # Update `pre-commit` hooks
+    python run hooks run         # Run `pre-commit` hooks on all files
 """
 
 import argparse
 import sys
 from pathlib import Path
-from scripts import build
-from scripts import clean
-from scripts import common
-from scripts import install_dev
-from scripts import publish
-from scripts import test
 
+from scripts import build, clean, common, hooks, lint, publish, test
 
 PACKAGES = common.PACKAGES
 PACKAGES_DIR = common.PACKAGES_DIR
+ROOT_DIR = common.ROOT_DIR
+
+
+def resolve_path(arg: str) -> Path | None:
+    """
+    Resolve a path argument to a valid Path object.
+
+    Tries in order:
+    1. Check if it's a package name in packages/
+    2. Check if it's a relative path from root
+    3. Check if it's an absolute path
+
+    Returns Path if valid, None otherwise.
+    """
+    if arg in PACKAGES:
+        pkg_path = PACKAGES_DIR / arg
+        if pkg_path.exists():
+            return pkg_path
+
+    rel_path = ROOT_DIR / arg
+
+    if rel_path.exists():
+        return rel_path
+
+    abs_path = Path(arg)
+
+    if abs_path.is_absolute() and abs_path.exists():
+        return abs_path
+
+    return None
 
 
 def main():
@@ -33,19 +64,21 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-python run install-dev
 python run test-all
 python run build cnpj-fmt
+python run build cnpj-fmt --install-afterwards
 python run build-all
 python run publish cnpj-fmt
 python run publish-all
 python run clean
+python run lint
+python run hooks install
+python run hooks update
+python run hooks run
       """,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
-
-    subparsers.add_parser("install-dev", help="Install development dependencies")
 
     test_parser = subparsers.add_parser("test", help="Run tests")
     test_parser.add_argument("package", nargs="?", help="Specific package (optional)")
@@ -55,6 +88,12 @@ python run clean
     build_parser = subparsers.add_parser("build", help="Build package(s)")
     build_parser.add_argument(
         "package", nargs="?", help="Specific package (leave empty for all)"
+    )
+    build_parser.add_argument(
+        "--install-afterwards",
+        "-i",
+        action="store_true",
+        help="Install the package locally via pip after building",
     )
 
     subparsers.add_parser("build-all", help="Build all packages")
@@ -68,16 +107,27 @@ python run clean
 
     subparsers.add_parser("clean", help="Remove build files")
 
+    lint_parser = subparsers.add_parser("lint", help="Run linting and formatting")
+    lint_parser.add_argument("package", nargs="*", help="Specific package (optional)")
+
+    hooks_parser = subparsers.add_parser("hooks", help="Manage pre-commit hooks")
+    hooks_subparsers = hooks_parser.add_subparsers(
+        dest="hooks_command", help="Hooks command"
+    )
+    hooks_subparsers.add_parser("install", help="Install pre-commit hooks")
+    hooks_subparsers.add_parser("uninstall", help="Uninstall pre-commit hooks")
+    hooks_subparsers.add_parser(
+        "update", help="Update pre-commit hooks to latest versions"
+    )
+    hooks_subparsers.add_parser("run", help="Run pre-commit hooks on all files")
+
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
         sys.exit(1)
 
-    if args.command == "install-dev":
-        install_dev.install_dev()
-
-    elif args.command == "test":
+    if args.command == "test":
         if args.package:
             if args.package not in PACKAGES:
                 print(f"Error: Package '{args.package}' not found.")
@@ -124,10 +174,12 @@ python run clean
                 sys.exit(1)
             pkg_path = PACKAGES_DIR / args.package
 
-            if not build.build_package(pkg_path):
+            if not build.build_package(
+                pkg_path, install_afterwards=args.install_afterwards
+            ):
                 sys.exit(1)
         else:
-            build.build_all()
+            build.build_all(install_afterwards=args.install_afterwards)
 
     elif args.command == "build-all":
         build.build_all()
@@ -159,7 +211,7 @@ python run clean
                     if not publish.publish_package(PACKAGES_DIR / pkg_name):
                         sys.exit(1)
                 else:
-                    print(f"Error: Current directory is not a valid package.")
+                    print("Error: Current directory is not a valid package.")
                     sys.exit(1)
             else:
                 print(
@@ -172,6 +224,44 @@ python run clean
 
     elif args.command == "clean":
         clean.clean()
+
+    elif args.command == "lint":
+        if args.package:
+            resolved_paths = []
+            for pkg_arg in args.package:
+                resolved_path = resolve_path(pkg_arg)
+                if resolved_path is None:
+                    print(f"Error: '{pkg_arg}' is not a valid package, path, or file.")
+                    print(f"Available packages: {', '.join(PACKAGES)}")
+                    sys.exit(1)
+                resolved_paths.append(resolved_path)
+
+            if not lint.lint_files(resolved_paths):
+                sys.exit(1)
+        else:
+            if not lint.lint_all():
+                sys.exit(1)
+
+    elif args.command == "hooks":
+        if not args.hooks_command:
+            hooks_parser.print_help()
+            sys.exit(1)
+
+        if args.hooks_command == "install":
+            if not hooks.install_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "uninstall":
+            if not hooks.uninstall_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "update":
+            if not hooks.update_hooks():
+                sys.exit(1)
+        elif args.hooks_command == "run":
+            if not hooks.run_hooks():
+                sys.exit(1)
+        else:
+            hooks_parser.print_help()
+            sys.exit(1)
 
     else:
         parser.print_help()

@@ -1,0 +1,66 @@
+# Ruff configuration file
+# See https://docs.astral.sh/ruff/configuration/
+
+line-length = 100
+target-version = "py310"
+
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+]
+
+[lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "UP",  # pyupgrade
+  "ARG", # flake8-unused-arguments
+  "SIM", # flake8-simplify
+  "TCH", # flake8-type-checking
+  "PIE", # flake8-pie
+  "PT",  # flake8-pytest-style
+  "RET", # flake8-return
+  "RUF", # Ruff-specific rules
+]
+
+ignore = [
+  "E501",  # line too long (handled by ruff formatter)
+  "B008",  # do not perform function calls in argument defaults
+  "C901",  # too complex
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports
+"tests/**/*.py" = ["ARG"]  # allow assert in tests, unused arguments
+
+[lint.isort]
+known-first-party = ["scripts"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

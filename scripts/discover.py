@@ -3,7 +3,6 @@
 __all__ = ["get_sorted_packages"]
 
 from pathlib import Path
-from typing import Dict, List, Set
 
 # Try to import tomllib (Python 3.11+), fallback to tomli
 try:
@@ -11,22 +10,16 @@ try:
 
     TOMLDecodeError = tomllib.TOMLDecodeError
 except ImportError:
-    try:
-        import tomli
-        import tomli as tomllib
+    import tomli as tomllib
 
-        TOMLDecodeError = tomli.TOMLDecodeError
-    except ImportError:
-        raise ImportError(
-            "tomli is required for Python < 3.11. Install it with: pip install tomli"
-        )
+    TOMLDecodeError = tomllib.TOMLDecodeError
 
 
 ROOT_DIR = Path(__file__).parent.parent
 PACKAGES_DIR = ROOT_DIR / "packages"
 
 
-def discover_packages() -> List[str]:
+def discover_packages() -> list[str]:
     packages = []
 
     if not PACKAGES_DIR.exists():
@@ -39,7 +32,7 @@ def discover_packages() -> List[str]:
     return sorted(packages)
 
 
-def get_package_dependencies(package_name: str) -> List[str]:
+def get_package_dependencies(package_name: str) -> list[str]:
     pyproject_path = PACKAGES_DIR / package_name / "pyproject.toml"
 
     if not pyproject_path.exists():
@@ -72,7 +65,7 @@ def get_package_dependencies(package_name: str) -> List[str]:
         return []
 
 
-def get_dependency_graph() -> Dict[str, List[str]]:
+def get_dependency_graph() -> dict[str, list[str]]:
     packages = discover_packages()
     graph = {}
 
@@ -82,9 +75,9 @@ def get_dependency_graph() -> Dict[str, List[str]]:
     return graph
 
 
-def topological_sort(packages: List[str], graph: Dict[str, List[str]]) -> List[str]:
-    in_degree = {pkg: 0 for pkg in packages}
-    reverse_graph: Dict[str, List[str]] = {pkg: [] for pkg in packages}
+def topological_sort(packages: list[str], graph: dict[str, list[str]]) -> list[str]:
+    in_degree = dict.fromkeys(packages, 0)
+    reverse_graph: dict[str, list[str]] = {pkg: [] for pkg in packages}
 
     for pkg, deps in graph.items():
         for dep in deps:
@@ -111,7 +104,7 @@ def topological_sort(packages: List[str], graph: Dict[str, List[str]]) -> List[s
     return result
 
 
-def get_sorted_packages() -> List[str]:
+def get_sorted_packages() -> list[str]:
     """Get all packages sorted topologically (dependencies first)."""
     packages = discover_packages()
     graph = get_dependency_graph()

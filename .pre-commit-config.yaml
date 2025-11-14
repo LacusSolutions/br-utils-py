@@ -1,0 +1,68 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+  - pre-push
+
+default_stages:
+  - pre-commit
+
+repos:
+  # pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: name-tests-test
+      - id: trailing-whitespace
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-illegal-windows-names
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+
+  # sync LICENSE to all packages
+  - repo: local
+    hooks:
+      - id: sync-license
+        name: sync-license
+        entry: python -m scripts.sync_license
+        language: unsupported
+        files: LICENSE
+        pass_filenames: false
+
+  # lint and format source code before committing
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: python run lint
+        language: unsupported
+
+  # conventional-pre-commit
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.3.0
+    hooks:
+      - stages: [commit-msg]
+        id: conventional-pre-commit
+        args:
+          - --verbose
+          - --scopes
+          - br-utils,cnpj-fmt,cnpj-gen,cnpj-val,cnpj-utils,cpf-fmt,cpf-gen,cpf-val,cpf-utils,internal
+
+  # Run all tests before pushing to remote
+  - repo: local
+    hooks:
+      - stages: [pre-push]
+        id: test-all
+        name: Run All Tests
+        entry: python run test-all
+        language: unsupported
+        pass_filenames: false
+        always_run: true

@@ -1,10 +1,11 @@
 """Publish commands for packages."""
 
-__all__ = ["publish_package", "publish_all"]
+__all__ = ["publish_all", "publish_package"]
 
 import sys
-from .common import PACKAGES, PACKAGES_DIR, run_command
+
 from .build import build_package
+from .common import PACKAGES, PACKAGES_DIR, run_command
 
 
 def publish_package(pkg_path):
