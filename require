@@ -1,0 +1,46 @@
+"""Install package dependencies."""
+
+import subprocess
+import sys
+from pathlib import Path
+
+CURRENT_WORKING_DIR = Path.cwd().resolve()
+REQUIREMENTS_BASE_FILE = CURRENT_WORKING_DIR / "requirements.txt"
+REQUIREMENTS_DEV_FILE = CURRENT_WORKING_DIR / "requirements-dev.txt"
+
+
+def install_dependencies(file: Path):
+    """Install dependencies from requirements*.txt files."""
+    if not file.exists():
+        print(f"⚠️  \"{file.name}\" not found. Skipping...")
+        return
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            str(file),
+        ],
+        capture_output=True,
+        text=True,
+    )
+
+    if result.returncode == 0:
+        print(f"✅ \"{file.name}\" dependencies installed successfully.")
+    else:
+        print(f"❌ \"{file.name}\" failed to install dependencies.")
+        print(result.stderr) if result.stderr else None
+        sys.exit(result.returncode)
+
+
+def install_all():
+    """Install all dependencies."""
+    print("Installing dependencies...")
+    install_dependencies(REQUIREMENTS_DEV_FILE)
+    install_dependencies(REQUIREMENTS_BASE_FILE)
+
+if __name__ == "__main__":
+    install_all()
