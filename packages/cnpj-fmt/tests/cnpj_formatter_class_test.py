@@ -11,7 +11,6 @@ class TestCnpjFormatterClass(CnpjFormatterTestCases):
     def format(
         self,
         cnpj_string: str,
-        escape: bool | None = None,
         hidden: bool | None = None,
         hidden_key: str | None = None,
         hidden_start: int | None = None,
@@ -19,30 +18,32 @@ class TestCnpjFormatterClass(CnpjFormatterTestCases):
         dot_key: str | None = None,
         slash_key: str | None = None,
         dash_key: str | None = None,
+        escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> str:
         return self.formatter.format(
             cnpj_string,
-            escape=escape,
-            hidden=hidden,
-            hidden_key=hidden_key,
-            hidden_start=hidden_start,
-            hidden_end=hidden_end,
-            dot_key=dot_key,
-            slash_key=slash_key,
-            dash_key=dash_key,
-            on_fail=on_fail,
+            hidden,
+            hidden_key,
+            hidden_start,
+            hidden_end,
+            dot_key,
+            slash_key,
+            dash_key,
+            escape,
+            on_fail,
         )
 
     def test_object_oriented_get_options(self):
-        options = self.formatter.get_options()
+        options = self.formatter.options
 
         assert isinstance(options, CnpjFormatterOptions)
-        assert options.is_escaped() is False
-        assert options.is_hidden() is False
-        assert options.get_hidden_key() == "*"
-        assert options.get_hidden_start() == 5
-        assert options.get_hidden_end() == 13
-        assert options.get_dot_key() == "."
-        assert options.get_slash_key() == "/"
-        assert options.get_dash_key() == "-"
+        assert options.hidden is False
+        assert options.hidden_key == "*"
+        assert options.hidden_start == 5
+        assert options.hidden_end == 13
+        assert options.dot_key == "."
+        assert options.slash_key == "/"
+        assert options.dash_key == "-"
+        assert options.escape is False
+        assert callable(options.on_fail)
