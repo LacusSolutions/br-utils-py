@@ -1,5 +1,5 @@
 import pytest
-from cnpj_fmt import CnpjFormatterOptions
+from cnpj_fmt import CnpjFormatterOptions, CnpjRangeError
 
 
 class TestCnpjFormatterOptions:
@@ -149,7 +149,7 @@ class TestCnpjFormatterOptions:
         options = CnpjFormatterOptions()
 
         with pytest.raises(
-            ValueError,
+            CnpjRangeError,
             match='Option "hidden_start" must be an integer between 0 and 13.',
         ):
             options.set_hidden_range(-1, 5)
@@ -158,7 +158,7 @@ class TestCnpjFormatterOptions:
         options = CnpjFormatterOptions()
 
         with pytest.raises(
-            ValueError,
+            CnpjRangeError,
             match='Option "hidden_end" must be an integer between 0 and 13.',
         ):
             options.set_hidden_range(5, 14)
@@ -167,7 +167,7 @@ class TestCnpjFormatterOptions:
         options = CnpjFormatterOptions()
 
         with pytest.raises(
-            ValueError,
+            CnpjRangeError,
             match='Option "hidden_start" must be an integer between 0 and 13.',
         ):
             options.set_hidden_range(14, 5)
