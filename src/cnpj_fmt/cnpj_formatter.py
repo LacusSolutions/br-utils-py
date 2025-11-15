@@ -2,6 +2,7 @@ import html
 from collections.abc import Callable
 
 from .cnpj_formatter_options import CNPJ_LENGTH, CnpjFormatterOptions
+from .exceptions import CnpjInvalidLengthError
 
 
 class CnpjFormatter:
@@ -62,8 +63,8 @@ class CnpjFormatter:
             on_fail_callback = actual_options.on_fail
 
             try:
-                error = ValueError(
-                    f'Parameter "{cnpj_string}" does not contain {CNPJ_LENGTH} digits.'
+                error = CnpjInvalidLengthError(
+                    cnpj_string, CNPJ_LENGTH, len(cnpj_numbers_string)
                 )
                 return on_fail_callback(cnpj_string, error)
             except TypeError:

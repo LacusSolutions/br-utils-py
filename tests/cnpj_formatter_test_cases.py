@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 
 import pytest
+from cnpj_fmt import CnpjRangeError
 
 
 class CnpjFormatterTestCases(ABC):
@@ -174,19 +175,19 @@ class CnpjFormatterTestCases(ABC):
         assert cnpj == "ABC"
 
     def test_option_with_range_start_minus_one_throws_exception(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(CnpjRangeError):
             self.format("03603568000195", hidden=True, hidden_start=-1)
 
     def test_option_with_range_start_greater_than_13_throws_exception(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(CnpjRangeError):
             self.format("03603568000195", hidden=True, hidden_start=14)
 
     def test_option_with_range_end_minus_one_throws_exception(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(CnpjRangeError):
             self.format("03603568000195", hidden=True, hidden_end=-1)
 
     def test_option_with_range_end_greater_than_13_throws_exception(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(CnpjRangeError):
             self.format("03603568000195", hidden=True, hidden_end=14)
 
     def test_cnpj_formats_to_hidden_format_with_custom_key_and_start_range(self):
