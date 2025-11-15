@@ -1,34 +1,52 @@
 from collections.abc import Callable
+from dataclasses import dataclass, replace
 
 CNPJ_LENGTH = 14
 
 
+def _default_on_fail(value: str, _error: Exception | None = None) -> str:
+    """Default callback for invalid CNPJ input."""
+    return value
+
+
+@dataclass(slots=True, frozen=False)
 class CnpjFormatterOptions:
-    def __init__(
-        self,
-        hidden: bool | None = None,
-        hidden_key: str | None = None,
-        hidden_start: int | None = None,
-        hidden_end: int | None = None,
-        dot_key: str | None = None,
-        slash_key: str | None = None,
-        dash_key: str | None = None,
-        escape: bool | None = None,
-        on_fail: Callable | None = None,
-    ) -> None:
-        self.__set_hidden(hidden if hidden is not None else False)
-        self.__set_hidden_key(hidden_key if hidden_key is not None else "*")
-        self.set_hidden_range(
-            hidden_start if hidden_start is not None else 5,
-            hidden_end if hidden_end is not None else 13,
-        )
-        self.__set_dot_key(dot_key if dot_key is not None else ".")
-        self.__set_slash_key(slash_key if slash_key is not None else "/")
-        self.__set_dash_key(dash_key if dash_key is not None else "-")
-        self.__set_escape(escape if escape is not None else False)
-        self.__set_on_fail(
-            on_fail if on_fail is not None else (lambda value, error=None: value)
-        )
+    hidden: bool | None = None
+    hidden_key: str | None = None
+    hidden_start: int | None = None
+    hidden_end: int | None = None
+    dot_key: str | None = None
+    slash_key: str | None = None
+    dash_key: str | None = None
+    escape: bool | None = None
+    on_fail: Callable | None = None
+
+    def __post_init__(self) -> None:
+        if self.hidden is None:
+            object.__setattr__(self, "hidden", False)
+        if self.hidden_key is None:
+            object.__setattr__(self, "hidden_key", "*")
+        if self.hidden_start is None:
+            object.__setattr__(self, "hidden_start", 5)
+        if self.hidden_end is None:
+            object.__setattr__(self, "hidden_end", 13)
+        if self.dot_key is None:
+            object.__setattr__(self, "dot_key", ".")
+        if self.slash_key is None:
+            object.__setattr__(self, "slash_key", "/")
+        if self.dash_key is None:
+            object.__setattr__(self, "dash_key", "-")
+        if self.escape is None:
+            object.__setattr__(self, "escape", False)
+        if self.on_fail is None:
+            object.__setattr__(self, "on_fail", _default_on_fail)
+
+        self.set_hidden_range(self.hidden_start, self.hidden_end)
+
+        if not callable(self.on_fail):
+            raise TypeError(
+                f'"on_fail" argument must be a callable, {type(self.on_fail).__name__} given'
+            )
 
     def merge(
         self,
@@ -42,17 +60,34 @@ class CnpjFormatterOptions:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> "CnpjFormatterOptions":
-        return CnpjFormatterOptions(
-            hidden if hidden is not None else self.hidden,
-            hidden_key if hidden_key is not None else self.hidden_key,
-            hidden_start if hidden_start is not None else self.hidden_start,
-            hidden_end if hidden_end is not None else self.hidden_end,
-            dot_key if dot_key is not None else self.dot_key,
-            slash_key if slash_key is not None else self.slash_key,
-            dash_key if dash_key is not None else self.dash_key,
-            escape if escape is not None else self.escape,
-            on_fail if on_fail is not None else self.on_fail,
-        )
+        kwargs = {}
+
+        if hidden is not None:
+            kwargs["hidden"] = hidden
+        if hidden_key is not None:
+            kwargs["hidden_key"] = hidden_key
+        if hidden_start is not None:
+            kwargs["hidden_start"] = hidden_start
+        if hidden_end is not None:
+            kwargs["hidden_end"] = hidden_end
+        if dot_key is not None:
+            kwargs["dot_key"] = dot_key
+        if slash_key is not None:
+            kwargs["slash_key"] = slash_key
+        if dash_key is not None:
+            kwargs["dash_key"] = dash_key
+        if escape is not None:
+            kwargs["escape"] = escape
+        if on_fail is not None:
+            kwargs["on_fail"] = on_fail
+
+        new_start = kwargs.get("hidden_start", self.hidden_start)
+        new_end = kwargs.get("hidden_end", self.hidden_end)
+
+        temp = replace(self, **kwargs)
+        temp.set_hidden_range(new_start, new_end)
+
+        return temp
 
     def set_hidden_range(self, start: int, end: int) -> None:
         min_val = 0
@@ -60,87 +95,30 @@ class CnpjFormatterOptions:
 
         if start < min_val or start > max_val:
             raise ValueError(
-                f'Option "hiddenStart" must be an integer between {min_val} and {max_val}.'
+                f'Option "hidden_start" must be an integer between {min_val} and {max_val}.'
             )
 
         if end < min_val or end > max_val:
             raise ValueError(
-                f'Option "hiddenRange.end" must be an integer between {min_val} and {max_val}.'
+                f'Option "hidden_end" must be an integer between {min_val} and {max_val}.'
             )
 
         if start > end:
-            aux = start
-            start = end
-            end = aux
+            start, end = end, start
 
-        self.__hidden_start = start
-        self.__hidden_end = end
+        object.__setattr__(self, "hidden_start", start)
+        object.__setattr__(self, "hidden_end", end)
 
-    def __set_escape(self, value: bool) -> None:
-        self.__escape = value
+    def __setattr__(self, name: str, value: object):
+        if name == "on_fail":
+            if value is None:
+                if hasattr(self, "on_fail") and self.on_fail is not None:
+                    raise TypeError(
+                        '"on_fail" argument must be a callable, NoneType given'
+                    )
+            elif not callable(value):
+                raise TypeError(
+                    f'"on_fail" argument must be a callable, {type(value).__name__} given'
+                )
 
-    def __is_escape(self) -> bool:
-        return self.__escape
-
-    def __set_hidden(self, value: bool) -> None:
-        self.__hidden = value
-
-    def __is_hidden(self) -> bool:
-        return self.__hidden
-
-    def __set_hidden_key(self, value: str) -> None:
-        self.__hidden_key = value
-
-    def __get_hidden_key(self) -> str:
-        return self.__hidden_key
-
-    def __set_hidden_start(self, value: int) -> None:
-        self.set_hidden_range(value, self.__hidden_end)
-
-    def __get_hidden_start(self) -> int:
-        return self.__hidden_start
-
-    def __set_hidden_end(self, value: int) -> None:
-        self.set_hidden_range(self.__hidden_start, value)
-
-    def __get_hidden_end(self) -> int:
-        return self.__hidden_end
-
-    def __set_dot_key(self, value: str) -> None:
-        self.__dot_key = value
-
-    def __get_dot_key(self) -> str:
-        return self.__dot_key
-
-    def __set_slash_key(self, value: str) -> None:
-        self.__slash_key = value
-
-    def __get_slash_key(self) -> str:
-        return self.__slash_key
-
-    def __set_dash_key(self, value: str) -> None:
-        self.__dash_key = value
-
-    def __get_dash_key(self) -> str:
-        return self.__dash_key
-
-    def __set_on_fail(self, callback: Callable) -> None:
-        if not callable(callback):
-            raise TypeError(
-                f"must be of type Callable, {type(callback).__name__} given"
-            )
-
-        self.__on_fail = callback
-
-    def __get_on_fail(self) -> Callable:
-        return self.__on_fail
-
-    hidden = property(__is_hidden, __set_hidden)
-    hidden_key = property(__get_hidden_key, __set_hidden_key)
-    hidden_start = property(__get_hidden_start, __set_hidden_start)
-    hidden_end = property(__get_hidden_end, __set_hidden_end)
-    dot_key = property(__get_dot_key, __set_dot_key)
-    slash_key = property(__get_slash_key, __set_slash_key)
-    dash_key = property(__get_dash_key, __set_dash_key)
-    escape = property(__is_escape, __set_escape)
-    on_fail = property(__get_on_fail, __set_on_fail)
+        object.__setattr__(self, name, value)
