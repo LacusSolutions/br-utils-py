@@ -1,11 +1,12 @@
 import html
-import re
 from collections.abc import Callable
 
 from .cnpj_formatter_options import CNPJ_LENGTH, CnpjFormatterOptions
 
 
 class CnpjFormatter:
+    __slots__ = ("_options",)
+
     def __init__(
         self,
         hidden: bool | None = None,
@@ -18,7 +19,7 @@ class CnpjFormatter:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> None:
-        self.__options = CnpjFormatterOptions(
+        self._options = CnpjFormatterOptions(
             hidden,
             hidden_key,
             hidden_start,
@@ -43,7 +44,7 @@ class CnpjFormatter:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> str:
-        actual_options = self.__get_options().merge(
+        actual_options = self._options.merge(
             hidden,
             hidden_key,
             hidden_start,
@@ -55,17 +56,15 @@ class CnpjFormatter:
             on_fail,
         )
 
-        cnpj_numbers_string = re.sub(r"[^0-9]", "", cnpj_string)
-        cnpj_numbers_array = list(cnpj_numbers_string)
+        cnpj_numbers_string = "".join(filter(str.isdigit, cnpj_string))
 
-        if len(cnpj_numbers_array) != CNPJ_LENGTH:
-            error = ValueError(
-                f'Parameter "{cnpj_string}" does not contain {CNPJ_LENGTH} digits.'
-            )
-
+        if len(cnpj_numbers_string) != CNPJ_LENGTH:
             on_fail_callback = actual_options.on_fail
 
             try:
+                error = ValueError(
+                    f'Parameter "{cnpj_string}" does not contain {CNPJ_LENGTH} digits.'
+                )
                 return on_fail_callback(cnpj_string, error)
             except TypeError:
                 return on_fail_callback(cnpj_string)
@@ -75,26 +74,29 @@ class CnpjFormatter:
             hidden_end = actual_options.hidden_end
             hidden_key = actual_options.hidden_key
 
-            for i in range(hidden_start, hidden_end + 1):
-                cnpj_numbers_array[i] = hidden_key
+            prefix = cnpj_numbers_string[:hidden_start]
+            hidden_part_length = hidden_end - hidden_start + 1
+            masked = hidden_key * hidden_part_length
+            suffix = cnpj_numbers_string[hidden_end + 1 :]
+            cnpj_numbers_string = prefix + masked + suffix
 
-        dot_key = actual_options.dot_key
-        dash_key = actual_options.dash_key
-        slash_key = actual_options.slash_key
-
-        cnpj_numbers_array.insert(12, dash_key)
-        cnpj_numbers_array.insert(8, slash_key)
-        cnpj_numbers_array.insert(5, dot_key)
-        cnpj_numbers_array.insert(2, dot_key)
-
-        pretty_cnpj = "".join(cnpj_numbers_array)
+        pretty_cnpj = (
+            cnpj_numbers_string[0:2]
+            + actual_options.dot_key
+            + cnpj_numbers_string[2:5]
+            + actual_options.dot_key
+            + cnpj_numbers_string[5:8]
+            + actual_options.slash_key
+            + cnpj_numbers_string[8:12]
+            + actual_options.dash_key
+            + cnpj_numbers_string[12:14]
+        )
 
         if actual_options.escape:
             return html.escape(pretty_cnpj, quote=True)
 
         return pretty_cnpj
 
-    def __get_options(self) -> CnpjFormatterOptions:
-        return self.__options
-
-    options = property(__get_options)
+    @property
+    def options(self) -> CnpjFormatterOptions:
+        return self._options
