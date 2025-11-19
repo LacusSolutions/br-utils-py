@@ -1,7 +1,8 @@
 from collections.abc import Callable
 
 from cnpj_fmt import cnpj_fmt
-from cnpj_formatter_test_cases import CnpjFormatterTestCases
+
+from .cnpj_formatter_test_cases import CnpjFormatterTestCases
 
 
 class CnpjFormatterFunctionTest(CnpjFormatterTestCases):
