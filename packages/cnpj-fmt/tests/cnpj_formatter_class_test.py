@@ -4,7 +4,7 @@ from cnpj_fmt import CnpjFormatter, CnpjFormatterOptions
 from cnpj_formatter_test_cases import CnpjFormatterTestCases
 
 
-class TestCnpjFormatterClass(CnpjFormatterTestCases):
+class CnpjFormatterClassTest(CnpjFormatterTestCases):
     def setup_method(self):
         self.formatter = CnpjFormatter()
 
