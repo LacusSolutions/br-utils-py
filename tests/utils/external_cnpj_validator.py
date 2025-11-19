@@ -3,8 +3,13 @@ import os
 import urllib.parse
 import urllib.request
 
+from .env_variables import load_test_env
+
 
 class ExternalCnpjValidator:
+    def __init__(self):
+        load_test_env()
+
     def is_valid(self, cnpj_string: str) -> bool:
         api_url = os.getenv("API_URL")
 
