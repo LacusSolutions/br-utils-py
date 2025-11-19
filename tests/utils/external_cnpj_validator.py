@@ -21,7 +21,7 @@ class ExternalCnpjValidator:
         if not api_token:
             raise Exception("API secret not defined.")
 
-        cnpj_escaped = urllib.parse.quote(cnpj_string)
+        cnpj_escaped = urllib.parse.quote(cnpj_string, safe="")
         request_url = f"{api_url}/cnpj/val/{cnpj_escaped}"
         req = urllib.request.Request(request_url)
         req.add_header("Authorization", f"Bearer {api_token}")
