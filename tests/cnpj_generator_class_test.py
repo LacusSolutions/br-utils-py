@@ -17,8 +17,8 @@ class CnpjGeneratorClassTest(CnpjGeneratorTestCases):
         if not hasattr(self, "generator"):
             self.setup_method()
 
-        options = self.generator.get_options()
+        options = self.generator.options
 
         assert isinstance(options, CnpjGeneratorOptions)
-        assert options.is_formatting() is False
-        assert options.get_prefix() == ""
+        assert options.format is False
+        assert options.prefix == ""
