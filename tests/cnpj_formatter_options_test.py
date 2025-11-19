@@ -2,7 +2,7 @@ import pytest
 from cnpj_fmt import CnpjFormatterOptions, CnpjRangeError
 
 
-class TestCnpjFormatterOptions:
+class CnpjFormatterOptionsTest:
     def test_constructor_with_all_no_params(self):
         options = CnpjFormatterOptions()
         assert options.hidden is False
