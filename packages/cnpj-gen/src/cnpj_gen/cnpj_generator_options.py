@@ -31,9 +31,6 @@ class CnpjGeneratorOptions:
 
         new_options = replace(self, **kwargs)
 
-        # if "prefix" in kwargs:
-        #     new_options._set_prefix(new_options.prefix)
-
         return new_options
 
     def __setattr__(self, name: str, value: object) -> None:
