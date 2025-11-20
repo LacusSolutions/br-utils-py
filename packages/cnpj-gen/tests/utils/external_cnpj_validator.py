@@ -28,13 +28,12 @@ class ExternalCnpjValidator:
 
         try:
             with urllib.request.urlopen(req, timeout=30) as response:
-                if response.status >= 400:
-                    raise Exception(
-                        f'HTTP error ({response.status}) with CNPJ "{cnpj_string}"'
-                    )
-
                 data = json.loads(response.read().decode())
 
                 return data.get("result", False)
         except urllib.error.HTTPError as e:
             raise Exception(f'HTTP error ({e.code}) with CNPJ "{cnpj_string}"') from e
+        except urllib.error.URLError as e:
+            raise Exception(f'Network error with CNPJ "{cnpj_string}"') from e
+        except json.JSONDecodeError as e:
+            raise Exception(f'Invalid JSON response for CNPJ "{cnpj_string}"') from e
