@@ -1,6 +1,5 @@
 import os
 import shutil
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -11,12 +10,12 @@ def load_test_env() -> None:
     env_file = package_root / ".env.test"
     env_example_file = package_root / ".env.example"
 
-    if not env_file.exists() and env_example_file.exists():
-        shutil.copy(env_example_file, env_file)
-
     if not env_file.exists():
-        print(f"Environment file not found: {env_file}")
-        sys.exit(1)
+        if env_example_file.exists():
+            shutil.copy(env_example_file, env_file)
+        else:
+            print(f'⚠️ Environment file "{env_file}" not found. Skipping...')
+            return
 
     load_dotenv(env_file, override=False)
 
