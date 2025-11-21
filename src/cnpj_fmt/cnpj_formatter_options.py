@@ -86,10 +86,10 @@ class CnpjFormatterOptions:
         new_start = kwargs.get("hidden_start", self.hidden_start)
         new_end = kwargs.get("hidden_end", self.hidden_end)
 
-        temp = replace(self, **kwargs)
-        temp.set_hidden_range(new_start, new_end)
+        new_options = replace(self, **kwargs)
+        new_options.set_hidden_range(new_start, new_end)
 
-        return temp
+        return new_options
 
     def set_hidden_range(self, start: int, end: int) -> None:
         min_val = 0
