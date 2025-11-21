@@ -37,7 +37,7 @@ class CnpjGeneratorOptions:
         if name == "prefix" and value is not None:
             min_digits = 0
             max_digits = CNPJ_LENGTH - 2
-            value = re.sub(r"[^0-9]", "", value)
+            value = re.sub(r"[^0-9]", "", str(value))
             prefix_length = len(value)
 
             if prefix_length > CNPJ_LENGTH - 2:
