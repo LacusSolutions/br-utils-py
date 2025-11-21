@@ -1,6 +1,6 @@
 [project]
 name = "cnpj-gen"
-version = "0.0.1"
+version = "1.0.0"
 # dynamic = [ "version" ]
 description = "Utility function to generate valid CNPJ (Brazilian employer ID)"
 license = "MIT"
@@ -32,7 +32,7 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries",
-  "Topic :: Utilities"
+  "Topic :: Utilities",
 ]
 requires-python = ">=3.10"
 
@@ -63,7 +63,7 @@ minversion = "8.0"
 testpaths = [ "tests/" ]
 python_files = [ "*_test.py" ]
 python_functions = [ "test_*" ]
-python_classes = [ "Test*" ]
+python_classes = [ "*Test" ]
 
 [tool.coverage.run]
 source = [ "src/" ]

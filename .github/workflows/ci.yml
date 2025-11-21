@@ -32,3 +32,6 @@ jobs:
       - run: python require
 
       - run: python run test-all
+        env:
+          API_URL: ${{ vars.BR_UTILS_API_URL }}
+          API_TOKEN: ${{ secrets.BR_UTILS_API_TOKEN }}
