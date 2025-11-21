@@ -108,7 +108,21 @@ class CnpjFormatterOptions:
         object.__setattr__(self, "hidden_end", end)
 
     def __setattr__(self, name: str, value: object):
-        if name == "on_fail":
+        if name == "hidden_start":
+            if value is not None:
+                object.__setattr__(self, name, value)
+
+                if hasattr(self, "hidden_end") and self.hidden_end is not None:
+                    self.set_hidden_range(self.hidden_start, self.hidden_end)
+                    return
+        elif name == "hidden_end":
+            if value is not None:
+                object.__setattr__(self, name, value)
+
+                if hasattr(self, "hidden_start") and self.hidden_start is not None:
+                    self.set_hidden_range(self.hidden_start, self.hidden_end)
+                    return
+        elif name == "on_fail":
             if value is None:
                 if hasattr(self, "on_fail") and self.on_fail is not None:
                     raise TypeError(
