@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Package management scripts for cnpj-fmt.
+Package management scripts for cnpj-cd.
 
 This script delegates to the monorepo's run script, ensuring all commands
 are executed in the context of this package.
@@ -16,7 +16,7 @@ Usage:
 import sys
 from pathlib import Path
 
-PACKAGE_NAME = "cnpj-fmt"
+PACKAGE_NAME = "cnpj-cd"
 PACKAGE_DIR = Path(__file__).parent.resolve()
 ROOT_RUN_SCRIPT = PACKAGE_DIR.parent.parent / "run"
 
@@ -30,7 +30,7 @@ def main():
     args = sys.argv[1:]
 
     if not args:
-        print("Package management scripts for cnpj-fmt")
+        print("Package management scripts for cnpj-cd")
         print("\nUsage:")
         print("    python run test              # Run tests")
         print("    python run lint              # Run linting and formatting")
