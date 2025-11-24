@@ -100,6 +100,7 @@ class CnpjGeneratorOptionsTest:
 
         with pytest.raises(InvalidArgumentException) as exc_info:
             options.prefix = "12345678000910"
+
         assert (
             'Option "prefix" must be a string containing between 0 and 12 digits.'
             in str(exc_info.value)
@@ -110,6 +111,7 @@ class CnpjGeneratorOptionsTest:
 
         with pytest.raises(InvalidArgumentException) as exc_info:
             options.prefix = "123456780000"
+
         assert 'The branch ID (characters 8 to 11) cannot be "0000".' in str(
             exc_info.value
         )
