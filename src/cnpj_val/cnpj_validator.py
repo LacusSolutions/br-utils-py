@@ -1,50 +1,24 @@
-from cnpj_gen import CnpjGeneratorVerifierDigit as CnpjVerifierDigit
+from cnpj_cd import CnpjCheckDigits
 
 CNPJ_LENGTH = 14
 
 
 class CnpjValidator:
-    __slots__ = ("_verifier_digit",)
-
-    def __init__(self) -> None:
-        self._verifier_digit = CnpjVerifierDigit()
-
     def is_valid(self, cnpj_string: str) -> bool:
-        cnpj_numbers_string = "".join(filter(str.isdigit, cnpj_string))
+        cnpj_str_digits = "".join(filter(str.isdigit, cnpj_string))
 
-        if len(cnpj_numbers_string) != CNPJ_LENGTH:
+        if len(cnpj_str_digits) != CNPJ_LENGTH:
             return False
 
-        cnpj_numbers_array = [int(digit) for digit in cnpj_numbers_string]
+        cnpj_num_digits = [int(digit) for digit in cnpj_str_digits]
+        cnpj_first_check_digit = cnpj_num_digits[-2]
+        cnpj_second_check_digit = cnpj_num_digits[-1]
+        cnpj_check_digits = CnpjCheckDigits(cnpj_num_digits)
 
-        if not self._validate_first_verifier_digit(cnpj_numbers_array):
+        if cnpj_first_check_digit != cnpj_check_digits.first_digit:
             return False
 
-        if not self._validate_second_verifier_digit(cnpj_numbers_array):
+        if cnpj_second_check_digit != cnpj_check_digits.second_digit:
             return False
 
         return True
-
-    def _validate_first_verifier_digit(self, cnpj_numbers_array: list[int]) -> bool:
-        first_verifier_digit_index = CNPJ_LENGTH - 2
-        provided_first_verifier_digit = cnpj_numbers_array[first_verifier_digit_index]
-        base_first_verifier_digit_calculation = cnpj_numbers_array[
-            :first_verifier_digit_index
-        ]
-        calculated_first_verifier_digit = self._verifier_digit.calculate(
-            base_first_verifier_digit_calculation
-        )
-
-        return provided_first_verifier_digit == calculated_first_verifier_digit
-
-    def _validate_second_verifier_digit(self, cnpj_numbers_array: list[int]) -> bool:
-        second_verifier_digit_index = CNPJ_LENGTH - 1
-        provided_second_verifier_digit = cnpj_numbers_array[second_verifier_digit_index]
-        base_second_verifier_digit_calculation = cnpj_numbers_array[
-            :second_verifier_digit_index
-        ]
-        calculated_second_verifier_digit = self._verifier_digit.calculate(
-            base_second_verifier_digit_calculation
-        )
-
-        return provided_second_verifier_digit == calculated_second_verifier_digit
