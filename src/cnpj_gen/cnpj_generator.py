@@ -6,12 +6,15 @@ from .cnpj_generator_options import CnpjGeneratorOptions
 
 
 class CnpjGenerator:
+    """Class to generate a valid CNPJ according to the given options."""
+
     __slots__ = "_options"
 
     def __init__(self, format: bool | None = None, prefix: str | None = None):
         self._options = CnpjGeneratorOptions(format, prefix)
 
     def generate(self, format: bool | None = None, prefix: str | None = None) -> str:
+        """Executes the CNPJ generation, overriding any given options with the ones set on the generator instance."""
         actual_options = self._options.merge(format, prefix)
 
         prefix_numbers = [int(digit) for digit in actual_options.prefix]
@@ -63,4 +66,5 @@ class CnpjGenerator:
 
     @property
     def options(self) -> CnpjGeneratorOptions:
+        """Direct access to the options manager for the CNPJ generator."""
         return self._options

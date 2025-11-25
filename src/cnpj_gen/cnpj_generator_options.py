@@ -11,6 +11,8 @@ CNPJ_LENGTH = 14
 
 @dataclass(slots=True, frozen=False)
 class CnpjGeneratorOptions:
+    """Class to manage and store the options for the CNPJ generator."""
+
     format: bool | None = None
     prefix: str | None = None
 
@@ -25,6 +27,7 @@ class CnpjGeneratorOptions:
         format: bool | None = None,
         prefix: str | None = None,
     ) -> "CnpjGeneratorOptions":
+        """Creates a new instance of CnpjGeneratorOptions with the given options merged with the current options."""
         kwargs = {}
 
         if format is not None:
