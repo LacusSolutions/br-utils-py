@@ -1,5 +1,9 @@
 import pytest
-from cnpj_gen import CnpjGeneratorOptions, InvalidArgumentException
+from cnpj_gen import (
+    CnpjGeneratorInvalidPrefixBranchIdError,
+    CnpjGeneratorInvalidPrefixLengthError,
+    CnpjGeneratorOptions,
+)
 
 
 class CnpjGeneratorOptionsTest:
@@ -98,20 +102,17 @@ class CnpjGeneratorOptionsTest:
     def test_prefix_setter_throws_error_with_too_many_digits(self):
         options = CnpjGeneratorOptions()
 
-        with pytest.raises(InvalidArgumentException) as exc_info:
+        with pytest.raises(CnpjGeneratorInvalidPrefixLengthError) as exc_info:
             options.prefix = "12345678000910"
 
-        assert (
-            'Option "prefix" must be a string containing between 0 and 12 digits.'
-            in str(exc_info.value)
+        assert "The prefix length must be equals to or less than 12. Got 14." in str(
+            exc_info.value
         )
 
     def test_prefix_setter_throws_error_with_invalid_branch_id(self):
         options = CnpjGeneratorOptions()
 
-        with pytest.raises(InvalidArgumentException) as exc_info:
+        with pytest.raises(CnpjGeneratorInvalidPrefixBranchIdError) as exc_info:
             options.prefix = "123456780000"
 
-        assert 'The branch ID (characters 8 to 11) cannot be "0000".' in str(
-            exc_info.value
-        )
+        assert 'The prefix branch ID "0000" is not valid.' in str(exc_info.value)

@@ -1,4 +1,5 @@
 import pytest
+from cnpj_gen import CnpjGeneratorInvalidPrefixLengthError
 
 from .utils.external_cnpj_validator import ExternalCnpjValidator
 
@@ -76,10 +77,8 @@ class CnpjGeneratorTestCases:
             ), f"Input: {cnpj}, Expected: ##.###.###/####-##"
 
     def test_prefixed_value_cannot_accept_string_with_more_than_12_digits(self):
-        from cnpj_gen import InvalidArgumentException
-
-        with pytest.raises(InvalidArgumentException):
+        with pytest.raises(CnpjGeneratorInvalidPrefixLengthError):
             self.generate(False, "12.345.678/0000-99")
 
-        with pytest.raises(InvalidArgumentException):
+        with pytest.raises(CnpjGeneratorInvalidPrefixLengthError):
             self.generate(False, "12345678000099")
