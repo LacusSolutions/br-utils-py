@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+
+"""
+Package management scripts for cnpj-utils.
+
+This script delegates to the monorepo's run script, ensuring all commands
+are executed in the context of this package.
+
+Usage:
+    python run test              # Run tests
+    python run lint              # Run linting and formatting
+    python run build             # Build package
+    python run build -i          # Build and install package locally
+"""
+
+import sys
+from pathlib import Path
+
+PACKAGE_NAME = "cnpj-utils"
+PACKAGE_DIR = Path(__file__).parent.resolve()
+ROOT_RUN_SCRIPT = PACKAGE_DIR.parent.parent / "run"
+
+
+def main():
+    """Delegate to the monorepo run script with package context."""
+    if not ROOT_RUN_SCRIPT.exists():
+        print(f"Error: Could not find monorepo run script at {ROOT_RUN_SCRIPT}")
+        sys.exit(1)
+
+    args = sys.argv[1:]
+
+    if not args:
+        print("Package management scripts for cnpj-utils")
+        print("\nUsage:")
+        print("    python run test              # Run tests")
+        print("    python run lint              # Run linting and formatting")
+        print("    python run build             # Build package")
+        print("    python run build -i          # Build and install package locally")
+        sys.exit(0)
+
+    command = args[0]
+
+    import subprocess
+
+    if command == "test":
+        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "test", PACKAGE_NAME]
+        cmd_args.extend(args[1:])
+    elif command == "lint":
+        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "lint", PACKAGE_NAME]
+        cmd_args.extend(args[1:])
+    elif command == "build":
+        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "build", PACKAGE_NAME]
+        cmd_args.extend(args[1:])
+    else:
+        print(f"Error: Unknown command '{command}'")
+        print("\nAvailable commands: test, lint, build")
+        sys.exit(1)
+
+    result = subprocess.run(cmd_args, cwd=PACKAGE_DIR.parent.parent)
+    sys.exit(result.returncode)
+
+
+if __name__ == "__main__":
+    main()
