@@ -1,13 +1,3 @@
-"""Custom exceptions for the cnpj-cd package."""
-
-__all__ = [
-    "CnpjCheckDigitsCalculationError",
-    "CnpjCheckDigitsError",
-    "CnpjInvalidLengthError",
-    "CnpjTypeError",
-]
-
-
 class CnpjCheckDigitsError(Exception):
     """Base exception for all cnpj-cd related errors."""
 
