@@ -6,6 +6,8 @@ from .exceptions import CnpjInvalidLengthError
 
 
 class CnpjFormatter:
+    """Class to format a CNPJ string according to the given options."""
+
     __slots__ = ("_options",)
 
     def __init__(
@@ -45,6 +47,7 @@ class CnpjFormatter:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> str:
+        """Executes the CNPJ string formatting, overriding any given options with the ones set on the formatter instance."""
         actual_options = self._options.merge(
             hidden,
             hidden_key,
@@ -100,4 +103,5 @@ class CnpjFormatter:
 
     @property
     def options(self) -> CnpjFormatterOptions:
+        """Direct access to the options manager for the CNPJ formatter."""
         return self._options

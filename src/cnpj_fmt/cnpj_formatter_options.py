@@ -13,6 +13,8 @@ def _default_on_fail(value: str, _error: Exception | None = None) -> str:
 
 @dataclass(slots=True, frozen=False)
 class CnpjFormatterOptions:
+    """Class to manage and store the options for the CNPJ formatter."""
+
     hidden: bool | None = None
     hidden_key: str | None = None
     hidden_start: int | None = None
@@ -62,6 +64,7 @@ class CnpjFormatterOptions:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> "CnpjFormatterOptions":
+        """Creates a new CnpjFormatterOptions instance with the given options merged with the current instance."""
         kwargs = {}
 
         if hidden is not None:
@@ -92,6 +95,7 @@ class CnpjFormatterOptions:
         return new_options
 
     def set_hidden_range(self, start: int, end: int) -> None:
+        """Sets the range of hidden digits for the CNPJ formatter."""
         min_val = 0
         max_val = CNPJ_LENGTH - 1
 
