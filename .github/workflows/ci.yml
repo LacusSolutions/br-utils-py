@@ -34,7 +34,7 @@ jobs:
       # FIXME: remove step
       - name: Temporary In-monorepo Installation
         run: |
-          python  run build -i cnpj-gen
+          python  run build -i cnpj-cd
 
       - run: python run test-all
         env:
