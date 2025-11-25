@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 
-from .exceptions import CnpjRangeError
+from .exceptions import CnpjFormatterHiddenRangeError
 
 CNPJ_LENGTH = 14
 
@@ -100,10 +100,10 @@ class CnpjFormatterOptions:
         max_val = CNPJ_LENGTH - 1
 
         if start < min_val or start > max_val:
-            raise CnpjRangeError("hidden_start", start, min_val, max_val)
+            raise CnpjFormatterHiddenRangeError("hidden_start", start, min_val, max_val)
 
         if end < min_val or end > max_val:
-            raise CnpjRangeError("hidden_end", end, min_val, max_val)
+            raise CnpjFormatterHiddenRangeError("hidden_end", end, min_val, max_val)
 
         if start > end:
             start, end = end, start
