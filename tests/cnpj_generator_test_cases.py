@@ -1,12 +1,15 @@
+from abc import ABC, abstractmethod
+
 import pytest
 from cnpj_gen import CnpjGeneratorInvalidPrefixLengthError
 
 from .utils.external_cnpj_validator import ExternalCnpjValidator
 
 
-class CnpjGeneratorTestCases:
+class CnpjGeneratorTestCases(ABC):
+    @abstractmethod
     def generate(self, format: bool | None = None, prefix: str | None = None) -> str:
-        raise NotImplementedError
+        pass
 
     def is_valid(self, cnpj_string: str) -> bool:
         validator = ExternalCnpjValidator()
