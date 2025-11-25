@@ -1,11 +1,8 @@
-"""Custom exceptions for the cnpj-fmt package."""
-
-
 class CnpjFormatterError(Exception):
     """Base exception for all cnpj-fmt related errors."""
 
 
-class CnpjInvalidLengthError(CnpjFormatterError):
+class CnpjFormatterInvalidLengthError(CnpjFormatterError):
     """Raised when a CNPJ string does not contain the expected number of digits."""
 
     def __init__(
@@ -14,15 +11,14 @@ class CnpjInvalidLengthError(CnpjFormatterError):
         self.cnpj_string = cnpj_string
         self.expected_length = expected_length
         self.actual_length = actual_length
-        message = (
+
+        super().__init__(
             f'Parameter "{cnpj_string}" does not contain {expected_length} digits. '
             f"Found {actual_length} digit(s)."
         )
 
-        super().__init__(message)
 
-
-class CnpjRangeError(CnpjFormatterError):
+class CnpjFormatterHiddenRangeError(CnpjFormatterError):
     """Raised when a range value (hidden_start or hidden_end) is out of bounds."""
 
     def __init__(
@@ -32,9 +28,8 @@ class CnpjRangeError(CnpjFormatterError):
         self.value = value
         self.min_val = min_val
         self.max_val = max_val
-        message = (
+
+        super().__init__(
             f'Option "{option_name}" must be an integer between {min_val} and {max_val}. '
             f"Got {value}."
         )
-
-        super().__init__(message)

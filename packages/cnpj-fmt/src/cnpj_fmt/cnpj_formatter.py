@@ -2,10 +2,12 @@ import html
 from collections.abc import Callable
 
 from .cnpj_formatter_options import CNPJ_LENGTH, CnpjFormatterOptions
-from .exceptions import CnpjInvalidLengthError
+from .exceptions import CnpjFormatterInvalidLengthError
 
 
 class CnpjFormatter:
+    """Class to format a CNPJ string according to the given options."""
+
     __slots__ = ("_options",)
 
     def __init__(
@@ -45,6 +47,7 @@ class CnpjFormatter:
         escape: bool | None = None,
         on_fail: Callable | None = None,
     ) -> str:
+        """Executes the CNPJ string formatting, overriding any given options with the ones set on the formatter instance."""
         actual_options = self._options.merge(
             hidden,
             hidden_key,
@@ -63,7 +66,7 @@ class CnpjFormatter:
             on_fail_callback = actual_options.on_fail
 
             try:
-                error = CnpjInvalidLengthError(
+                error = CnpjFormatterInvalidLengthError(
                     cnpj_string, CNPJ_LENGTH, len(cnpj_numbers_string)
                 )
                 return on_fail_callback(cnpj_string, error)
@@ -100,4 +103,5 @@ class CnpjFormatter:
 
     @property
     def options(self) -> CnpjFormatterOptions:
+        """Direct access to the options manager for the CNPJ formatter."""
         return self._options

@@ -40,9 +40,9 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cnpj-fmt>=0.0.1",
-  "cnpj-gen>=0.0.1",
-  "cnpj-val>=0.0.1",
+  "cnpj-fmt>=1.0.0",
+  "cnpj-gen>=1.0.0",
+  "cnpj-val>=1.0.0",
 ]
 
   [[project.authors]]
@@ -72,7 +72,7 @@ minversion = "8.0"
 testpaths = [ "tests/" ]
 python_files = [ "*_test.py" ]
 python_functions = [ "test_*" ]
-python_classes = [ "Test*" ]
+python_classes = [ "*Test" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
