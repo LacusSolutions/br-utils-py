@@ -15,6 +15,7 @@ def cnpj_fmt(
     escape: bool | None = None,
     on_fail: Callable | None = None,
 ) -> str:
+    """Formats a CNPJ string according to the given options. Default options returns the traditional CNPJ format (`91.415.732/0007-93`)."""
     formatter = CnpjFormatter(
         hidden,
         hidden_key,
