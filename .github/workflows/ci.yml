@@ -35,6 +35,9 @@ jobs:
       - name: Temporary In-monorepo Installation
         run: |
           python  run build -i cnpj-cd
+          python  run build -i cnpj-fmt
+          python  run build -i cnpj-gen
+          python  run build -i cnpj-val
 
       - run: python run test-all
         env:
