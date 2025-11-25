@@ -1,7 +1,10 @@
 import re
 from dataclasses import dataclass, replace
 
-from .exceptions import InvalidArgumentException
+from .exceptions import (
+    CnpjGeneratorInvalidPrefixBranchIdError,
+    CnpjGeneratorInvalidPrefixLengthError,
+)
 
 CNPJ_LENGTH = 14
 
@@ -41,13 +44,9 @@ class CnpjGeneratorOptions:
             prefix_length = len(value)
 
             if prefix_length > CNPJ_LENGTH - 2:
-                raise InvalidArgumentException(
-                    f'Option "prefix" must be a string containing between {min_digits} and {max_digits} digits.'
-                )
+                raise CnpjGeneratorInvalidPrefixLengthError(prefix_length, max_digits)
 
             if prefix_length > 8 and value[8:] == "0000":
-                raise InvalidArgumentException(
-                    'The branch ID (characters 8 to 11) cannot be "0000".'
-                )
+                raise CnpjGeneratorInvalidPrefixBranchIdError(value[8:])
 
         object.__setattr__(self, name, value)

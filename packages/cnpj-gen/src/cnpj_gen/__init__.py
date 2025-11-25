@@ -1,11 +1,17 @@
 from .cnpj_gen import cnpj_gen
 from .cnpj_generator import CnpjGenerator
 from .cnpj_generator_options import CnpjGeneratorOptions
-from .exceptions import InvalidArgumentException
+from .exceptions import (
+    CnpjGeneratorError,
+    CnpjGeneratorInvalidPrefixBranchIdError,
+    CnpjGeneratorInvalidPrefixLengthError,
+)
 
 __all__ = [
     "CnpjGenerator",
+    "CnpjGeneratorError",
+    "CnpjGeneratorInvalidPrefixBranchIdError",
+    "CnpjGeneratorInvalidPrefixLengthError",
     "CnpjGeneratorOptions",
-    "InvalidArgumentException",
     "cnpj_gen",
 ]
