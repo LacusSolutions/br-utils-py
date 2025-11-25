@@ -55,7 +55,7 @@ repos:
         args:
           - --verbose
           - --scopes
-          - br-utils,cnpj-fmt,cnpj-cd,cnpj-gen,cnpj-val,cnpj-utils,cpf-fmt,cpf-cd,,cpf-gen,cpf-val,cpf-utils,internal
+          - br-utils,cnpj-fmt,cnpj-cd,cnpj-gen,cnpj-val,cnpj-utils,cpf-fmt,cpf-cd,cpf-gen,cpf-val,cpf-utils,internal
 
   # Run all tests before pushing to remote
   - repo: local
