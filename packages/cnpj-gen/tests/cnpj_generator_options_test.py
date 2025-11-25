@@ -105,7 +105,7 @@ class CnpjGeneratorOptionsTest:
         with pytest.raises(CnpjGeneratorInvalidPrefixLengthError) as exc_info:
             options.prefix = "12345678000910"
 
-        assert "The prefix length must be equals to or less than 12. Got 14." in str(
+        assert "The prefix length must be less than or equal to 12. Got 14." in str(
             exc_info.value
         )
 

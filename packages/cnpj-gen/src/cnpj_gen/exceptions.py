@@ -10,7 +10,7 @@ class CnpjGeneratorInvalidPrefixLengthError(CnpjGeneratorError):
         self.max_length = max_length
 
         super().__init__(
-            f"The prefix length must be equals to or less than {max_length}. Got {prefix_length}."
+            f"The prefix length must be less than or equal to {max_length}. Got {prefix_length}."
         )
 
 
