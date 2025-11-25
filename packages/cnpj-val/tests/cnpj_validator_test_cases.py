@@ -1,6 +1,10 @@
-class CnpjValidatorTestCases:
+from abc import ABC, abstractmethod
+
+
+class CnpjValidatorTestCases(ABC):
+    @abstractmethod
     def is_valid(self, _cnpj_string: str) -> bool:
-        raise NotImplementedError
+        pass
 
     def test_cnpj_string_with_dots_and_dash_is_valid(self):
         result = self.is_valid("22.250.620/0001-11")
