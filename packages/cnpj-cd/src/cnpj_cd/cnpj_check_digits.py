@@ -93,7 +93,7 @@ class CnpjCheckDigits:
                 original_input, CNPJ_MIN_LENGTH, CNPJ_MAX_LENGTH, total_length
             )
 
-        expanded_digits = []
+        flat_digits = []
 
         for digit_str in cnpj_digits:
             if not digit_str:
@@ -101,20 +101,21 @@ class CnpjCheckDigits:
 
             try:
                 digit_int = int(digit_str)
-                expanded_digits.extend(self._flatten_digits([digit_int]))
+                flat_digits.extend(self._flatten_digits([digit_int]))
             except ValueError:
                 raise CnpjTypeError(original_input)
 
-        return expanded_digits
+        return flat_digits
 
     def _flatten_digits(self, digits: list[int]) -> list[int]:
-        """Breaks down multiple digits within the array into individual digits."""
-        expanded = []
+        """Breaks down multiple digits within the array into individual digits. Negative numbers are converted to their absolute value."""
+        flat_digits = []
 
         for digit in digits:
-            expanded.extend([int(d) for d in str(digit)])
+            abs_digit = abs(digit)
+            flat_digits.extend([int(d) for d in str(abs_digit)])
 
-        return expanded
+        return flat_digits
 
     def _validate_length(
         self, cnpj_digits: list[int], original_input: str | list

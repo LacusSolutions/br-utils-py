@@ -302,3 +302,32 @@ class CnpjCheckDigitsTest:
             assert (
                 calculated_digit == expected_digit
             ), f"Input: {input_str}, Expected: {expected_digit}, Result: {calculated_digit}"
+
+    def test_calculate_check_digits_with_negative_integers_in_list(self):
+        input_with_negatives = [-9, -1, -4, -1, -5, -7, -3, -2, -0, -0, -0, -7]
+        expected_check_digits = CnpjCheckDigits([9, 1, 4, 1, 5, 7, 3, 2, 0, 0, 0, 7])
+
+        check_digits = CnpjCheckDigits(input_with_negatives)
+
+        assert check_digits.first_digit == expected_check_digits.first_digit
+        assert check_digits.second_digit == expected_check_digits.second_digit
+        assert check_digits.to_string() == expected_check_digits.to_string()
+
+    def test_calculate_check_digits_with_mixed_positive_negative_integers(self):
+        input_mixed = [9, -1, 4, -1, 5, 7, -3, 2, 0, 0, 0, 7]
+        expected_check_digits = CnpjCheckDigits([9, 1, 4, 1, 5, 7, 3, 2, 0, 0, 0, 7])
+
+        check_digits = CnpjCheckDigits(input_mixed)
+
+        assert check_digits.first_digit == expected_check_digits.first_digit
+        assert check_digits.second_digit == expected_check_digits.second_digit
+
+    def test_calculate_check_digits_with_negative_multi_digit_integer(self):
+        input_negative = [-91415732, 0, 0, 0, 7]
+        expected_check_digits = CnpjCheckDigits([914157320007])
+
+        check_digits = CnpjCheckDigits(input_negative)
+
+        assert check_digits.first_digit == expected_check_digits.first_digit
+        assert check_digits.second_digit == expected_check_digits.second_digit
+        assert check_digits.to_string() == expected_check_digits.to_string()
