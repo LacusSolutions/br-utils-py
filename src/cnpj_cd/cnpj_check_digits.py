@@ -6,8 +6,6 @@ from .exceptions import (
     CnpjTypeError,
 )
 
-__all__ = ["CnpjCheckDigits"]
-
 CNPJ_MIN_LENGTH = 12
 CNPJ_MAX_LENGTH = 14
 
