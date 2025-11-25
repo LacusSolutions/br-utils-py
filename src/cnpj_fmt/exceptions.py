@@ -1,6 +1,3 @@
-"""Custom exceptions for the cnpj-fmt package."""
-
-
 class CnpjFormatterError(Exception):
     """Base exception for all cnpj-fmt related errors."""
 
