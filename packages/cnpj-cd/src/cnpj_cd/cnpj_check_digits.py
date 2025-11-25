@@ -1,0 +1,135 @@
+import re
+
+from .exceptions import (
+    CnpjCheckDigitsCalculationError,
+    CnpjInvalidLengthError,
+    CnpjTypeError,
+)
+
+__all__ = ["CnpjCheckDigits"]
+
+CNPJ_MIN_LENGTH = 12
+CNPJ_MAX_LENGTH = 14
+
+
+class CnpjCheckDigits:
+    __slots__ = ("_cnpj_digits", "_first_digit", "_second_digit")
+
+    def __init__(self, cnpj_digits: str | list[str] | list[int]) -> None:
+        original_input = cnpj_digits
+
+        if not isinstance(cnpj_digits, (str, list)):
+            raise CnpjTypeError(original_input)
+
+        if isinstance(cnpj_digits, str):
+            cnpj_digits = self._handle_string_input(cnpj_digits, original_input)
+        elif isinstance(cnpj_digits, list):
+            cnpj_digits = self._handle_list_input(cnpj_digits, original_input)
+
+        self._validate_length(cnpj_digits, original_input)
+        self._cnpj_digits = cnpj_digits[:CNPJ_MIN_LENGTH]
+        self._first_digit: int | None = None
+        self._second_digit: int | None = None
+
+    @property
+    def first_digit(self) -> int:
+        if self._first_digit is None:
+            base_digits_sequence = self._cnpj_digits
+            self._first_digit = self._calculate(base_digits_sequence)
+
+        return self._first_digit
+
+    @property
+    def second_digit(self) -> int:
+        if self._second_digit is None:
+            base_digits_sequence = self._cnpj_digits + [self.first_digit]
+            self._second_digit = self._calculate(base_digits_sequence)
+
+        return self._second_digit
+
+    def to_list(self) -> list[int]:
+        return self._cnpj_digits + [self.first_digit, self.second_digit]
+
+    def to_string(self) -> str:
+        return "".join(str(digit) for digit in self.to_list())
+
+    def _handle_string_input(self, cnpj_digits: str, original_input: str) -> list[int]:
+        numeric_str = re.sub(r"[^0-9]", "", cnpj_digits)
+
+        if not numeric_str:
+            raise CnpjInvalidLengthError(
+                original_input, CNPJ_MIN_LENGTH, CNPJ_MAX_LENGTH, 0
+            )
+
+        return [int(d) for d in numeric_str]
+
+    def _handle_list_input(
+        self, cnpj_digits: list[str] | list[int], original_input: list
+    ) -> list[int]:
+        if all(isinstance(digit, str) for digit in cnpj_digits):
+            return self._handle_string_list(cnpj_digits, original_input)
+        if all(isinstance(digit, int) for digit in cnpj_digits):
+            return self._flatten_digits(cnpj_digits)
+
+        raise CnpjTypeError(original_input)
+
+    def _handle_string_list(
+        self, cnpj_digits: list[str], original_input: list
+    ) -> list[int]:
+        total_length = sum(len(digit_str) for digit_str in cnpj_digits if digit_str)
+
+        if total_length < CNPJ_MIN_LENGTH or total_length > CNPJ_MAX_LENGTH:
+            raise CnpjInvalidLengthError(
+                original_input, CNPJ_MIN_LENGTH, CNPJ_MAX_LENGTH, total_length
+            )
+
+        expanded_digits = []
+
+        for digit_str in cnpj_digits:
+            if not digit_str:
+                continue
+
+            try:
+                digit_int = int(digit_str)
+                expanded_digits.extend(self._flatten_digits([digit_int]))
+            except ValueError:
+                raise CnpjTypeError(original_input)
+
+        return expanded_digits
+
+    def _flatten_digits(self, digits: list[int]) -> list[int]:
+        expanded = []
+
+        for digit in digits:
+            expanded.extend([int(d) for d in str(digit)])
+
+        return expanded
+
+    def _validate_length(
+        self, cnpj_digits: list[int], original_input: str | list
+    ) -> None:
+        length = len(cnpj_digits)
+
+        if length < CNPJ_MIN_LENGTH or length > CNPJ_MAX_LENGTH:
+            raise CnpjInvalidLengthError(
+                original_input, CNPJ_MIN_LENGTH, CNPJ_MAX_LENGTH, length
+            )
+
+    def _calculate(self, cnpj_sequence: list[int]) -> int:
+        min_length = CNPJ_MIN_LENGTH
+        max_length = CNPJ_MAX_LENGTH - 1
+        sequence_length = len(cnpj_sequence)
+
+        if sequence_length < min_length or sequence_length > max_length:
+            raise CnpjCheckDigitsCalculationError(cnpj_sequence)
+
+        factor = 2
+        sum_result = 0
+
+        for num in reversed(cnpj_sequence):
+            sum_result += num * factor
+            factor = 2 if factor == 9 else factor + 1
+
+        remainder = sum_result % 11
+
+        return 0 if remainder < 2 else 11 - remainder

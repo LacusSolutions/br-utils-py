@@ -1,14 +1,14 @@
 import random
 
+from cnpj_cd import CnpjCheckDigits
+
 from .cnpj_generator_options import CnpjGeneratorOptions
-from .cnpj_generator_verifier_digit import CnpjGeneratorVerifierDigit
 
 
 class CnpjGenerator:
-    __slots__ = ("_options", "_verifier_digit")
+    __slots__ = "_options"
 
     def __init__(self, format: bool | None = None, prefix: str | None = None):
-        self._verifier_digit = CnpjGeneratorVerifierDigit()
         self._options = CnpjGeneratorOptions(format, prefix)
 
     def generate(self, format: bool | None = None, prefix: str | None = None) -> str:
@@ -19,9 +19,9 @@ class CnpjGenerator:
         business_id = self._generate_business_id(prefix_numbers)
         branch_id = self._generate_branch_id(prefix_numbers)
         cnpj_sequence = business_id + branch_id
-        cnpj_sequence.append(self._verifier_digit.calculate(cnpj_sequence))
-        cnpj_sequence.append(self._verifier_digit.calculate(cnpj_sequence))
-        cnpj_generated = "".join(str(digit) for digit in cnpj_sequence)
+
+        cnpj_check_digits = CnpjCheckDigits(cnpj_sequence)
+        cnpj_generated = cnpj_check_digits.to_string()
 
         if actual_options.format:
             return self._format(cnpj_generated)
