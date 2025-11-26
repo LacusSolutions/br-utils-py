@@ -18,10 +18,7 @@ class CnpjValidator:
         cnpj_second_check_digit = cnpj_num_digits[-1]
         cnpj_check_digits = CnpjCheckDigits(cnpj_num_digits)
 
-        if cnpj_first_check_digit != cnpj_check_digits.first_digit:
-            return False
-
-        if cnpj_second_check_digit != cnpj_check_digits.second_digit:
-            return False
-
-        return True
+        return (
+            cnpj_first_check_digit == cnpj_check_digits.first_digit
+            and cnpj_second_check_digit == cnpj_check_digits.second_digit
+        )
