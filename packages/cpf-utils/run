@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 from subprocess import run
 
-PACKAGE_NAME = "cnpj-fmt"
+PACKAGE_NAME = "cpf-utils"
 PACKAGE_DIR = Path(__file__).parent.resolve()
 ROOT_RUN_SCRIPT = PACKAGE_DIR.parent.parent / "run"
 
