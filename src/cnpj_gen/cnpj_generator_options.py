@@ -35,13 +35,10 @@ class CnpjGeneratorOptions:
         if prefix is not None:
             kwargs["prefix"] = prefix
 
-        new_options = replace(self, **kwargs)
-
-        return new_options
+        return replace(self, **kwargs)
 
     def __setattr__(self, name: str, value: object) -> None:
         if name == "prefix" and value is not None:
-            min_digits = 0
             max_digits = CNPJ_LENGTH - 2
             value = re.sub(r"[^0-9]", "", str(value))
             prefix_length = len(value)
