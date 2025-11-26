@@ -44,14 +44,14 @@ class CnpjCheckDigits:
     def second_digit(self) -> int:
         """Calculates and returns the second check digit.As it's immutable, it caches the calculation result. And, as it depends on the first check digit, it's also calculated."""
         if self._second_digit is None:
-            base_digits_sequence = self._cnpj_digits + [self.first_digit]
+            base_digits_sequence = [*self._cnpj_digits, self.first_digit]
             self._second_digit = self._calculate(base_digits_sequence)
 
         return self._second_digit
 
     def to_list(self) -> list[int]:
         """Returns the complete CNPJ as a list of 14 integers (12 base digits + 2 check digits)."""
-        return self._cnpj_digits + [self.first_digit, self.second_digit]
+        return [*self._cnpj_digits, self.first_digit, self.second_digit]
 
     def to_string(self) -> str:
         """Returns the complete CNPJ as a string of 14 digits (12 base digits + 2 check digits)."""
@@ -100,8 +100,8 @@ class CnpjCheckDigits:
             try:
                 digit_int = int(digit_str)
                 flat_digits.extend(self._flatten_digits([digit_int]))
-            except ValueError:
-                raise CnpjTypeError(original_input)
+            except ValueError as e:
+                raise CnpjTypeError(original_input) from e
 
         return flat_digits
 

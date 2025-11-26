@@ -261,7 +261,7 @@ class CnpjCheckDigitsTest:
 
     def test_calculate_first_check_digits_with_string_list_input(self):
         for input_str, expected in test_cases.items():
-            input_list = [digit for digit in input_str]
+            input_list = list(input_str)
             cnpj_check_digits = CnpjCheckDigits(input_list)
             calculated_digit = cnpj_check_digits.first_digit
             expected_digit = int(expected[-2])
@@ -272,7 +272,7 @@ class CnpjCheckDigitsTest:
 
     def test_calculate_second_check_digits_with_string_list_input(self):
         for input_str, expected in test_cases.items():
-            input_list = [digit for digit in input_str]
+            input_list = list(input_str)
             cnpj_check_digits = CnpjCheckDigits(input_list)
             calculated_digit = cnpj_check_digits.second_digit
             expected_digit = int(expected[-1])
