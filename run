@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 
 """
-Package management scripts for cnpj-fmt.
+Package management scripts.
 
 This script delegates to the monorepo's run script, ensuring all commands
 are executed in the context of this package.
 
 Usage:
-    python run test              # Run tests
-    python run lint              # Run linting and formatting
-    python run build             # Build package
-    python run build -i          # Build and install package locally
+    python run lint        # Run linting and formatting
+    python run test        # Run tests
+    python run build       # Build package
+    python run build -i    # Build package and install it locally
+    python run clean       # Remove build files
+    python run publish     # Publish package to PyPI
 """
 
 import sys
 from pathlib import Path
+from subprocess import run
 
 PACKAGE_NAME = "cnpj-fmt"
 PACKAGE_DIR = Path(__file__).parent.resolve()
@@ -30,33 +33,32 @@ def main():
     args = sys.argv[1:]
 
     if not args:
-        print("Package management scripts for cnpj-fmt")
-        print("\nUsage:")
-        print("    python run test              # Run tests")
-        print("    python run lint              # Run linting and formatting")
-        print("    python run build             # Build package")
-        print("    python run build -i          # Build and install package locally")
+        print(f'Package management scripts for "{PACKAGE_NAME}"')
+        print(
+            """
+Usage:
+    python run test        # Run tests
+    python run lint        # Run linting and formatting
+    python run build       # Build package
+    python run build -i    # Build and install package locally
+    python run clean       # Remove build files
+    python run publish     # Publish package to PyPI
+"""
+        )
         sys.exit(0)
 
     command = args[0]
+    allowed_commands = ["lint", "test", "build", "clean", "publish"]
 
-    import subprocess
-
-    if command == "test":
-        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "test", PACKAGE_NAME]
-        cmd_args.extend(args[1:])
-    elif command == "lint":
-        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "lint", PACKAGE_NAME]
-        cmd_args.extend(args[1:])
-    elif command == "build":
-        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), "build", PACKAGE_NAME]
+    if command in allowed_commands:
+        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), command, PACKAGE_NAME]
         cmd_args.extend(args[1:])
     else:
-        print(f"Error: Unknown command '{command}'")
-        print("\nAvailable commands: test, lint, build")
+        print(f'Error: Unknown command "{command}"\n')
+        print(f"Available commands: {', '.join(allowed_commands)}")
         sys.exit(1)
 
-    result = subprocess.run(cmd_args, cwd=PACKAGE_DIR.parent.parent)
+    result = run(cmd_args, cwd=PACKAGE_DIR.parent.parent)
     sys.exit(result.returncode)
 
 
