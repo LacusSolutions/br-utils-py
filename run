@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+"""
+Package management scripts.
+
+This script delegates to the monorepo's run script, ensuring all commands
+are executed in the context of this package.
+
+Usage:
+    python run lint        # Run linting and formatting
+    python run test        # Run tests
+    python run build       # Build package
+    python run build -i    # Build package and install it locally
+    python run clean       # Remove build files
+    python run publish     # Publish package to PyPI
+"""
+
+import sys
+from pathlib import Path
+from subprocess import run
+
+PACKAGE_NAME = "cpf-cd"
+PACKAGE_DIR = Path(__file__).parent.resolve()
+ROOT_RUN_SCRIPT = PACKAGE_DIR.parent.parent / "run"
+
+
+def main():
+    """Delegate to the monorepo run script with package context."""
+    if not ROOT_RUN_SCRIPT.exists():
+        print(f"Error: Could not find monorepo run script at {ROOT_RUN_SCRIPT}")
+        sys.exit(1)
+
+    args = sys.argv[1:]
+
+    if not args:
+        print(f'Package management scripts for "{PACKAGE_NAME}"')
+        print(
+            """
+Usage:
+    python run test        # Run tests
+    python run lint        # Run linting and formatting
+    python run build       # Build package
+    python run build -i    # Build and install package locally
+    python run clean       # Remove build files
+    python run publish     # Publish package to PyPI
+"""
+        )
+        sys.exit(0)
+
+    command = args[0]
+    allowed_commands = ["lint", "test", "build", "clean", "publish"]
+
+    if command in allowed_commands:
+        cmd_args = [sys.executable, str(ROOT_RUN_SCRIPT), command, PACKAGE_NAME]
+        cmd_args.extend(args[1:])
+    else:
+        print(f'Error: Unknown command "{command}"\n')
+        print(f"Available commands: {', '.join(allowed_commands)}")
+        sys.exit(1)
+
+    result = run(cmd_args, cwd=PACKAGE_DIR.parent.parent)
+    sys.exit(result.returncode)
+
+
+if __name__ == "__main__":
+    main()
