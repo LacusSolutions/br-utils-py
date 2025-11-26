@@ -150,7 +150,7 @@ class CnpjFormatterOptionsTest:
 
         with pytest.raises(
             CnpjFormatterHiddenRangeError,
-            match='Option "hidden_start" must be an integer between 0 and 13.',
+            match=r'Option "hidden_start" must be an integer between 0 and 13\.',
         ):
             options.set_hidden_range(-1, 5)
 
@@ -159,7 +159,7 @@ class CnpjFormatterOptionsTest:
 
         with pytest.raises(
             CnpjFormatterHiddenRangeError,
-            match='Option "hidden_end" must be an integer between 0 and 13.',
+            match=r'Option "hidden_end" must be an integer between 0 and 13\.',
         ):
             options.set_hidden_range(5, 14)
 
@@ -168,7 +168,7 @@ class CnpjFormatterOptionsTest:
 
         with pytest.raises(
             CnpjFormatterHiddenRangeError,
-            match='Option "hidden_start" must be an integer between 0 and 13.',
+            match=r'Option "hidden_start" must be an integer between 0 and 13\.',
         ):
             options.set_hidden_range(14, 5)
 
