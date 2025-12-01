@@ -1,7 +1,6 @@
 [project]
 name = "cnpj-gen"
-version = "1.0.0"
-# dynamic = [ "version" ]
+dynamic = [ "version" ]
 description = "Utility function to generate valid CNPJ (Brazilian employer ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
@@ -52,11 +51,11 @@ dependencies = [
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
 [build-system]
+requires = [ "setuptools>=80.9.0", "wheel" ]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=80.9.0", "setuptools-scm[toml]>=9.2.0" ]
 
-[tool]
-setuptools_scm = { }
+[tool.setuptools.dynamic.version]
+attr = "cnpj_gen.__version__"
 
 [tool.setuptools.packages.find]
 where = [ "src/" ]

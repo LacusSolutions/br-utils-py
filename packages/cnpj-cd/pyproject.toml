@@ -1,7 +1,6 @@
 [project]
 name = "cnpj-cd"
-version = "1.0.0"
-# dynamic = [ "version" ]
+dynamic = [ "version" ]
 description = "Utility resources to calculate check digits on CNPJ (Brazilian employer ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
@@ -50,11 +49,11 @@ requires-python = ">=3.10"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
 [build-system]
+requires = [ "setuptools>=80.9.0", "wheel" ]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=80.9.0", "setuptools-scm[toml]>=9.2.0" ]
 
-[tool]
-setuptools_scm = { }
+[tool.setuptools.dynamic.version]
+attr = "cnpj_cd.__version__"
 
 [tool.setuptools.packages.find]
 where = [ "src/" ]

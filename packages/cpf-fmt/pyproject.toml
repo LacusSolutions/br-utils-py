@@ -1,7 +1,6 @@
 [project]
 name = "cpf-fmt"
-version = "0.0.1"
-# dynamic = [ "version" ]
+dynamic = [ "version" ]
 description = "Utility function to format CNPJ (Brazilian personal ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
@@ -48,11 +47,11 @@ requires-python = ">=3.10"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
 [build-system]
+requires = [ "setuptools>=80.9.0", "wheel" ]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=80.9.0", "setuptools-scm[toml]>=9.2.0" ]
 
-[tool]
-setuptools_scm = { }
+[tool.setuptools.dynamic.version]
+attr = "cpf_fmt.__version__"
 
 [tool.setuptools.packages.find]
 where = [ "src/" ]
