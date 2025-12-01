@@ -45,11 +45,12 @@ def get_package_dependencies(package_name: str) -> list[str]:
         dependencies = data.get("project", {}).get("dependencies", [])
         all_packages = discover_packages()
         internal_deps = []
+        operators = ["~=", ">=", "<=", "==", "!=", "<", ">"]
 
         for dep in dependencies:
             dep_name = dep.strip()
 
-            for op in ["~=", ">=", "<=", "==", "!=", "<", ">"]:
+            for op in operators:
                 if op in dep_name:
                     dep_name = dep_name.split(op)[0].strip()
                     break
@@ -76,6 +77,7 @@ def get_dependency_graph() -> dict[str, list[str]]:
 
 
 def topological_sort(packages: list[str], graph: dict[str, list[str]]) -> list[str]:
+    """Perform topological sort using Kahn's algorithm."""
     in_degree = dict.fromkeys(packages, 0)
     reverse_graph: dict[str, list[str]] = {pkg: [] for pkg in packages}
 
@@ -85,21 +87,22 @@ def topological_sort(packages: list[str], graph: dict[str, list[str]]) -> list[s
                 reverse_graph[dep].append(pkg)
                 in_degree[pkg] += 1
 
-    queue = [pkg for pkg in packages if in_degree[pkg] == 0]
+    queue = sorted([pkg for pkg in packages if in_degree[pkg] == 0])
     result = []
 
     while queue:
-        queue.sort()
         pkg = queue.pop(0)
         result.append(pkg)
 
         for dependent in reverse_graph[pkg]:
             in_degree[dependent] -= 1
+
             if in_degree[dependent] == 0:
                 queue.append(dependent)
+                queue.sort()
 
-    remaining = [pkg for pkg in packages if pkg not in result]
-    result.extend(sorted(remaining))
+    remaining = sorted([pkg for pkg in packages if pkg not in result])
+    result.extend(remaining)
 
     return result
 

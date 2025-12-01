@@ -3,13 +3,20 @@
 __all__ = ["publish_all", "publish_package"]
 
 import sys
+from argparse import ArgumentParser
 
 from .build import build_package
 from .common import PACKAGES, PACKAGES_DIR, run_command
 
 
-def publish_package(pkg_path):
-    """Publish an specific package to PyPI."""
+def setup_commands(parser: ArgumentParser):
+    """Setup CLI arguments for publishing packages."""
+    publish_parser = parser.add_parser("publish", help="Publish package(s) to PyPI")
+    publish_parser.add_argument("package", help="Specific package")
+
+
+def publish_package(pkg_path) -> bool:
+    """Publish a specific package to PyPI."""
     print(f"Publishing {pkg_path.name}...")
 
     if not build_package(pkg_path):
@@ -38,5 +45,5 @@ def publish_all():
             f"\n⚠️  Publication failed for the following packages: {', '.join(failed)}"
         )
         sys.exit(1)
-    else:
-        print("\n✅ All packages published successfully!")
+
+    print("\n✅ All packages published successfully!")

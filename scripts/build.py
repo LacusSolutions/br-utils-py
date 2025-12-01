@@ -1,68 +1,148 @@
 """Build commands for packages."""
 
-__all__ = ["build_all", "build_package"]
+__all__ = ["build_all", "build_package", "setup_commands"]
 
-import shutil
 import sys
+from argparse import ArgumentParser
+from shutil import rmtree
 
-from .common import PACKAGES, PACKAGES_DIR, run_command
+from .common import PACKAGES, PACKAGES_DIR, Spinner, run_command
 
 
-def build_package(pkg_path, install_afterwards=False):
-    """Build an specific package."""
-    print(f"Building {pkg_path.name}...")
+def setup_commands(parser: ArgumentParser) -> None:
+    """Setup CLI arguments for building packages."""
+    build_parser = parser.add_parser("build", help="Build package(s)")
+    build_parser.add_argument(
+        "package", nargs="?", help="Specific package (leave empty for all)"
+    )
+    build_parser.add_argument(
+        "--install-afterwards",
+        "-i",
+        action="store_true",
+        help="Install the package locally via pip after building",
+    )
+    build_parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Quiet mode: show less output",
+    )
+
+
+def build_package(pkg_path, install_afterwards=False, quiet=False):
+    """Build a specific package."""
+    if not quiet:
+        print(f"Building {pkg_path.name}...")
 
     dist_dir = pkg_path / "dist"
 
     if install_afterwards and dist_dir.exists():
-        shutil.rmtree(dist_dir)
+        rmtree(dist_dir)
 
-    if not run_command([sys.executable, "-m", "build"], cwd=pkg_path):
-        return False
+    build_cmd = [sys.executable, "-m", "build"]
+
+    if quiet:
+        success, _ = run_command(build_cmd, cwd=pkg_path, silent=True)
+
+        if not success:
+            return False
+    else:
+        if not run_command(build_cmd, cwd=pkg_path):
+            return False
 
     if install_afterwards:
         if not dist_dir.exists():
             print(f"Error: dist/ directory not found in {pkg_path.name}")
-
             return False
 
-        whl_files = list(dist_dir.glob("*.whl"))
+        whl_files = sorted(
+            dist_dir.glob("*.whl"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
 
         if not whl_files:
             print(f"Error: No .whl file found in dist/ for {pkg_path.name}")
-
             return False
 
-        whl_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
         whl_file = whl_files[0]
 
-        print(f"Installing {whl_file.name}...")
+        if not quiet:
+            print(f"Installing {whl_file.name}...")
 
-        if not run_command(
-            [sys.executable, "-m", "pip", "install", "--force-reinstall", str(whl_file)]
-        ):
-            print(f"Error: Failed to install {whl_file.name}")
+        install_cmd = [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--force-reinstall",
+            str(whl_file),
+        ]
 
-            return False
+        if quiet:
+            success, _ = run_command(install_cmd, silent=True)
 
-        print(f"✅ Successfully installed {pkg_path.name}")
+            if not success:
+                print(f"Error: Failed to install {whl_file.name}")
+                return False
+        else:
+            if not run_command(install_cmd):
+                print(f"Error: Failed to install {whl_file.name}")
+                return False
+
+        if not quiet:
+            print(f"✅ Successfully installed {pkg_path.name}")
 
     return True
 
 
-def build_all(install_afterwards=False):
+def build_all(install_afterwards=False, quiet=False):
     """Build all packages."""
-    print("Building all packages...")
+    if not quiet:
+        print("Building all packages...")
+
     failed = []
+    succeeded = []
 
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
+    def _clear_spinner_line(message: str) -> None:
+        """Clear spinner line before printing status."""
+        max_length = max(len(message) + 10, 100)
+        print("\r" + " " * max_length + "\r", end="", flush=True)
 
-        if not build_package(pkg_path, install_afterwards=install_afterwards):
-            failed.append(pkg)
+    if quiet:
+        with Spinner("Building packages") as spinner:
+            for pkg in PACKAGES:
+                spinner.update_message(f"Building packages: {pkg}")
+                pkg_path = PACKAGES_DIR / pkg
+
+                if build_package(
+                    pkg_path,
+                    install_afterwards=install_afterwards,
+                    quiet=quiet,
+                ):
+                    succeeded.append(pkg)
+                    _clear_spinner_line(f"Building packages: {pkg}")
+                    print(f"✅ {pkg}")
+                else:
+                    failed.append(pkg)
+                    _clear_spinner_line(f"Building packages: {pkg}")
+                    print(f"❌ {pkg}")
+    else:
+        for pkg in PACKAGES:
+            pkg_path = PACKAGES_DIR / pkg
+
+            if build_package(
+                pkg_path, install_afterwards=install_afterwards, quiet=quiet
+            ):
+                succeeded.append(pkg)
+            else:
+                failed.append(pkg)
 
     if failed:
         print(f"\n⚠️  Build failed for the following packages: {', '.join(failed)}")
         sys.exit(1)
     else:
-        print("\n✅ All packages built successfully!")
+        if quiet:
+            print(f"\n✅ Built {len(succeeded)} package(s) successfully")
+        else:
+            print("\n✅ All packages built successfully!")

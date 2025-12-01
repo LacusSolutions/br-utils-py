@@ -4,23 +4,24 @@
 Monorepo management scripts.
 
 Usage:
-    python run test              # Run tests for current package
-    python run test-all          # Run tests for all packages
-    python run build             # Build all packages
-    python run build [pkg] [-i]  # Build specified package
-    python run publish [pkg]     # Publish specified package
-    python run clean             # Remove build files
-    python run lint              # Run linting and formatting for all packages
+    python run lint              # Run linting and formatting for all packages in current directory
     python run lint [pkg|path]   # Run linting and formatting for package, path, or file
+    python run test              # Run tests for all packages in current directory
+    python run test [pkg]        # Run tests for specified package
+    python run build             # Build all packages in current directory
+    python run build [pkg]       # Build specified package
+    python run build -i [pkg]    # Build and install specified package
+    python run clean             # Remove build files for all packages in current directory
+    python run clean [pkg]       # Remove build files for specified package
+    python run publish [pkg]     # Publish specified package to PyPI
     python run hooks install     # Install `pre-commit` hooks
     python run hooks uninstall   # Uninstall `pre-commit` hooks
     python run hooks update      # Update `pre-commit` hooks
     python run hooks run         # Run `pre-commit` hooks on all files
 """
 
-import argparse
 import sys
-from pathlib import Path
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 from scripts import build, clean, common, hooks, lint, publish, test
 
@@ -29,97 +30,37 @@ PACKAGES_DIR = common.PACKAGES_DIR
 ROOT_DIR = common.ROOT_DIR
 
 
-def resolve_path(arg: str) -> Path | None:
-    """
-    Resolve a path argument to a valid Path object.
-
-    Tries in order:
-    1. Check if it's a package name in packages/
-    2. Check if it's a relative path from root
-    3. Check if it's an absolute path
-
-    Returns Path if valid, None otherwise.
-    """
-    if arg in PACKAGES:
-        pkg_path = PACKAGES_DIR / arg
-        if pkg_path.exists():
-            return pkg_path
-
-    rel_path = ROOT_DIR / arg
-
-    if rel_path.exists():
-        return rel_path
-
-    abs_path = Path(arg)
-
-    if abs_path.is_absolute() and abs_path.exists():
-        return abs_path
-
-    return None
-
-
 def main():
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Monorepo management scripts",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-python run test-all
-python run build cnpj-fmt
-python run build cnpj-fmt --install-afterwards
-python run build-all
-python run publish cnpj-fmt
-python run publish-all
-python run clean
-python run lint
-python run hooks install
-python run hooks update
-python run hooks run
-      """,
+    python run hooks install
+    python run hooks update
+    python run hooks run
+    python run lint
+    python run lint cpf-fmt
+    python run test
+    python run test cnpj-gen
+    python run build
+    python run build cnpj-val
+    python run build --install-afterwards cpf-utils
+    python run build -i cnpj-utils
+    python run clean
+    python run clean cpf-fmt
+    python run publish cpf-gen
+""",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
-    test_parser = subparsers.add_parser("test", help="Run tests")
-    test_parser.add_argument("package", nargs="?", help="Specific package (optional)")
-
-    subparsers.add_parser("test-all", help="Run tests for all packages")
-
-    build_parser = subparsers.add_parser("build", help="Build package(s)")
-    build_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)"
-    )
-    build_parser.add_argument(
-        "--install-afterwards",
-        "-i",
-        action="store_true",
-        help="Install the package locally via pip after building",
-    )
-
-    subparsers.add_parser("build-all", help="Build all packages")
-
-    publish_parser = subparsers.add_parser("publish", help="Publish package(s) to PyPI")
-    publish_parser.add_argument(
-        "package", nargs="?", help="Specific package (leave empty for all)"
-    )
-
-    subparsers.add_parser("publish-all", help="Publish all packages to PyPI")
-
-    subparsers.add_parser("clean", help="Remove build files")
-
-    lint_parser = subparsers.add_parser("lint", help="Run linting and formatting")
-    lint_parser.add_argument("package", nargs="*", help="Specific package (optional)")
-
-    hooks_parser = subparsers.add_parser("hooks", help="Manage pre-commit hooks")
-    hooks_subparsers = hooks_parser.add_subparsers(
-        dest="hooks_command", help="Hooks command"
-    )
-    hooks_subparsers.add_parser("install", help="Install pre-commit hooks")
-    hooks_subparsers.add_parser("uninstall", help="Uninstall pre-commit hooks")
-    hooks_subparsers.add_parser(
-        "update", help="Update pre-commit hooks to latest versions"
-    )
-    hooks_subparsers.add_parser("run", help="Run pre-commit hooks on all files")
+    hooks.setup_commands(subparsers)
+    lint.setup_commands(subparsers)
+    test.setup_commands(subparsers)
+    build.setup_commands(subparsers)
+    clean.setup_commands(subparsers)
+    publish.setup_commands(subparsers)
 
     args = parser.parse_args()
 
@@ -128,112 +69,115 @@ python run hooks run
         sys.exit(1)
 
     if args.command == "test":
-        if args.package:
+        if hasattr(args, "watch") and args.watch:
+            test.test_watch(
+                package=args.package,
+                quiet=hasattr(args, "quiet") and args.quiet,
+                verbose=hasattr(args, "verbose") and args.verbose,
+            )
+        elif args.package:
             if args.package not in PACKAGES:
                 print(f"Error: Package '{args.package}' not found.")
                 print(f"Available packages: {', '.join(PACKAGES)}")
                 sys.exit(1)
+
             pkg_path = PACKAGES_DIR / args.package
 
-            if not test.test_package(pkg_path):
-                sys.exit(1)
-        else:
-            cwd = Path.cwd()
-
-            if PACKAGES_DIR in cwd.parents:
-                pkg_name = None
-                current = cwd
-
-                while current != PACKAGES_DIR.parent:
-                    if current.parent == PACKAGES_DIR:
-                        pkg_name = current.name
-                        break
-                    current = current.parent
-
-                if pkg_name and pkg_name in PACKAGES:
-                    test.test_package(PACKAGES_DIR / pkg_name)
-                else:
-                    print(
-                        "Error: Current directory is not a valid package. Specify the package or use 'test-all'"
-                    )
-                    sys.exit(1)
-            else:
-                print(
-                    "Error: Not inside a package. Specify the package or use 'test-all'"
-                )
-                sys.exit(1)
-
-    elif args.command == "test-all":
-        test.test_all()
-
-    elif args.command == "build":
-        if args.package:
-            if args.package not in PACKAGES:
-                print(f"Error: Package '{args.package}' not found.")
-                print(f"Available packages: {', '.join(PACKAGES)}")
-                sys.exit(1)
-            pkg_path = PACKAGES_DIR / args.package
-
-            if not build.build_package(
-                pkg_path, install_afterwards=args.install_afterwards
+            if not test.test_package(
+                pkg_path,
+                quiet=hasattr(args, "quiet") and args.quiet,
+                verbose=hasattr(args, "verbose") and args.verbose,
             ):
                 sys.exit(1)
         else:
-            build.build_all(install_afterwards=args.install_afterwards)
+            test.test_all(
+                quiet=hasattr(args, "quiet") and args.quiet,
+                verbose=hasattr(args, "verbose") and args.verbose,
+            )
 
-    elif args.command == "build-all":
-        build.build_all()
+    elif args.command == "test-all":
+        test.test_all(
+            quiet=hasattr(args, "quiet") and args.quiet,
+            verbose=hasattr(args, "verbose") and args.verbose,
+        )
 
-    elif args.command == "publish":
+    elif args.command == "build":
+        quiet_mode = hasattr(args, "quiet") and args.quiet
+
         if args.package:
             if args.package not in PACKAGES:
                 print(f"Error: Package '{args.package}' not found.")
                 print(f"Available packages: {', '.join(PACKAGES)}")
                 sys.exit(1)
+
             pkg_path = PACKAGES_DIR / args.package
 
-            if not publish.publish_package(pkg_path):
-                sys.exit(1)
-        else:
-            cwd = Path.cwd()
+            if quiet_mode:
+                from .scripts.common import Spinner
 
-            if PACKAGES_DIR in cwd.parents:
-                pkg_name = None
-                current = cwd
+                with Spinner(f"Building packages: {args.package}"):
+                    success = build.build_package(
+                        pkg_path,
+                        install_afterwards=args.install_afterwards,
+                        quiet=quiet_mode,
+                    )
 
-                while current != PACKAGES_DIR.parent:
-                    if current.parent == PACKAGES_DIR:
-                        pkg_name = current.name
-                        break
-                    current = current.parent
+                max_length = max(len(f"Building packages: {args.package}") + 10, 100)
+                print("\r" + " " * max_length + "\r", end="", flush=True)
 
-                if pkg_name and pkg_name in PACKAGES:
-                    if not publish.publish_package(PACKAGES_DIR / pkg_name):
-                        sys.exit(1)
+                if success:
+                    print(f"✅ {args.package}")
                 else:
-                    print("Error: Current directory is not a valid package.")
+                    print(f"❌ {args.package}")
                     sys.exit(1)
             else:
-                print(
-                    "Error: Not inside a package. Specify the package or use 'publish-all'"
-                )
-                sys.exit(1)
+                if not build.build_package(
+                    pkg_path,
+                    install_afterwards=args.install_afterwards,
+                    quiet=quiet_mode,
+                ):
+                    sys.exit(1)
+        else:
+            build.build_all(
+                install_afterwards=args.install_afterwards,
+                quiet=quiet_mode,
+            )
 
-    elif args.command == "publish-all":
-        publish.publish_all()
+    elif args.command == "publish":
+        if args.package not in PACKAGES:
+            print(f"Error: Package '{args.package}' not found.")
+            print(f"Available packages: {', '.join(PACKAGES)}")
+            sys.exit(1)
+
+        pkg_path = PACKAGES_DIR / args.package
+
+        if not publish.publish_package(pkg_path):
+            sys.exit(1)
 
     elif args.command == "clean":
-        clean.clean()
+        if args.package:
+            if args.package not in PACKAGES:
+                print(f"Error: Package '{args.package}' not found.")
+                print(f"Available packages: {', '.join(PACKAGES)}")
+                sys.exit(1)
+
+            pkg_path = PACKAGES_DIR / args.package
+            clean.clean_package(pkg_path)
+        else:
+            clean.clean_all()
 
     elif args.command == "lint":
         if args.package:
             resolved_paths = []
+
             for pkg_arg in args.package:
-                resolved_path = resolve_path(pkg_arg)
+                resolved_path = common.resolve_path(pkg_arg)
+
                 if resolved_path is None:
                     print(f"Error: '{pkg_arg}' is not a valid package, path, or file.")
                     print(f"Available packages: {', '.join(PACKAGES)}")
                     sys.exit(1)
+
                 resolved_paths.append(resolved_path)
 
             if not lint.lint_files(resolved_paths):
@@ -244,7 +188,7 @@ python run hooks run
 
     elif args.command == "hooks":
         if not args.hooks_command:
-            hooks_parser.print_help()
+            parser.parse_args([args.command, "--help"])
             sys.exit(1)
 
         if args.hooks_command == "install":
@@ -260,7 +204,7 @@ python run hooks run
             if not hooks.run_hooks():
                 sys.exit(1)
         else:
-            hooks_parser.print_help()
+            parser.parse_args([args.command, "--help"])
             sys.exit(1)
 
     else:

@@ -11,7 +11,6 @@ def sync_license() -> bool:
 
     if not license_file.exists():
         print(f"Error: LICENSE file not found at {license_file}")
-
         return False
 
     print("Syncing LICENSE to all packages...")
@@ -22,6 +21,7 @@ def sync_license() -> bool:
         dest_license = pkg_path / "LICENSE"
 
         try:
+            pkg_path.mkdir(parents=True, exist_ok=True)
             shutil.copy2(license_file, dest_license)
             print(f"  ✓ Synced LICENSE to {pkg}/")
         except Exception as e:
@@ -30,7 +30,6 @@ def sync_license() -> bool:
 
     if failed:
         print(f"\n⚠️  Failed to sync LICENSE to: {', '.join(failed)}")
-
         return False
 
     print(f"\n✅ Successfully synced LICENSE to all {len(PACKAGES)} packages!")

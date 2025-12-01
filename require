@@ -12,7 +12,7 @@ REQUIREMENTS_DEV_FILE = CURRENT_WORKING_DIR / "requirements-dev.txt"
 def install_dependencies(file: Path):
     """Install dependencies from requirements*.txt files."""
     if not file.exists():
-        print(f"⚠️  \"{file.name}\" not found. Skipping...")
+        print(f'⚠️  "{file.name}" not found. Skipping...')
         return
 
     result = subprocess.run(
@@ -29,9 +29,9 @@ def install_dependencies(file: Path):
     )
 
     if result.returncode == 0:
-        print(f"✅ \"{file.name}\" dependencies installed successfully.")
+        print(f'✅ "{file.name}" dependencies installed successfully.')
     else:
-        print(f"❌ \"{file.name}\" failed to install dependencies.")
+        print(f'❌ "{file.name}" failed to install dependencies.')
         print(result.stderr) if result.stderr else None
         sys.exit(result.returncode)
 
@@ -41,6 +41,7 @@ def install_all():
     print("Installing dependencies...")
     install_dependencies(REQUIREMENTS_DEV_FILE)
     install_dependencies(REQUIREMENTS_BASE_FILE)
+
 
 if __name__ == "__main__":
     install_all()

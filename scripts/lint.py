@@ -1,103 +1,145 @@
 """Linting and formatting commands for packages."""
 
 __all__ = [
-    "lint",
     "lint_all",
     "lint_files",
+    "lint_package",
+    "setup_commands",
 ]
 
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 
 from .common import (
-    PACKAGES,
-    PACKAGES_DIR,
     ROOT_DIR,
-    SCRIPTS_DIR,
+    Spinner,
     run_command,
 )
 
+PATTERNS_TO_LINT = [
+    "require",
+    "run",
+    "*.py",
+]
 
-def lint(pkg_path: Path | None = None) -> bool:
-    """Run linting and formatting on a specific directory or the entire repository."""
-    if pkg_path is None:
-        pkg_path = ROOT_DIR
 
-    print(f"Running linting for {pkg_path.name}...")
-    ruff_cmd = [
-        sys.executable,
-        "-m",
-        "ruff",
-        "check",
-        "--fix-only",
-        str(pkg_path),
-    ]
+def setup_commands(parser: ArgumentParser):
+    """Setup CLI arguments for linting and formatting."""
+    lint_parser = parser.add_parser("lint", help="Run linting and formatting")
+    lint_parser.add_argument("package", nargs="*", help="Specific package (optional)")
 
-    if not run_command(ruff_cmd, cwd=ROOT_DIR):
+
+def lint_path(path: Path) -> tuple[bool, list[str]]:
+    """Run linting and formatting on a file or directory.
+
+    Returns:
+        Tuple of (success, list of error messages)
+    """
+    succeeded = True
+    errors = []
+    files = set()
+
+    for pattern in PATTERNS_TO_LINT:
+        if pattern.endswith(".py"):
+            files.update(path.rglob(pattern))
+        else:
+            for found_path in path.rglob(pattern):
+                if found_path.is_file() and found_path.name == pattern:
+                    files.add(found_path)
+
+    if not files:
+        return True, []
+
+    def _check_error(success: bool, output: str, tool_name: str) -> bool:
+        """Check if command output indicates an error."""
+        if not success and output:
+            if tool_name == "ruff check":
+                if "All checks passed!" not in output:
+                    return True
+            elif "error" in output.lower() or "failed" in output.lower():
+                return True
         return False
 
-    print(f"Formatting code for {pkg_path.name}...")
-    ruff_format_cmd = [
-        sys.executable,
-        "-m",
-        "ruff",
-        "format",
-        str(pkg_path),
-    ]
+    with Spinner("Linting files") as spinner:
+        for file in sorted(files):  # Sort for consistent processing order
+            try:
+                relative_path = file.relative_to(ROOT_DIR)
+            except ValueError:
+                relative_path = file
 
-    if not run_command(ruff_format_cmd, cwd=ROOT_DIR):
-        return False
+            spinner.update_message(f"Linting files: {relative_path}")
+            success, output = run_command(
+                [sys.executable, "-m", "ruff", "check", "--fix", str(file)],
+                cwd=ROOT_DIR,
+                silent=True,
+            )
 
-    black_cmd = [
-        sys.executable,
-        "-m",
-        "black",
-        str(pkg_path),
-    ]
+            if _check_error(success, output, "ruff check"):
+                errors.append(f"ruff linting failed for {file!s}:\n{output}")
+                succeeded = False
 
-    return run_command(black_cmd, cwd=ROOT_DIR)
+            success, output = run_command(
+                [sys.executable, "-m", "ruff", "format", str(file)],
+                cwd=ROOT_DIR,
+                silent=True,
+            )
+
+            if _check_error(success, output, "ruff format"):
+                errors.append(f"ruff formatting failed for {file!s}:\n{output}")
+                succeeded = False
+
+            success, output = run_command(
+                [sys.executable, "-m", "black", str(file)],
+                cwd=ROOT_DIR,
+                silent=True,
+            )
+
+            if _check_error(success, output, "black"):
+                errors.append(f"black formatting failed for {file!s}:\n{output}")
+                succeeded = False
+
+    return succeeded, errors
 
 
 def lint_files(paths: list[Path]) -> bool:
     """Run linting and formatting on a list of files or directories."""
-    failed = []
-    python_extensions = {".py"}
+    all_errors = []
 
     for path in paths:
-        # Skip non-Python files (only lint .py files or directories)
-        if path.is_file() and path.suffix not in python_extensions:
-            continue
+        succeeded, errors = lint_path(path)
+        if not succeeded:
+            all_errors.extend(errors)
 
-        if not lint(path):
-            failed.append(str(path))
+    if not all_errors:
+        print("✅ All linting passed!")
+        return True
 
-    if failed:
-        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
-        return False
+    print("\n".join(all_errors))
 
-    print("\n✅ All linting passed!")
-    return True
+    return False
+
+
+def _print_lint_result(succeeded: bool, errors: list[str]) -> bool:
+    """Print linting result and return success status."""
+    if succeeded:
+        print("✅ All linting passed!")
+        return True
+
+    print("\n".join(errors))
+
+    return False
+
+
+def lint_package(pkg_path: Path = ROOT_DIR) -> bool:
+    """Run linting and formatting on a specific directory or the entire repository."""
+    succeeded, errors = lint_path(pkg_path)
+
+    return _print_lint_result(succeeded, errors)
 
 
 def lint_all() -> bool:
-    """Run linting and formatting on all packages and root."""
-    print("Running linting for all packages...")
-    failed = []
+    """Run linting and formatting on entire project."""
+    succeeded, errors = lint_path(ROOT_DIR)
 
-    if not lint(SCRIPTS_DIR):
-        failed.append("scripts")
-
-    for pkg in PACKAGES:
-        pkg_path = PACKAGES_DIR / pkg
-
-        if not lint(pkg_path):
-            failed.append(pkg)
-
-    if failed:
-        print(f"\n⚠️  Linting failed for: {', '.join(failed)}")
-
-        return False
-
-    print("\n✅ All linting passed!")
-
-    return True
+    return _print_lint_result(succeeded, errors)
