@@ -1,7 +1,6 @@
 [project]
 name = "br-utils"
-version = "0.0.1"
-# dynamic = [ "version" ]
+dynamic = [ "version" ]
 description = "Utility resources to deal with Brazilian-related data."
 license = "MIT"
 license-files = [ "LICENSE" ]
@@ -62,11 +61,11 @@ dependencies = [
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
 [build-system]
+requires = [ "setuptools>=80.9.0", "wheel" ]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=80.9.0", "setuptools-scm[toml]>=9.2.0" ]
 
-[tool]
-setuptools_scm = { }
+[tool.setuptools.dynamic.version]
+attr = "br_utils.__version__"
 
 [tool.setuptools.packages.find]
 where = [ "src/" ]
