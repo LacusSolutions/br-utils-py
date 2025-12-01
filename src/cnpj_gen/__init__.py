@@ -15,3 +15,5 @@ __all__ = [
     "CnpjGeneratorOptions",
     "cnpj_gen",
 ]
+
+__version__ = "0.0.0"
