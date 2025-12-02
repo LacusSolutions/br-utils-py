@@ -13,29 +13,13 @@ concurrency:
 jobs:
   lint:
     uses: ./.github/workflows/lint.yml
-    strategy:
-      max-parallel: 3
-      matrix:
-        python-version:
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-          - '3.14'
     inputs:
-      python-version: ${{ matrix.python-version }}
+      python-version: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
+      max-parallel: 3
 
   test:
     uses: ./.github/workflows/test.yml
-    strategy:
-      matrix:
-        python-version:
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-          - '3.14'
     inputs:
-      python-version: ${{ matrix.python-version }}
+      python-version: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
       api-url: ${{ vars.BR_UTILS_API_URL }}
       api-token: ${{ secrets.BR_UTILS_API_TOKEN }}

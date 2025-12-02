@@ -5,18 +5,27 @@ on:
     inputs:
       python-version:
         type: string
-        description: 'Python version to use'
+        description: 'Python version(s) to use (single version like "3.x" or JSON array like ["3.10", "3.11"])'
         required: false
         default: '3.x'
+      max-parallel:
+        type: number
+        description: 'Maximum number of parallel jobs'
+        required: false
+        default: 3
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: ${{ inputs.max-parallel }}
+      matrix:
+        python-version: ${{ inputs.python-version == '3.x' && fromJSON('["3.x"]') || inputs.python-version[0] == '[' && fromJSON(inputs.python-version) || fromJSON(format('["{0}"]', inputs.python-version)) }}
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - run: python -m pip install --upgrade pip
       - run: python require
