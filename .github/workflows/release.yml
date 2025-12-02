@@ -145,7 +145,7 @@ jobs:
             -d "{
               \"target_commitish\": \"$COMMIT_SHA\",
               \"tag_name\": \"$TAG_NAME\",
-              \"name\": \"$PKG_NAME $PKG_VERSION\",
+              \"name\": \"$TAG_NAME\",
               \"draft\": false,
               \"prerelease\": $([[ "$PKG_VERSION" =~ -(dev|alpha|beta|rc) ]] && echo "true" || echo "false")
             }")
