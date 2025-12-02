@@ -29,7 +29,6 @@ jobs:
       api-token: ${{ secrets.BR_UTILS_API_TOKEN }}
 
   validate:
-    needs: [lint, test]
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.validate.outputs.branch_name }}
