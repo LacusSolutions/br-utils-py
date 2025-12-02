@@ -15,7 +15,6 @@ jobs:
     uses: ./.github/workflows/lint.yml
     with:
       python-version: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
-      max-parallel: 3
 
   test:
     uses: ./.github/workflows/test.yml

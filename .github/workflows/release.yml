@@ -18,7 +18,18 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      api-url: ${{ vars.BR_UTILS_API_URL }}
+    secrets:
+      api-token: ${{ secrets.BR_UTILS_API_TOKEN }}
+
   validate:
+    needs: [lint, test]
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.validate.outputs.branch_name }}
@@ -116,7 +127,7 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
   create-release:
-    needs: validate
+    needs: [lint, test, validate]
     runs-on: ubuntu-latest
     permissions:
       contents: write
