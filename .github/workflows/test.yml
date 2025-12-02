@@ -11,13 +11,11 @@ on:
       api-url:
         type: string
         description: 'BR Utils API URL'
-        required: false
-        default: ${{ vars.BR_UTILS_API_URL }}
+        required: true
       api-token:
         type: string
         description: 'BR Utils API token'
-        required: false
-        default: ${{ secrets.BR_UTILS_API_TOKEN }}
+        required: true
 
 jobs:
   test:
