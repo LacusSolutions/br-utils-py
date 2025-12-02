@@ -67,9 +67,10 @@ def test_all(quiet: bool, verbose: bool):
 
     if failed:
         print(f"\n⚠️  Tests failed for the following packages: {', '.join(failed)}")
-        sys.exit(1)
+        return False
     else:
         print("\n✅ All tests passed!")
+        return True
 
 
 def test_watch(package: str | None, quiet: bool, verbose: bool):
