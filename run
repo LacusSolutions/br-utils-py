@@ -68,86 +68,67 @@ Examples:
         parser.print_help()
         sys.exit(1)
 
+    if args.command == "hooks":
+        if not args.hooks_command:
+            parser.parse_args([args.command, "--help"])
+            sys.exit(1)
+
+        if args.hooks_command == "install":
+            sys.exit(0) if hooks.install_hooks() else sys.exit(1)
+
+        if args.hooks_command == "uninstall":
+            sys.exit(0) if hooks.uninstall_hooks() else sys.exit(1)
+
+        if args.hooks_command == "update":
+            sys.exit(0) if hooks.update_hooks() else sys.exit(1)
+
+        if args.hooks_command == "run":
+            sys.exit(0) if hooks.run_hooks() else sys.exit(1)
+
+        parser.parse_args([args.command, "--help"])
+        sys.exit(1)
+
+    if args.command == "lint":
+        is_all_mode = not args.package
+
+        if is_all_mode:
+            sys.exit(0) if lint.lint_all() else sys.exit(1)
+
+        resolved_paths = []
+
+        for pkg_arg in args.package:
+            resolved_path = common.resolve_path(pkg_arg)
+
+            if resolved_path is None:
+                print(f"Error: '{pkg_arg}' is not a valid package, path, or file.")
+                print(f"Available packages: {', '.join(PACKAGES)}")
+                sys.exit(1)
+
+            resolved_paths.append(resolved_path)
+
+        sys.exit(0) if lint.lint_files(resolved_paths) else sys.exit(1)
+
     if args.command == "test":
-        if hasattr(args, "watch") and args.watch:
+        is_all_mode = not args.package
+        is_watch_mode = hasattr(args, "watch") and args.watch
+        is_quiet_mode = hasattr(args, "quiet") and args.quiet
+        is_verbose_mode = hasattr(args, "verbose") and args.verbose
+
+        if is_watch_mode:
             test.test_watch(
                 package=args.package,
-                quiet=hasattr(args, "quiet") and args.quiet,
-                verbose=hasattr(args, "verbose") and args.verbose,
+                quiet=is_quiet_mode,
+                verbose=is_verbose_mode,
             )
-        elif args.package:
-            if args.package not in PACKAGES:
-                print(f"Error: Package '{args.package}' not found.")
-                print(f"Available packages: {', '.join(PACKAGES)}")
-                sys.exit(1)
+            sys.exit(0)
 
-            pkg_path = PACKAGES_DIR / args.package
-
-            if not test.test_package(
-                pkg_path,
-                quiet=hasattr(args, "quiet") and args.quiet,
-                verbose=hasattr(args, "verbose") and args.verbose,
-            ):
-                sys.exit(1)
-        else:
-            test.test_all(
-                quiet=hasattr(args, "quiet") and args.quiet,
-                verbose=hasattr(args, "verbose") and args.verbose,
+        if is_all_mode:
+            (
+                sys.exit(0)
+                if test.test_all(quiet=is_quiet_mode, verbose=is_verbose_mode)
+                else sys.exit(1)
             )
 
-    elif args.command == "test-all":
-        test.test_all(
-            quiet=hasattr(args, "quiet") and args.quiet,
-            verbose=hasattr(args, "verbose") and args.verbose,
-        )
-
-    elif args.command == "build":
-        quiet_mode = hasattr(args, "quiet") and args.quiet
-        version = getattr(args, "version", None)
-
-        if args.package:
-            if args.package not in PACKAGES:
-                print(f"Error: Package '{args.package}' not found.")
-                print(f"Available packages: {', '.join(PACKAGES)}")
-                sys.exit(1)
-
-            pkg_path = PACKAGES_DIR / args.package
-
-            if quiet_mode:
-                from .scripts.common import Spinner
-
-                with Spinner(f"Building packages: {args.package}"):
-                    success = build.build_package(
-                        pkg_path,
-                        install_afterwards=args.install_afterwards,
-                        quiet=quiet_mode,
-                        version=version,
-                    )
-
-                max_length = max(len(f"Building packages: {args.package}") + 10, 100)
-                print("\r" + " " * max_length + "\r", end="", flush=True)
-
-                if success:
-                    print(f"✅ {args.package}")
-                else:
-                    print(f"❌ {args.package}")
-                    sys.exit(1)
-            else:
-                if not build.build_package(
-                    pkg_path,
-                    install_afterwards=args.install_afterwards,
-                    quiet=quiet_mode,
-                    version=version,
-                ):
-                    sys.exit(1)
-        else:
-            build.build_all(
-                install_afterwards=args.install_afterwards,
-                quiet=quiet_mode,
-                version=version,
-            )
-
-    elif args.command == "publish":
         if args.package not in PACKAGES:
             print(f"Error: Package '{args.package}' not found.")
             print(f"Available packages: {', '.join(PACKAGES)}")
@@ -155,65 +136,101 @@ Examples:
 
         pkg_path = PACKAGES_DIR / args.package
 
-        if not publish.publish_package(pkg_path):
+        (
+            sys.exit(0)
+            if test.test_package(
+                pkg_path,
+                quiet=is_quiet_mode,
+                verbose=is_verbose_mode,
+            )
+            else sys.exit(1)
+        )
+
+    if args.command == "build":
+        is_all_mode = not args.package
+        version = getattr(args, "version", None)
+        is_quiet_mode = hasattr(args, "quiet") and args.quiet
+        is_install_afterwards_mode = (
+            hasattr(args, "install_afterwards") and args.install_afterwards
+        )
+
+        if is_all_mode:
+            (
+                sys.exit(0)
+                if build.build_all(
+                    install_afterwards=is_install_afterwards_mode,
+                    quiet=is_quiet_mode,
+                    version=version,
+                )
+                else sys.exit(1)
+            )
+
+        if args.package not in PACKAGES:
+            print(f"Error: Package '{args.package}' not found.")
+            print(f"Available packages: {', '.join(PACKAGES)}")
             sys.exit(1)
 
-    elif args.command == "clean":
-        if args.package:
-            if args.package not in PACKAGES:
-                print(f"Error: Package '{args.package}' not found.")
-                print(f"Available packages: {', '.join(PACKAGES)}")
+        pkg_path = PACKAGES_DIR / args.package
+
+        if is_quiet_mode:
+            with common.Spinner(f"Building packages: {args.package}"):
+                success = build.build_package(
+                    pkg_path,
+                    install_afterwards=args.install_afterwards,
+                    quiet=is_quiet_mode,
+                    version=version,
+                )
+
+            max_length = max(len(f"Building packages: {args.package}") + 10, 100)
+            print("\r" + " " * max_length + "\r", end="", flush=True)
+
+            if not success:
+                print(f"❌ {args.package}")
                 sys.exit(1)
 
-            pkg_path = PACKAGES_DIR / args.package
-            clean.clean_package(pkg_path)
-        else:
+            print(f"✅ {args.package}")
+            sys.exit(0)
+
+        (
+            sys.exit(0)
+            if build.build_package(
+                pkg_path,
+                install_afterwards=args.install_afterwards,
+                quiet=is_quiet_mode,
+                version=version,
+            )
+            else sys.exit(1)
+        )
+
+    if args.command == "clean":
+        is_all_mode = not args.package
+
+        if is_all_mode:
             clean.clean_all()
+            sys.exit(0)
 
-    elif args.command == "lint":
-        if args.package:
-            resolved_paths = []
-
-            for pkg_arg in args.package:
-                resolved_path = common.resolve_path(pkg_arg)
-
-                if resolved_path is None:
-                    print(f"Error: '{pkg_arg}' is not a valid package, path, or file.")
-                    print(f"Available packages: {', '.join(PACKAGES)}")
-                    sys.exit(1)
-
-                resolved_paths.append(resolved_path)
-
-            if not lint.lint_files(resolved_paths):
-                sys.exit(1)
-        else:
-            if not lint.lint_all():
-                sys.exit(1)
-
-    elif args.command == "hooks":
-        if not args.hooks_command:
-            parser.parse_args([args.command, "--help"])
+        if args.package not in PACKAGES:
+            print(f"Error: Package '{args.package}' not found.")
+            print(f"Available packages: {', '.join(PACKAGES)}")
             sys.exit(1)
 
-        if args.hooks_command == "install":
-            if not hooks.install_hooks():
-                sys.exit(1)
-        elif args.hooks_command == "uninstall":
-            if not hooks.uninstall_hooks():
-                sys.exit(1)
-        elif args.hooks_command == "update":
-            if not hooks.update_hooks():
-                sys.exit(1)
-        elif args.hooks_command == "run":
-            if not hooks.run_hooks():
-                sys.exit(1)
-        else:
-            parser.parse_args([args.command, "--help"])
+        pkg_path = PACKAGES_DIR / args.package
+
+        clean.clean_package(pkg_path)
+        sys.exit(0)
+
+    if args.command == "publish":
+        if args.package not in PACKAGES:
+            print(f"Error: Package '{args.package}' not found.")
+            print(f"Available packages: {', '.join(PACKAGES)}")
             sys.exit(1)
 
-    else:
-        parser.print_help()
-        sys.exit(1)
+        pkg_path = PACKAGES_DIR / args.package
+
+        sys.exit(0) if publish.publish_package(pkg_path) else sys.exit(1)
+
+    parser.print_help()
+    sys.exit(1)
 
 
 if __name__ == "__main__":
