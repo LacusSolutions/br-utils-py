@@ -12,8 +12,9 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/lint.yml
     strategy:
+      max-parallel: 3
       matrix:
         python-version:
           - '3.10'
@@ -21,19 +22,11 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
-    steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - run: python -m pip install --upgrade pip
-      - run: python require
-
-      - run: python run lint
+    inputs:
+      python-version: ${{ matrix.python-version }}
 
   test:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/test.yml
     strategy:
       matrix:
         python-version:
@@ -42,16 +35,7 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
-    steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - run: python -m pip install --upgrade pip
-      - run: python require
-
-      - run: python run test
-        env:
-          API_URL: ${{ vars.BR_UTILS_API_URL }}
-          API_TOKEN: ${{ secrets.BR_UTILS_API_TOKEN }}
+    inputs:
+      python-version: ${{ matrix.python-version }}
+      api-url: ${{ vars.BR_UTILS_API_URL }}
+      api-token: ${{ secrets.BR_UTILS_API_TOKEN }}

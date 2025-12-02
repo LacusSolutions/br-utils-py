@@ -1,0 +1,37 @@
+name: Run Unit Tests
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        description: 'Python version to use'
+        required: false
+        default: '3.x'
+      api-url:
+        type: string
+        description: 'BR Utils API URL'
+        required: false
+        default: ${{ vars.BR_UTILS_API_URL }}
+      api-token:
+        type: string
+        description: 'BR Utils API token'
+        required: false
+        default: ${{ secrets.BR_UTILS_API_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - run: python -m pip install --upgrade pip
+      - run: python require
+
+      - run: python run test
+        env:
+          API_URL: ${{ inputs.api-url }}
+          API_TOKEN: ${{ inputs.api-token }}
