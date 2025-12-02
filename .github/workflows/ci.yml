@@ -11,8 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Unit Tests Assertions
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,7 +30,28 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python require
 
-      - run: python run test-all
+      - run: python run lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+    steps:
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: python -m pip install --upgrade pip
+      - run: python require
+
+      - run: python run test
         env:
           API_URL: ${{ vars.BR_UTILS_API_URL }}
           API_TOKEN: ${{ secrets.BR_UTILS_API_TOKEN }}

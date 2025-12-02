@@ -63,7 +63,7 @@ repos:
       - stages: [pre-push]
         id: test-all
         name: Run All Tests
-        entry: python run test-all
+        entry: python run test
         language: unsupported
         pass_filenames: false
         always_run: true
