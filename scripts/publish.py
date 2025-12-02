@@ -5,7 +5,6 @@ __all__ = ["publish_all", "publish_package"]
 import sys
 from argparse import ArgumentParser
 
-from .build import build_package
 from .common import PACKAGES, PACKAGES_DIR, run_command
 
 
@@ -19,8 +18,20 @@ def publish_package(pkg_path) -> bool:
     """Publish a specific package to PyPI."""
     print(f"Publishing {pkg_path.name}...")
 
-    if not build_package(pkg_path):
-        print(f"Error: Failed to build {pkg_path.name}")
+    dist_dir = pkg_path / "dist"
+
+    if not dist_dir.exists():
+        print(f"Error: No distribution files found for {pkg_path.name}")
+        print("       The 'dist/' directory does not exist.")
+        print(f"       Please run 'python run build {pkg_path.name}' first.")
+        return False
+
+    dist_files = list(dist_dir.glob("*"))
+
+    if not dist_files:
+        print(f"Error: No distribution files found for {pkg_path.name}")
+        print("       The 'dist/' directory is empty.")
+        print(f"       Please run 'python run build {pkg_path.name}' first.")
         return False
 
     return run_command(

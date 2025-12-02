@@ -103,6 +103,7 @@ Examples:
 
     elif args.command == "build":
         quiet_mode = hasattr(args, "quiet") and args.quiet
+        version = getattr(args, "version", None)
 
         if args.package:
             if args.package not in PACKAGES:
@@ -120,6 +121,7 @@ Examples:
                         pkg_path,
                         install_afterwards=args.install_afterwards,
                         quiet=quiet_mode,
+                        version=version,
                     )
 
                 max_length = max(len(f"Building packages: {args.package}") + 10, 100)
@@ -135,12 +137,14 @@ Examples:
                     pkg_path,
                     install_afterwards=args.install_afterwards,
                     quiet=quiet_mode,
+                    version=version,
                 ):
                     sys.exit(1)
         else:
             build.build_all(
                 install_afterwards=args.install_afterwards,
                 quiet=quiet_mode,
+                version=version,
             )
 
     elif args.command == "publish":

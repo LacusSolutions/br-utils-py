@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from shutil import rmtree
 
 from .common import PACKAGES, PACKAGES_DIR, Spinner, run_command
+from .version import VersionContext
 
 
 def setup_commands(parser: ArgumentParser) -> None:
@@ -27,10 +28,29 @@ def setup_commands(parser: ArgumentParser) -> None:
         action="store_true",
         help="Quiet mode: show less output",
     )
+    build_parser.add_argument(
+        "-v",
+        "--version",
+        help="Set the version of the package being built",
+    )
 
 
-def build_package(pkg_path, install_afterwards=False, quiet=False):
+def build_package(pkg_path, install_afterwards=False, quiet=False, version=None):
     """Build a specific package."""
+    if version:
+        if not quiet:
+            print(f"Setting version to {version} for {pkg_path.name}...")
+        try:
+            with VersionContext(pkg_path, version):
+                return _build_package_impl(pkg_path, install_afterwards, quiet)
+        except (FileNotFoundError, ValueError, Exception):
+            return False
+    else:
+        return _build_package_impl(pkg_path, install_afterwards, quiet)
+
+
+def _build_package_impl(pkg_path, install_afterwards=False, quiet=False):
+    """Internal implementation of package building."""
     if not quiet:
         print(f"Building {pkg_path.name}...")
 
@@ -96,8 +116,14 @@ def build_package(pkg_path, install_afterwards=False, quiet=False):
     return True
 
 
-def build_all(install_afterwards=False, quiet=False):
+def build_all(install_afterwards=False, quiet=False, version=None):
     """Build all packages."""
+    if version:
+        print(
+            "Warning: --version option is only supported when building a specific package"
+        )
+        print("         Ignoring version option for build all")
+
     if not quiet:
         print("Building all packages...")
 
