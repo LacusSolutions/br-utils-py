@@ -70,7 +70,7 @@ class CpfGeneratorTestCases(ABC):
         for _ in range(25):
             cpf = self.generate(True)
 
-            assert re.match(pattern, cpf), f"Input: {cpf}, Expected: ##.###.###/####-##"
+            assert re.match(pattern, cpf), f"Input: {cpf}, Expected: ###.###.###-##"
 
     def test_prefixed_value_cannot_accept_string_with_more_than_9_digits(self):
         with pytest.raises(CpfGeneratorInvalidPrefixLengthError):
