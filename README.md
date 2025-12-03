@@ -1,4 +1,4 @@
-![cnpj-cd for Python](https://github.com/user-attachments/assets/80ba4abd-169b-456a-acc3-d10759856a1e)
+![cnpj-cd for Python](https://br-utils.vercel.app/img/cover_cnpj-cd.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cnpj-cd)](https://pypi.org/project/cnpj-cd)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-cd)](https://pypi.org/project/cnpj-cd)
