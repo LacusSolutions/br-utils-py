@@ -1,4 +1,4 @@
-![cnpj-fmt for Python](https://github.com/user-attachments/assets/a2c32327-060c-4ea5-9f35-03c11d1c37ab)
+![cnpj-fmt for Python](https://br-utils.vercel.app/img/cover_cnpj-fmt.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cnpj-fmt)](https://pypi.org/project/cnpj-fmt)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-fmt)](https://pypi.org/project/cnpj-fmt)
