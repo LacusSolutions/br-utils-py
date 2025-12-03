@@ -1,4 +1,4 @@
-![cnpj-gen for Python](https://github.com/user-attachments/assets/80ba4abd-169b-456a-acc3-d10759856a1e)
+![cnpj-gen for Python](https://br-utils.vercel.app/img/cover_cnpj-gen.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cnpj-gen)](https://pypi.org/project/cnpj-gen)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-gen)](https://pypi.org/project/cnpj-gen)
