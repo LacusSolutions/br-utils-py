@@ -2,3 +2,4 @@ cnpj-cd>=1.0.0
 cnpj-fmt>=1.0.0
 cnpj-gen>=1.0.0
 cnpj-val>=1.0.0
+cpf-cd
