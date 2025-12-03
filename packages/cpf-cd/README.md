@@ -70,12 +70,11 @@ check_digits = CpfCheckDigits(["054", "496", "519"])  # also flattens
 
 ```python
 # List of single-digit integers
-check_digits = CpfCheckDigits([0, 5, 4, 4, 9, 6, 5, 1, 9])
+check_digits = CpfCheckDigits([1, 2, 3, 4, 5, 6, 7, 8, 9])
 
 # List with multi-digit integers (automatically flattened)
-check_digits = CpfCheckDigits([54496519])         # flattens to individual digits
-check_digits = CpfCheckDigits([54, 496, 519])     # also flattens
-```
+check_digits = CpfCheckDigits([123456789])         # flattens to individual digits
+check_digits = CpfCheckDigits([123, 456, 789])     # also flattens
 
 ### Properties
 
