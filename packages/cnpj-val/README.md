@@ -1,4 +1,4 @@
-![cnpj-val for Python](https://github.com/user-attachments/assets/798de57c-445e-49f0-ba50-6fd72f12d8e4)
+![cnpj-val for Python](https://br-utils.vercel.app/img/cover_cnpj-val.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cnpj-val)](https://pypi.org/project/cnpj-val)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-val)](https://pypi.org/project/cnpj-val)
