@@ -1,7 +1,7 @@
 [project]
 name = "cpf-cd"
 dynamic = [ "version" ]
-description = "Utility function to format CNPJ (Brazilian personal ID)"
+description = "Utility resources to calculate check digits on CPF (Brazilian personal ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
