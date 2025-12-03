@@ -1,6 +1,7 @@
 import re
 
 from .exceptions import (
+    CpfCheckDigitsCalculationError,
     CpfInvalidLengthError,
     CpfTypeError,
 )
@@ -33,19 +34,27 @@ class CpfCheckDigits:
     @property
     def first_digit(self) -> int:
         """Calculates and returns the first check digit.As it's immutable, it caches the calculation result."""
-        raise NotImplementedError("Getter `first_digit` not implemented yet")
+        if self._first_digit is None:
+            base_digits_sequence = self._cpf_digits.copy()
+            self._first_digit = self._calculate(base_digits_sequence)
+
+        return self._first_digit
 
     @property
     def second_digit(self) -> int:
         """Calculates and returns the second check digit.As it's immutable, it caches the calculation result. And, as it depends on the first check digit, it's also calculated."""
-        raise NotImplementedError("Getter `second_digit` is not implemented yet")
+        if self._second_digit is None:
+            base_digits_sequence = [*self._cpf_digits, self.first_digit]
+            self._second_digit = self._calculate(base_digits_sequence)
+
+        return self._second_digit
 
     def to_list(self) -> list[int]:
-        """Returns the complete CPF as a list of 14 integers (12 base digits + 2 check digits)."""
+        """Returns the complete CPF as a list of 11 integers (9 base digits + 2 check digits)."""
         return [*self._cpf_digits, self.first_digit, self.second_digit]
 
     def to_string(self) -> str:
-        """Returns the complete CPF as a string of 14 digits (12 base digits + 2 check digits)."""
+        """Returns the complete CPF as a string of 11 digits (9 base digits + 2 check digits)."""
         return "".join(str(digit) for digit in self.to_list())
 
     def _handle_string_input(self, cpf_digits: str, original_input: str) -> list[int]:
@@ -118,5 +127,21 @@ class CpfCheckDigits:
             )
 
     def _calculate(self, cpf_sequence: list[int]) -> int:
-        """Calculates the CPF check digits using the official Brazilian algorithm. For the first check digit, it uses the digits 1 through 12 of the CPF base. For the second one, it uses the digits 1 through 13 (with the first check digit)."""
-        raise NotImplementedError("Method `_calculate` not implemented yet")
+        """Calculates the CPF check digits using the official Brazilian algorithm. For the first check digit, it uses the digits 1 through 9 of the CPF base. For the second one, it uses the digits 1 through 10 (with the first check digit)."""
+        min_length = CPF_MIN_LENGTH
+        max_length = CPF_MAX_LENGTH - 1
+        sequence_length = len(cpf_sequence)
+
+        if sequence_length < min_length or sequence_length > max_length:
+            raise CpfCheckDigitsCalculationError(cpf_sequence)
+
+        factor = sequence_length + 1
+        sum_result = 0
+
+        for num in cpf_sequence:
+            sum_result += num * factor
+            factor -= 1
+
+        remainder = 11 - (sum_result % 11)
+
+        return 0 if remainder > 9 else remainder
