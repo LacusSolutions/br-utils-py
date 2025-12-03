@@ -35,7 +35,7 @@ class CnpjCheckDigits:
     def first_digit(self) -> int:
         """Calculates and returns the first check digit.As it's immutable, it caches the calculation result."""
         if self._first_digit is None:
-            base_digits_sequence = self._cnpj_digits
+            base_digits_sequence = self._cnpj_digits.copy()
             self._first_digit = self._calculate(base_digits_sequence)
 
         return self._first_digit
