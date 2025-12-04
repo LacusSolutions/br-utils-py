@@ -30,9 +30,12 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries",
-  "Topic :: Utilities"
+  "Topic :: Utilities",
 ]
 requires-python = ">=3.10"
+dependencies = [
+  "cpf-cd",
+]
 
   [[project.authors]]
   name = "Julio L. Muller"
@@ -42,7 +45,7 @@ requires-python = ">=3.10"
   content-type = "text/markdown"
 
   [project.urls]
-  Homepage = "https://cnpj-utils.vercel.app/"
+  Homepage = "https://cpf-utils.vercel.app/"
   Source = "https://github.com/LacusSolutions/br-utils-py"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
@@ -61,7 +64,7 @@ minversion = "8.0"
 testpaths = [ "tests/" ]
 python_files = [ "*_test.py" ]
 python_functions = [ "test_*" ]
-python_classes = [ "Test*" ]
+python_classes = [ "*Test" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
