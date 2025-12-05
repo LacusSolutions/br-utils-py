@@ -12,3 +12,13 @@ class CpfGeneratorPrefixLengthError(CpfGeneratorError):
         super().__init__(
             f"The prefix length must be less than or equal to {max_length}. Got {prefix_length}."
         )
+
+
+class CpfGeneratorPrefixNotValidError(CpfGeneratorError):
+    """Raised when the prefix is not valid (e.g., repeated digits)."""
+
+    def __init__(self, actual_prefix: str | list[str] | list[int], reason: str) -> None:
+        self.actual_prefix = actual_prefix
+        self.reason = reason
+
+        super().__init__(f'The prefix "{actual_prefix}" is invalid. {reason}')
