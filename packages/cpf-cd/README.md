@@ -189,7 +189,7 @@ except CpfCheckDigitsInputNotValidError as e:
 All errors extend from a common error instance `CpfCheckDigitsError`, so you can use this type to handle any error thrown by the module.
 
 ```python
-from cpf_gen import CpfCheckDigitsError
+from cpf_cd import CpfCheckDigitsError
 
 try:
   # some risky code run
