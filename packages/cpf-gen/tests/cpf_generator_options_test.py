@@ -1,5 +1,9 @@
 import pytest
-from cpf_gen import CpfGeneratorOptions, CpfGeneratorPrefixLengthError
+from cpf_gen import (
+    CpfGeneratorOptions,
+    CpfGeneratorPrefixLengthError,
+    CpfGeneratorPrefixNotValidError,
+)
 
 
 class CpfGeneratorOptionsTest:
@@ -9,7 +13,7 @@ class CpfGeneratorOptionsTest:
         assert options.format is False
         assert options.prefix == ""
 
-    def test_constructor_with_all_null_params(self):
+    def test_constructor_with_all_none_params(self):
         options = CpfGeneratorOptions(
             format=None,
             prefix=None,
@@ -27,7 +31,7 @@ class CpfGeneratorOptionsTest:
         assert options.format is True
         assert options.prefix == "123456"
 
-    def test_constructor_with_mixed_null_and_valid_values(self):
+    def test_constructor_with_mixed_none_and_valid_values(self):
         options = CpfGeneratorOptions(
             format=True,
             prefix=None,
@@ -35,6 +39,30 @@ class CpfGeneratorOptionsTest:
 
         assert options.format is True
         assert options.prefix == ""
+
+    def test_constructor_throws_error_on_prefix_too_long(self):
+        with pytest.raises(CpfGeneratorPrefixLengthError) as exc_info:
+            CpfGeneratorOptions(prefix="1234567890")
+
+        assert "The prefix length must be less than or equal to 9. Got 10." in str(
+            exc_info.value
+        )
+
+    def test_constructor_throws_error_on_prefix_with_repeated_digits(self):
+        invalid_prefixes = [
+            "111111111",
+            "222222222",
+            "333333333",
+            "444444444",
+            "555555555",
+        ]
+
+        for prefix in invalid_prefixes:
+            with pytest.raises(CpfGeneratorPrefixNotValidError) as exc_info:
+                CpfGeneratorOptions(prefix=prefix)
+
+            assert f"{prefix}" in str(exc_info.value)
+            assert "Repeated digits are not considered valid." in str(exc_info.value)
 
     def test_merge_returns_new_instance(self):
         original_options = CpfGeneratorOptions()
@@ -107,3 +135,26 @@ class CpfGeneratorOptionsTest:
         assert "The prefix length must be less than or equal to 9. Got 10." in str(
             exc_info.value
         )
+
+    def test_prefix_setter_throws_error_with_repeated_digits(self):
+        invalid_prefixes = [
+            "111111111",
+            "222222222",
+            "333333333",
+            "444444444",
+            "555555555",
+            "666666666",
+            "777777777",
+            "888888888",
+            "999999999",
+            "000000000",
+        ]
+
+        for prefix in invalid_prefixes:
+            options = CpfGeneratorOptions()
+
+            with pytest.raises(CpfGeneratorPrefixNotValidError) as exc_info:
+                options.prefix = prefix
+
+            assert f"{prefix}" in str(exc_info.value)
+            assert "Repeated digits are not considered valid." in str(exc_info.value)
