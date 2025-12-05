@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       version:
-        description: 'Version to release (e.g., 1.2.3 or 1.2.3-alpha1)'
+        description: 'Version to release (e.g., 1.2.3 or 1.2.3.alpha1)'
         required: true
         type: string
 
@@ -65,11 +65,11 @@ jobs:
 
           # Accepted versions format:
           # - stable: \d+\.\d+\.\d+
-          # - pre-release: \d+\.\d+\.\d+-(dev|alpha|beta|rc)\d+
-          if [[ ! "$PKG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(dev|alpha|beta|rc)[0-9]+)?$ ]]; then
+          # - pre-release: \d+\.\d+\.\d+\.(dev|alpha|beta|rc)\d+
+          if [[ ! "$PKG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.(dev|alpha|beta|rc)[0-9]+)?$ ]]; then
             echo "❌ Version '$PKG_VERSION' does not match expected format:"
-            echo "   Expected: X.Y.Z or X.Y.Z-{dev,alpha,beta,rc}N"
-            echo "   Example: 1.2.3 or 1.2.3-alpha1"
+            echo "   Expected: X.Y.Z or X.Y.Z.{dev,alpha,beta,rc}N"
+            echo "   Example: 1.2.3 or 1.2.3.alpha1"
             exit 1
           fi
 
@@ -157,7 +157,7 @@ jobs:
               \"tag_name\": \"$TAG_NAME\",
               \"name\": \"$TAG_NAME\",
               \"draft\": false,
-              \"prerelease\": $([[ "$PKG_VERSION" =~ -(dev|alpha|beta|rc) ]] && echo "true" || echo "false")
+              \"prerelease\": $([[ "$PKG_VERSION" =~ \.(dev|alpha|beta|rc) ]] && echo "true" || echo "false")
             }")
 
           HTTP_CODE=$(echo "$RELEASE_RESPONSE" | tail -n1)
