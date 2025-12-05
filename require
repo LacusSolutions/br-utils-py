@@ -21,6 +21,7 @@ def install_dependencies(file: Path):
             "-m",
             "pip",
             "install",
+            "--upgrade",
             "-r",
             str(file),
         ],
