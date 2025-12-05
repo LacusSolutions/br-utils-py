@@ -44,7 +44,7 @@ class CpfGeneratorOptions:
                 raise CpfGeneratorPrefixLengthError(prefix_length, PREFIX_MAX_LENGTH)
 
             if prefix_length == PREFIX_MAX_LENGTH:
-                digits_set = set(value)
+                digits_set = set(prefix_value)
 
                 if len(digits_set) == 1:
                     raise CpfGeneratorPrefixNotValidError(
