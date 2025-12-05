@@ -222,7 +222,7 @@ cpf7 = generator.generate()  # '987.654.321-XX' (formatted with prefix)
 ## Dependencies
 
 - **Python**: >= 3.10
-- **cpf-cd**: For CPF check digit calculation
+- **cpf-cd**: for check digit calculation
 
 ## Contribution & Support
 
