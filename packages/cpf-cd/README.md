@@ -184,6 +184,19 @@ except CpfCheckDigitsInputNotValidError as e:
     print(e)  # CPF input ['999', '999', '999'] is invalid. Repeated digits are not considered valid.
 ```
 
+### Catch any error from the package
+
+All errors extend from a common error instance `CpfCheckDigitsError`, so you can use this type to handle any error thrown by the module.
+
+```python
+from cpf_gen import CpfCheckDigitsError
+
+try:
+  # some risky code run
+except CpfCheckDigitsError as e:
+  # do something
+```
+
 ## Features
 
 - ✅ **Multiple Input Formats**: Accepts strings, lists of strings, or lists of integers
