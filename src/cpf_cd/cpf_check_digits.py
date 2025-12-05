@@ -22,7 +22,7 @@ class CpfCheckDigits:
             raise CpfCheckDigitsInputTypeError(original_input)
 
         if isinstance(cpf_input, str):
-            cpf_input = self._handle_string_input(cpf_input, original_input)
+            cpf_input = self._handle_string_input(cpf_input)
         else:
             cpf_input = self._handle_list_input(cpf_input, original_input)
 
@@ -57,65 +57,45 @@ class CpfCheckDigits:
         """Returns the complete CPF as a string of 11 digits (9 base digits + 2 check digits)."""
         return "".join(str(digit) for digit in self.to_list())
 
-    def _handle_string_input(self, cpf_string: str, original_input: str) -> list[int]:
-        """When CPF is provided as a string, it's sanitized, validated and converted to a list of integers."""
+    def _handle_string_input(self, cpf_string: str) -> list[int]:
+        """When CPF is provided as a string, it is sanitized, validated and converted to a list of integers."""
         digits_only_string = re.sub(r"[^0-9]", "", cpf_string)
-        digits_count = len(digits_only_string)
 
-        if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
-            raise CpfCheckDigitsInputLengthError(
-                original_input, digits_only_string, CPF_MIN_LENGTH, CPF_MAX_LENGTH
-            )
-
-        return [int(d) for d in digits_only_string]
+        return [int(digit_string) for digit_string in digits_only_string]
 
     def _handle_list_input(
         self, cpf_list: list[str] | list[int], original_input: list
     ) -> list[int]:
-        """When CPF is provided as a list of strings or integers, it's validated and converted to a list of integers for further processing."""
+        """When CPF is provided as a list of strings or integers, it is sanitized, validated and converted to a list of integers for further processing."""
         if all(isinstance(digit, str) for digit in cpf_list):
-            return self._handle_string_list_input(cpf_list, original_input)
+            return self._handle_string_list_input(cpf_list)
 
         if all(isinstance(digit, int) for digit in cpf_list):
             return self._flatten_digits(cpf_list)
 
         raise CpfCheckDigitsInputTypeError(original_input)
 
-    def _handle_string_list_input(
-        self, cpf_string_list: list[str], original_input: list
-    ) -> list[int]:
-        """When CPF is provided as a list of strings, it's validated and converted to a list of integers for further processing."""
-        digits_count = sum(len(fragment) for fragment in cpf_string_list if fragment)
-
-        if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
-            raise CpfCheckDigitsInputLengthError(
-                original_input, "".join(cpf_string_list), CPF_MIN_LENGTH, CPF_MAX_LENGTH
-            )
-
-        flat_digits = []
+    def _handle_string_list_input(self, cpf_string_list: list[str]) -> list[int]:
+        """When CPF is provided as a list of strings, it is sanitized, validated and converted to a list of integers for further processing."""
+        final_cpf_int_list = []
 
         for list_item in cpf_string_list:
-            if not list_item:
-                continue
+            cpf_int_list = self._handle_string_input(list_item)
+            final_cpf_int_list.extend(cpf_int_list)
 
-            try:
-                digits_int = int(list_item)
-                flat_digits_int = self._flatten_digits([digits_int])
-                flat_digits.extend(flat_digits_int)
-            except ValueError as error:
-                raise CpfCheckDigitsInputTypeError(original_input) from error
-
-        return flat_digits
+        return final_cpf_int_list
 
     def _flatten_digits(self, int_list: list[int]) -> list[int]:
-        """Breaks down multiple digits within the array into individual digits. Negative numbers are converted to their absolute value."""
-        flat_digits = []
+        """Breaks down multiple digits within the array into individual ones. Negative numbers are converted to their absolute value."""
+        final_cpf_int_list = []
 
         for number in int_list:
             abs_number = abs(number)
-            flat_digits.extend([int(digit_string) for digit_string in str(abs_number)])
+            final_cpf_int_list.extend(
+                [int(digit_string) for digit_string in str(abs_number)]
+            )
 
-        return flat_digits
+        return final_cpf_int_list
 
     def _validate_length(
         self, cpf_int_list: list[int], original_input: str | list

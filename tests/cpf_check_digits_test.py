@@ -177,6 +177,19 @@ class CpfCheckDigitsTest:
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
+    def test_constructor_throws_error_with_string_list_with_non_numeric_chars_input(
+        self,
+    ):
+        input = ["123", "abc", "000"]
+
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
+            CpfCheckDigits(input)
+
+        assert (
+            "CPF input ['123', 'abc', '000'] does not contain 9 to 11 digits. Got 6 in \"123000\"."
+            in str(exc_info.value)
+        ), f"Input: {input}, Exception: {exc_info.value}"
+
     def test_constructor_throws_error_with_string_list_with_too_many_digits_input_in_fewer_items(
         self,
     ):
