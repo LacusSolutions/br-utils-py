@@ -46,7 +46,7 @@ class CpfCheckDigitsInputLengthError(CpfCheckDigitsError):
 
 
 class CpfCheckDigitsInputNotValidError(CpfCheckDigitsError):
-    """Raised when the class input contains non-invalid characters."""
+    """Raised when the class input is not valid (e.g., repeated digits)."""
 
     def __init__(self, actual_input: str | list[str] | list[int], reason: str) -> None:
         self.actual_input = actual_input
