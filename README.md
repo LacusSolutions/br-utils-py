@@ -145,41 +145,43 @@ print(list_input.to_string())  # '05449651910'
 
 The package raises specific exceptions for different error scenarios:
 
-### `CpfTypeError`
+### `CpfCheckDigitsInputTypeError`
 
 Raised when the input type is not supported (must be `str`, `list[str]`, or `list[int]`).
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfTypeError
+from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputTypeError
 
 try:
     CpfCheckDigits(12345678901)  # int not allowed
-except CpfTypeError as e:
+except CpfCheckDigitsInputTypeError as e:
     print(e)  # CPF input must be of type str, list[str] or list[int]. Got int.
 ```
 
-### `CpfInvalidLengthError`
+### `CpfCheckDigitsInputLengthError`
 
 Raised when the input does not contain 9 to 11 digits.
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfInvalidLengthError
+from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputLengthError
 
 try:
     CpfCheckDigits("12345678")  # only 8 digits
-except CpfInvalidLengthError as e:
-    print(e)  # Parameter "12345678" does not contain 9 to 11 digits. Got 8.
+except CpfCheckDigitsInputLengthError as e:
+    print(e)  # CPF input "12345678" does not contain 9 to 11 digits. Got 8 in "12345678".
 ```
 
-### `CpfCheckDigitsCalculationError`
+### `CpfCheckDigitsInputNotValidError`
 
-Raised when the check digit calculation fails due to invalid sequence length.
+Raised when the input is forbidden for some restriction, like repeated digits like `111.111.111`, `222.222.222`, `333.333.333` and so on.
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfCheckDigitsCalculationError
+from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputNotValidError
 
-# This is an internal error that should not occur in normal usage
-# It happens when the sequence passed to _calculate() has invalid length
+try:
+    CpfCheckDigits(["999", "999", "999"])
+except CpfCheckDigitsInputNotValidError as e:
+    print(e)  # CPF input ['999', '999', '999'] is invalid. Repeated digits are not considered valid.
 ```
 
 ## Features
@@ -211,8 +213,8 @@ Creates a new `CpfCheckDigits` instance from the provided CPF base digits.
   - A list of integers (each integer can be a single digit or multi-digit number)
 
 **Raises:**
-- `CpfTypeError`: If the input type is not supported
-- `CpfInvalidLengthError`: If the input does not contain 9-11 digits
+- `CpfCheckDigitsInputTypeError`: If the input type is not supported
+- `CpfCheckDigitsInputLengthError`: If the input does not contain 9-11 digits
 
 **Returns:**
 - `CpfCheckDigits`: A new instance ready to calculate check digits
