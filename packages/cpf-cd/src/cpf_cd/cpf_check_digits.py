@@ -2,8 +2,8 @@ import re
 
 from .exceptions import (
     CpfCheckDigitsCalculationError,
-    CpfInvalidLengthError,
-    CpfTypeError,
+    CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputTypeError,
 )
 
 CPF_MIN_LENGTH = 9
@@ -15,19 +15,19 @@ class CpfCheckDigits:
 
     __slots__ = ("_cpf_digits", "_first_digit", "_second_digit")
 
-    def __init__(self, cpf_digits: str | list[str] | list[int]) -> None:
-        original_input = cpf_digits
+    def __init__(self, cpf_input: str | list[str] | list[int]) -> None:
+        original_input = cpf_input
 
-        if not isinstance(cpf_digits, (str, list)):
-            raise CpfTypeError(original_input)
+        if not isinstance(cpf_input, (str, list)):
+            raise CpfCheckDigitsInputTypeError(original_input)
 
-        if isinstance(cpf_digits, str):
-            cpf_digits = self._handle_string_input(cpf_digits, original_input)
-        elif isinstance(cpf_digits, list):
-            cpf_digits = self._handle_list_input(cpf_digits, original_input)
+        if isinstance(cpf_input, str):
+            cpf_input = self._handle_string_input(cpf_input, original_input)
+        else:
+            cpf_input = self._handle_list_input(cpf_input, original_input)
 
-        self._validate_length(cpf_digits, original_input)
-        self._cpf_digits = cpf_digits[:CPF_MIN_LENGTH]
+        self._validate_length(cpf_input, original_input)
+        self._cpf_digits = cpf_input[:CPF_MIN_LENGTH]
         self._first_digit: int | None = None
         self._second_digit: int | None = None
 
@@ -57,73 +57,78 @@ class CpfCheckDigits:
         """Returns the complete CPF as a string of 11 digits (9 base digits + 2 check digits)."""
         return "".join(str(digit) for digit in self.to_list())
 
-    def _handle_string_input(self, cpf_digits: str, original_input: str) -> list[int]:
-        """When CPF is provided as a string, it's validated and converted to a list of integers."""
-        numeric_str = re.sub(r"[^0-9]", "", cpf_digits)
+    def _handle_string_input(self, cpf_string: str, original_input: str) -> list[int]:
+        """When CPF is provided as a string, it's sanitized, validated and converted to a list of integers."""
+        digits_only_string = re.sub(r"[^0-9]", "", cpf_string)
+        digits_count = len(digits_only_string)
 
-        if not numeric_str:
-            raise CpfInvalidLengthError(
-                original_input, CPF_MIN_LENGTH, CPF_MAX_LENGTH, 0
+        if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
+            raise CpfCheckDigitsInputLengthError(
+                original_input, digits_only_string, CPF_MIN_LENGTH, CPF_MAX_LENGTH
             )
 
-        return [int(d) for d in numeric_str]
+        return [int(d) for d in digits_only_string]
 
     def _handle_list_input(
-        self, cpf_digits: list[str] | list[int], original_input: list
+        self, cpf_list: list[str] | list[int], original_input: list
     ) -> list[int]:
         """When CPF is provided as a list of strings or integers, it's validated and converted to a list of integers for further processing."""
-        if all(isinstance(digit, str) for digit in cpf_digits):
-            return self._handle_string_list(cpf_digits, original_input)
+        if all(isinstance(digit, str) for digit in cpf_list):
+            return self._handle_string_list_input(cpf_list, original_input)
 
-        if all(isinstance(digit, int) for digit in cpf_digits):
-            return self._flatten_digits(cpf_digits)
+        if all(isinstance(digit, int) for digit in cpf_list):
+            return self._flatten_digits(cpf_list)
 
-        raise CpfTypeError(original_input)
+        raise CpfCheckDigitsInputTypeError(original_input)
 
-    def _handle_string_list(
-        self, cpf_digits: list[str], original_input: list
+    def _handle_string_list_input(
+        self, cpf_string_list: list[str], original_input: list
     ) -> list[int]:
         """When CPF is provided as a list of strings, it's validated and converted to a list of integers for further processing."""
-        total_length = sum(len(digit_str) for digit_str in cpf_digits if digit_str)
+        digits_count = sum(len(fragment) for fragment in cpf_string_list if fragment)
 
-        if total_length < CPF_MIN_LENGTH or total_length > CPF_MAX_LENGTH:
-            raise CpfInvalidLengthError(
-                original_input, CPF_MIN_LENGTH, CPF_MAX_LENGTH, total_length
+        if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
+            raise CpfCheckDigitsInputLengthError(
+                original_input, "".join(cpf_string_list), CPF_MIN_LENGTH, CPF_MAX_LENGTH
             )
 
         flat_digits = []
 
-        for digit_str in cpf_digits:
-            if not digit_str:
+        for list_item in cpf_string_list:
+            if not list_item:
                 continue
 
             try:
-                digit_int = int(digit_str)
-                flat_digits.extend(self._flatten_digits([digit_int]))
-            except ValueError as e:
-                raise CpfTypeError(original_input) from e
+                digits_int = int(list_item)
+                flat_digits_int = self._flatten_digits([digits_int])
+                flat_digits.extend(flat_digits_int)
+            except ValueError as error:
+                raise CpfCheckDigitsInputTypeError(original_input) from error
 
         return flat_digits
 
-    def _flatten_digits(self, digits: list[int]) -> list[int]:
+    def _flatten_digits(self, int_list: list[int]) -> list[int]:
         """Breaks down multiple digits within the array into individual digits. Negative numbers are converted to their absolute value."""
         flat_digits = []
 
-        for digit in digits:
-            abs_digit = abs(digit)
-            flat_digits.extend([int(d) for d in str(abs_digit)])
+        for number in int_list:
+            abs_number = abs(number)
+            flat_digits.extend([int(digit_string) for digit_string in str(abs_number)])
 
         return flat_digits
 
     def _validate_length(
-        self, cpf_digits: list[int], original_input: str | list
+        self, cpf_int_list: list[int], original_input: str | list
     ) -> None:
         """Validates the length of the CPF digits."""
-        length = len(cpf_digits)
+        digits_count = len(cpf_int_list)
 
-        if length < CPF_MIN_LENGTH or length > CPF_MAX_LENGTH:
-            raise CpfInvalidLengthError(
-                original_input, CPF_MIN_LENGTH, CPF_MAX_LENGTH, length
+        if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
+            raise CpfCheckDigitsInputLengthError(
+                original_input,
+                "".join(str(digit) for digit in cpf_int_list),
+                CPF_MIN_LENGTH,
+                CPF_MAX_LENGTH,
             )
 
     def _calculate(self, cpf_sequence: list[int]) -> int:

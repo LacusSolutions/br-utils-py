@@ -1,5 +1,9 @@
 import pytest
-from cpf_cd import CpfCheckDigits, CpfInvalidLengthError, CpfTypeError
+from cpf_cd import (
+    CpfCheckDigits,
+    CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputTypeError,
+)
 
 test_cases = {
     "054496519": "05449651910",
@@ -59,7 +63,7 @@ class CpfCheckDigitsTest:
     def test_constructor_throws_error_with_int_input(self):
         input = 12345678901
 
-        with pytest.raises(CpfTypeError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputTypeError) as exc_info:
             CpfCheckDigits(input)
 
         assert "CPF input must be of type str, list[str] or list[int]. Got int." in str(
@@ -69,7 +73,7 @@ class CpfCheckDigitsTest:
     def test_constructor_throws_error_with_float_input(self):
         input = 12345678901.23
 
-        with pytest.raises(CpfTypeError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputTypeError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
@@ -80,7 +84,7 @@ class CpfCheckDigitsTest:
     def test_constructor_throws_error_with_none_input(self):
         input = None
 
-        with pytest.raises(CpfTypeError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputTypeError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
@@ -91,7 +95,7 @@ class CpfCheckDigitsTest:
     def test_constructor_throws_error_with_dict_input(self):
         input = {"12345678901": "12345678901"}
 
-        with pytest.raises(CpfTypeError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputTypeError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
@@ -102,73 +106,74 @@ class CpfCheckDigitsTest:
     def test_constructor_throws_error_with_empty_string_input(self):
         input = ""
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
-        assert 'Parameter "" does not contain 9 to 11 digits. Got 0.' in str(
+        assert 'CPF input "" does not contain 9 to 11 digits. Got 0.' in str(
             exc_info.value
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_empty_list_input(self):
         input = []
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
-        assert 'Parameter "[]" does not contain 9 to 11 digits. Got 0.' in str(
+        assert 'CPF input [] does not contain 9 to 11 digits. Got 0 in "".' in str(
             exc_info.value
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_non_numeric_string_input(self):
         input = "abcdefghij"
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
-        assert 'Parameter "abcdefghij" does not contain 9 to 11 digits. Got 0.' in str(
-            exc_info.value
+        assert (
+            'CPF input "abcdefghij" does not contain 9 to 11 digits. Got 0 in "".'
+            in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_string_with_too_few_digits_input(self):
         input = "12345678"
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
-        assert 'Parameter "12345678" does not contain 9 to 11 digits. Got 8.' in str(
+        assert 'CPF input "12345678" does not contain 9 to 11 digits. Got 8.' in str(
             exc_info.value
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_string_with_too_many_digits_input(self):
         input = "123456789012"
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            'Parameter "123456789012" does not contain 9 to 11 digits. Got 12.'
+            'CPF input "123456789012" does not contain 9 to 11 digits. Got 12.'
             in str(exc_info.value)
         ), (f"Input: {input}, Exception: {exc_info.value}")
 
     def test_constructor_throws_error_with_string_list_with_too_few_digits_input(self):
         input = ["1", "2", "3", "4", "5", "6", "7", "8"]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            "Parameter \"['1', '2', '3', '4', '5', '6', '7', '8']\" does not contain 9 to 11 digits. Got 8."
+            "CPF input ['1', '2', '3', '4', '5', '6', '7', '8'] does not contain 9 to 11 digits. Got 8 in \"12345678\"."
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_string_list_with_too_many_digits_input(self):
         input = ["0", "5", "4", "4", "9", "6", "5", "1", "9", "1", "0", "1"]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            "Parameter \"['0', '5', '4', '4', '9', '6', '5', '1', '9', '1', '0', '1']\" does not contain 9 to 11 digits. Got 12."
+            "CPF input ['0', '5', '4', '4', '9', '6', '5', '1', '9', '1', '0', '1'] does not contain 9 to 11 digits. Got 12 in \"054496519101\"."
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
@@ -177,33 +182,33 @@ class CpfCheckDigitsTest:
     ):
         input = ["054496519101"]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            "Parameter \"['054496519101']\" does not contain 9 to 11 digits. Got 12."
+            "CPF input ['054496519101'] does not contain 9 to 11 digits. Got 12 in \"054496519101\"."
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_int_list_with_too_few_digits_input(self):
         input = [1, 2, 3, 4, 5, 6, 7, 8]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            'Parameter "[1, 2, 3, 4, 5, 6, 7, 8]" does not contain 9 to 11 digits. Got 8.'
+            'CPF input [1, 2, 3, 4, 5, 6, 7, 8] does not contain 9 to 11 digits. Got 8 in "12345678".'
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
     def test_constructor_throws_error_with_int_list_with_too_many_digits_input(self):
         input = [0, 5, 4, 4, 9, 6, 5, 1, 9, 1, 0, 1]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            'Parameter "[0, 5, 4, 4, 9, 6, 5, 1, 9, 1, 0, 1]" does not contain 9 to 11 digits. Got 12.'
+            'CPF input [0, 5, 4, 4, 9, 6, 5, 1, 9, 1, 0, 1] does not contain 9 to 11 digits. Got 12 in "054496519101".'
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
@@ -212,11 +217,11 @@ class CpfCheckDigitsTest:
     ):
         input = [544965191012]
 
-        with pytest.raises(CpfInvalidLengthError) as exc_info:
+        with pytest.raises(CpfCheckDigitsInputLengthError) as exc_info:
             CpfCheckDigits(input)
 
         assert (
-            'Parameter "[544965191012]" does not contain 9 to 11 digits. Got 12.'
+            'CPF input [544965191012] does not contain 9 to 11 digits. Got 12 in "544965191012".'
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
 
