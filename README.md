@@ -141,7 +141,7 @@ The validator is designed to be forgiving with input format but strict with vali
 ## Dependencies
 
 - **Python**: >= 3.10
-- **cpf-cd**: >= 1.0.0 (for check digit calculation)
+- **cpf-cd**: for check digit calculation
 
 ## Contribution & Support
 

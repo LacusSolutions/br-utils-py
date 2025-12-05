@@ -34,7 +34,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cpf-cd",
+  "cpf-cd>=1.0.0",
 ]
 
   [[project.authors]]
