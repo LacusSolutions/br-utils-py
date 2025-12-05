@@ -99,17 +99,17 @@ from cpf_gen import CpfGeneratorError
 # This is the base class for all cpf-gen exceptions
 ```
 
-### `CpfGeneratorInvalidPrefixLengthError`
+### `CpfGeneratorPrefixLengthError`
 
 Raised when the prefix length exceeds the maximum allowed (9 digits).
 
 ```python
-from cpf_gen import CpfGenerator, CpfGeneratorInvalidPrefixLengthError
+from cpf_gen import CpfGenerator, CpfGeneratorPrefixLengthError
 
 try:
     generator = CpfGenerator()
     generator.options.prefix = "1234567890"  # 10 digits (too many)
-except CpfGeneratorInvalidPrefixLengthError as e:
+except CpfGeneratorPrefixLengthError as e:
     print(e)  # The prefix length must be less than or equal to 9. Got 10.
 ```
 

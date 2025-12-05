@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import pytest
-from cpf_gen import CpfGeneratorInvalidPrefixLengthError
+from cpf_gen import CpfGeneratorPrefixLengthError
 
 from .utils.external_cpf_validator import ExternalCpfValidator
 
@@ -73,8 +73,8 @@ class CpfGeneratorTestCases(ABC):
             assert re.match(pattern, cpf), f"Input: {cpf}, Expected: ###.###.###-##"
 
     def test_prefixed_value_cannot_accept_string_with_more_than_9_digits(self):
-        with pytest.raises(CpfGeneratorInvalidPrefixLengthError):
+        with pytest.raises(CpfGeneratorPrefixLengthError):
             self.generate(False, "1234567890")
 
-        with pytest.raises(CpfGeneratorInvalidPrefixLengthError):
+        with pytest.raises(CpfGeneratorPrefixLengthError):
             self.generate(False, "123.456.789-0")

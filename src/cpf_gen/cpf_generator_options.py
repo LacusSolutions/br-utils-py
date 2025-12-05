@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, replace
 
-from .exceptions import CpfGeneratorInvalidPrefixLengthError
+from .exceptions import CpfGeneratorPrefixLengthError
 
 CPF_LENGTH = 11
 
@@ -41,6 +41,6 @@ class CpfGeneratorOptions:
             prefix_length = len(value)
 
             if prefix_length > CPF_LENGTH - 2:
-                raise CpfGeneratorInvalidPrefixLengthError(prefix_length, max_digits)
+                raise CpfGeneratorPrefixLengthError(prefix_length, max_digits)
 
         object.__setattr__(self, name, value)

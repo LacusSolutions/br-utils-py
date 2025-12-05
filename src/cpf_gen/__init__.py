@@ -1,13 +1,13 @@
 from .cpf_gen import cpf_gen
 from .cpf_generator import CpfGenerator
 from .cpf_generator_options import CpfGeneratorOptions
-from .exceptions import CpfGeneratorError, CpfGeneratorInvalidPrefixLengthError
+from .exceptions import CpfGeneratorError, CpfGeneratorPrefixLengthError
 
 __all__ = [
     "CpfGenerator",
     "CpfGeneratorError",
-    "CpfGeneratorInvalidPrefixLengthError",
     "CpfGeneratorOptions",
+    "CpfGeneratorPrefixLengthError",
     "cpf_gen",
 ]
 
