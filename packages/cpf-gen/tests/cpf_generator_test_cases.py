@@ -23,7 +23,7 @@ class CpfGeneratorTestCases(ABC):
 
     def test_result_length_equals_to_14_with_formatting(self):
         for _ in range(25):
-            cpf = self.generate(True)
+            cpf = self.generate(format=True)
             cpf_size = len(cpf)
 
             assert cpf_size == 14, f"Input: {cpf}, Expected: 14, Result: {cpf_size}"
@@ -37,7 +37,7 @@ class CpfGeneratorTestCases(ABC):
 
     def test_generated_formatted_cpf_is_valid_with_formatting(self):
         for _ in range(25):
-            cpf = self.generate(True)
+            cpf = self.generate(format=True)
             is_valid = self.is_valid(cpf)
 
             assert is_valid, f"Input: {cpf}, Expected: true"
@@ -57,7 +57,7 @@ class CpfGeneratorTestCases(ABC):
         ]
 
         for prefix in prefixes:
-            cpf = self.generate(False, prefix)
+            cpf = self.generate(format=False, prefix=prefix)
             is_valid = self.is_valid(cpf)
 
             assert is_valid, f"Input: {cpf}, Expected: true"
@@ -68,13 +68,25 @@ class CpfGeneratorTestCases(ABC):
         pattern = r"(\d{3}).(\d{3}).(\d{3})-(\d{2})"
 
         for _ in range(25):
-            cpf = self.generate(True)
+            cpf = self.generate(format=True)
 
             assert re.match(pattern, cpf), f"Input: {cpf}, Expected: ###.###.###-##"
 
     def test_prefixed_value_cannot_accept_string_with_more_than_9_digits(self):
         with pytest.raises(CpfGeneratorPrefixLengthError):
-            self.generate(False, "1234567890")
+            self.generate(format=False, prefix="1234567890")
 
         with pytest.raises(CpfGeneratorPrefixLengthError):
-            self.generate(False, "123.456.789-0")
+            self.generate(format=False, prefix="123.456.789-0")
+
+    def test_never_generates_repeated_digits_cpf(self):
+        for digit in range(10):
+            invalid_prefix = str(digit) * 9
+            dangerous_prefix = str(digit) * 8
+
+            for _ in range(20):
+                cpf = self.generate(prefix=dangerous_prefix)
+
+                assert not cpf.startswith(
+                    invalid_prefix
+                ), f"Output: {cpf}, Should not have 9 repeated digits."
