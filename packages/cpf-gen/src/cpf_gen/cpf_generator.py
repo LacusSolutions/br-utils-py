@@ -3,6 +3,7 @@ import random
 from cpf_cd import CpfCheckDigits
 
 from .cpf_generator_options import CpfGeneratorOptions
+from .exceptions import CpfGeneratorPrefixNotValidError
 
 
 class CpfGenerator:
@@ -19,6 +20,11 @@ class CpfGenerator:
 
         prefix_numbers = [int(digit) for digit in actual_options.prefix]
         cpf_sequence = self._generate_id(prefix_numbers)
+
+        try:
+            CpfGeneratorOptions(prefix=cpf_sequence)
+        except CpfGeneratorPrefixNotValidError:
+            return self.generate(format, prefix)
 
         cpf_check_digits = CpfCheckDigits(cpf_sequence)
         cpf_generated = cpf_check_digits.to_string()

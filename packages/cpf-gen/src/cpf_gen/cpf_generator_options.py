@@ -1,9 +1,10 @@
 import re
 from dataclasses import dataclass, replace
 
-from .exceptions import CpfGeneratorInvalidPrefixLengthError
+from .exceptions import CpfGeneratorPrefixLengthError, CpfGeneratorPrefixNotValidError
 
 CPF_LENGTH = 11
+PREFIX_MAX_LENGTH = CPF_LENGTH - 2
 
 
 @dataclass(slots=True, frozen=False)
@@ -36,11 +37,21 @@ class CpfGeneratorOptions:
 
     def __setattr__(self, name: str, value: object) -> None:
         if name == "prefix" and value is not None:
-            max_digits = CPF_LENGTH - 2
-            value = re.sub(r"[^0-9]", "", str(value))
-            prefix_length = len(value)
+            prefix_value = re.sub(r"[^0-9]", "", str(value))
+            prefix_length = len(prefix_value)
 
-            if prefix_length > CPF_LENGTH - 2:
-                raise CpfGeneratorInvalidPrefixLengthError(prefix_length, max_digits)
+            if prefix_length > PREFIX_MAX_LENGTH:
+                raise CpfGeneratorPrefixLengthError(prefix_length, PREFIX_MAX_LENGTH)
+
+            if prefix_length == PREFIX_MAX_LENGTH:
+                digits_set = set(prefix_value)
+
+                if len(digits_set) == 1:
+                    raise CpfGeneratorPrefixNotValidError(
+                        value,
+                        "Repeated digits are not considered valid.",
+                    )
+
+            value = prefix_value
 
         object.__setattr__(self, name, value)

@@ -89,28 +89,43 @@ cpf = cpf_gen(prefix='528250911', format=True)  # returns '528.250.911-38'
 
 The package raises specific exceptions for different error scenarios:
 
-### `CpfGeneratorError`
-
-Base exception for all cpf-gen related errors.
-
-```python
-from cpf_gen import CpfGeneratorError
-
-# This is the base class for all cpf-gen exceptions
-```
-
-### `CpfGeneratorInvalidPrefixLengthError`
+### `CpfGeneratorPrefixLengthError`
 
 Raised when the prefix length exceeds the maximum allowed (9 digits).
 
 ```python
-from cpf_gen import CpfGenerator, CpfGeneratorInvalidPrefixLengthError
+from cpf_gen import CpfGenerator, CpfGeneratorPrefixLengthError
 
 try:
-    generator = CpfGenerator()
-    generator.options.prefix = "1234567890"  # 10 digits (too many)
-except CpfGeneratorInvalidPrefixLengthError as e:
+    generator = CpfGenerator(prefix="1234567890") # 10 digits (too many)
+except CpfGeneratorPrefixLengthError as e:
     print(e)  # The prefix length must be less than or equal to 9. Got 10.
+```
+
+### `CpfGeneratorPrefixNotValidError`
+
+Raised when the input is forbidden for some restriction, like repeated digits like `111.111.111`, `222.222.222`, `333.333.333` and so on.
+
+```python
+from cpf_gen import CpfGenerator, CpfGeneratorPrefixNotValidError
+
+try:
+    generator = CpfGenerator(prefix="777777777")
+except CpfGeneratorPrefixNotValidError as e:
+    print(e)  # The prefix "777777777" is invalid. Repeated digits are not considered valid.
+```
+
+### Catch any error from the package
+
+All errors extend from a common error instance `CpfGeneratorError`, so you can use this type to handle any error thrown by the module.
+
+```python
+from cpf_gen import CpfGeneratorError
+
+try:
+  # some risky code run
+except CpfGeneratorError as e:
+  # do something
 ```
 
 ## Features
@@ -207,7 +222,7 @@ cpf7 = generator.generate()  # '987.654.321-XX' (formatted with prefix)
 ## Dependencies
 
 - **Python**: >= 3.10
-- **cpf-cd**: For CPF check digit calculation
+- **cpf-cd**: for check digit calculation
 
 ## Contribution & Support
 
