@@ -2,44 +2,55 @@ class CpfCheckDigitsError(Exception):
     """Base exception for all cpf-cd related errors."""
 
 
-class CpfTypeError(CpfCheckDigitsError):
-    """Raised when a CPF digits is not a string or a list of strings or integers."""
+class CpfCheckDigitsInputTypeError(CpfCheckDigitsError):
+    """Raised when the class input does not match the expected type."""
 
-    def __init__(self, cpf) -> None:
-        self.cpf = cpf
+    def __init__(self, actual_input) -> None:
+        self.actual_input = actual_input
 
         super().__init__(
-            f"CPF input must be of type str, list[str] or list[int]. Got {type(cpf).__name__}."
+            f"CPF input must be of type str, list[str] or list[int]. Got {type(actual_input).__name__}."
         )
 
 
-class CpfInvalidLengthError(CpfCheckDigitsError):
-    """Raised when a CPF string does not contain the expected number of digits."""
+class CpfCheckDigitsInputLengthError(CpfCheckDigitsError):
+    """Raised when the class input does not contain the expected number of digits."""
 
     def __init__(
         self,
-        cpf: str | list[str] | list[int],
+        actual_input: str | list[str] | list[int],
+        evaluated_input: str,
         min_expected_length: int,
         max_expected_length: int,
-        actual_length: int,
     ) -> None:
-        self.cpf = cpf
+        self.actual_input = actual_input
+        self.evaluated_input = evaluated_input
         self.min_expected_length = min_expected_length
         self.max_expected_length = max_expected_length
-        self.actual_length = actual_length
+
+        if isinstance(actual_input, str):
+            fmt_actual_input = f'"{actual_input}"'
+        else:
+            fmt_actual_input = f"{actual_input}"
+
+        if actual_input == evaluated_input:
+            fmt_evaluated_input = f"{len(evaluated_input)}"
+        else:
+            fmt_evaluated_input = f'{len(evaluated_input)} in "{evaluated_input}"'
 
         super().__init__(
-            f'Parameter "{cpf}" does not contain {min_expected_length} to {max_expected_length} digits. '
-            f"Got {actual_length}."
+            f"CPF input {fmt_actual_input} does not contain "
+            f"{min_expected_length} to {max_expected_length} digits. "
+            f"Got {fmt_evaluated_input}."
         )
 
 
 class CpfCheckDigitsCalculationError(CpfCheckDigitsError):
     """Raised when the calculation of the CPF check digits fails."""
 
-    def __init__(self, cpf_digits: list[int]) -> None:
-        self.cpf_digits = cpf_digits
+    def __init__(self, actual_input: list[int]) -> None:
+        self.actual_input = actual_input
 
         super().__init__(
-            f"Failed to calculate the CPF check digits for the sequence: {cpf_digits}."
+            f"Failed to calculate CPF check digits for the sequence: {actual_input}."
         )

@@ -2,16 +2,16 @@ from .cpf_check_digits import CpfCheckDigits
 from .exceptions import (
     CpfCheckDigitsCalculationError,
     CpfCheckDigitsError,
-    CpfInvalidLengthError,
-    CpfTypeError,
+    CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputTypeError,
 )
 
 __all__ = [
     "CpfCheckDigits",
     "CpfCheckDigitsCalculationError",
     "CpfCheckDigitsError",
-    "CpfInvalidLengthError",
-    "CpfTypeError",
+    "CpfCheckDigitsInputLengthError",
+    "CpfCheckDigitsInputTypeError",
 ]
 
 __version__ = "0.0.0"
