@@ -3,6 +3,7 @@ from .exceptions import (
     CpfCheckDigitsCalculationError,
     CpfCheckDigitsError,
     CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputNotValidError,
     CpfCheckDigitsInputTypeError,
 )
 
@@ -11,6 +12,7 @@ __all__ = [
     "CpfCheckDigitsCalculationError",
     "CpfCheckDigitsError",
     "CpfCheckDigitsInputLengthError",
+    "CpfCheckDigitsInputNotValidError",
     "CpfCheckDigitsInputTypeError",
 ]
 

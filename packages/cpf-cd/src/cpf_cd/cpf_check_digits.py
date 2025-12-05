@@ -3,6 +3,7 @@ import re
 from .exceptions import (
     CpfCheckDigitsCalculationError,
     CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputNotValidError,
     CpfCheckDigitsInputTypeError,
 )
 
@@ -27,6 +28,8 @@ class CpfCheckDigits:
             cpf_input = self._handle_list_input(cpf_input, original_input)
 
         self._validate_length(cpf_input, original_input)
+        self._validate_non_repeated_digits(cpf_input, original_input)
+
         self._cpf_digits = cpf_input[:CPF_MIN_LENGTH]
         self._first_digit: int | None = None
         self._second_digit: int | None = None
@@ -64,7 +67,9 @@ class CpfCheckDigits:
         return [int(digit_string) for digit_string in digits_only_string]
 
     def _handle_list_input(
-        self, cpf_list: list[str] | list[int], original_input: list
+        self,
+        cpf_list: list[str] | list[int],
+        original_input: list,
     ) -> list[int]:
         """When CPF is provided as a list of strings or integers, it is sanitized, validated and converted to a list of integers for further processing."""
         if all(isinstance(digit, str) for digit in cpf_list):
@@ -98,7 +103,9 @@ class CpfCheckDigits:
         return final_cpf_int_list
 
     def _validate_length(
-        self, cpf_int_list: list[int], original_input: str | list
+        self,
+        cpf_int_list: list[int],
+        original_input: str | list[str] | list[int],
     ) -> None:
         """Validates the length of the CPF digits."""
         digits_count = len(cpf_int_list)
@@ -109,6 +116,21 @@ class CpfCheckDigits:
                 "".join(str(digit) for digit in cpf_int_list),
                 CPF_MIN_LENGTH,
                 CPF_MAX_LENGTH,
+            )
+
+    def _validate_non_repeated_digits(
+        self,
+        cpf_int_list: list[int],
+        original_input: str | list[str] | list[int],
+    ) -> None:
+        """Validates that the CPF digits are not all the same."""
+        eligible_cpf_int_list = cpf_int_list[:CPF_MIN_LENGTH]
+        digits_set = set(eligible_cpf_int_list)
+
+        if len(digits_set) == 1:
+            raise CpfCheckDigitsInputNotValidError(
+                original_input,
+                "Repeated digits are not considered valid.",
             )
 
     def _calculate(self, cpf_sequence: list[int]) -> int:
