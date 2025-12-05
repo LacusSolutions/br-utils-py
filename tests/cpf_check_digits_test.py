@@ -2,6 +2,7 @@ import pytest
 from cpf_cd import (
     CpfCheckDigits,
     CpfCheckDigitsInputLengthError,
+    CpfCheckDigitsInputNotValidError,
     CpfCheckDigitsInputTypeError,
 )
 
@@ -237,6 +238,47 @@ class CpfCheckDigitsTest:
             'CPF input [544965191012] does not contain 9 to 11 digits. Got 12 in "544965191012".'
             in str(exc_info.value)
         ), f"Input: {input}, Exception: {exc_info.value}"
+
+    def test_constructor_throws_error_with_repeated_digits_input(self):
+        invalid_inputs = [
+            "111111111",
+            "222222222",
+            "333333333",
+            "444444444",
+            "555555555",
+            "666666666",
+            "777777777",
+            "888888888",
+            "999999999",
+            "000000000",
+            ["111", "111", "111"],
+            ["222", "222", "222"],
+            ["333", "333", "333"],
+            ["444", "444", "444"],
+            ["555", "555", "555"],
+            ["666", "666", "666"],
+            ["777", "777", "777"],
+            ["888", "888", "888"],
+            ["999", "999", "999"],
+            ["000", "000", "000"],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [3, 3, 3, 3, 3, 3, 3, 3, 3],
+            [4, 4, 4, 4, 4, 4, 4, 4, 4],
+            [5, 5, 5, 5, 5, 5, 5, 5, 5],
+            [6, 6, 6, 6, 6, 6, 6, 6, 6],
+            [7, 7, 7, 7, 7, 7, 7, 7, 7],
+            [8, 8, 8, 8, 8, 8, 8, 8, 8],
+            [9, 9, 9, 9, 9, 9, 9, 9, 9],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ]
+
+        for input in invalid_inputs:
+            with pytest.raises(CpfCheckDigitsInputNotValidError) as exc_info:
+                CpfCheckDigits(input)
+
+            assert f"{input}" in str(exc_info.value)
+            assert "Repeated digits are not considered valid." in str(exc_info.value)
 
     def test_calculate_first_check_digits_with_string_input(self):
         for input_str, expected in test_cases.items():

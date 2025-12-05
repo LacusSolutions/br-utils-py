@@ -45,6 +45,21 @@ class CpfCheckDigitsInputLengthError(CpfCheckDigitsError):
         )
 
 
+class CpfCheckDigitsInputNotValidError(CpfCheckDigitsError):
+    """Raised when the class input contains non-invalid characters."""
+
+    def __init__(self, actual_input: str | list[str] | list[int], reason: str) -> None:
+        self.actual_input = actual_input
+        self.reason = reason
+
+        if isinstance(actual_input, str):
+            fmt_actual_input = f'"{actual_input}"'
+        else:
+            fmt_actual_input = f"{actual_input}"
+
+        super().__init__(f"CPF input {fmt_actual_input} is invalid. {reason}")
+
+
 class CpfCheckDigitsCalculationError(CpfCheckDigitsError):
     """Raised when the calculation of the CPF check digits fails."""
 
