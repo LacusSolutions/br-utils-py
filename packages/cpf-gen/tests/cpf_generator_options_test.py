@@ -1,5 +1,5 @@
 import pytest
-from cpf_gen import CpfGeneratorInvalidPrefixLengthError, CpfGeneratorOptions
+from cpf_gen import CpfGeneratorOptions, CpfGeneratorPrefixLengthError
 
 
 class CpfGeneratorOptionsTest:
@@ -101,7 +101,7 @@ class CpfGeneratorOptionsTest:
     def test_prefix_setter_throws_error_with_too_many_digits(self):
         options = CpfGeneratorOptions()
 
-        with pytest.raises(CpfGeneratorInvalidPrefixLengthError) as exc_info:
+        with pytest.raises(CpfGeneratorPrefixLengthError) as exc_info:
             options.prefix = "1234567890"
 
         assert "The prefix length must be less than or equal to 9. Got 10." in str(

@@ -2,7 +2,7 @@ class CpfGeneratorError(Exception):
     """Base exception for all cpf-gen related errors."""
 
 
-class CpfGeneratorInvalidPrefixLengthError(CpfGeneratorError):
+class CpfGeneratorPrefixLengthError(CpfGeneratorError):
     """Raised when the prefix length is too long."""
 
     def __init__(self, prefix_length: int, max_length: int) -> None:
