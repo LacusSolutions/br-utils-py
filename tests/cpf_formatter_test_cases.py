@@ -113,7 +113,7 @@ class CpfFormatterTestCases(ABC):
 
         assert (
             cpf == "123&amp;456&amp;789&lt;&gt;10"
-        ), f'Output: "{cpf}", Expected: "123&amp;456&amp;789&lt;1&gt;10"'
+        ), f'Output: "{cpf}", Expected: "123&amp;456&amp;789&lt;&gt;10"'
 
     def test_cpf_formats_to_hidden_format(self):
         cpf = self.format("12345678910", hidden=True)
