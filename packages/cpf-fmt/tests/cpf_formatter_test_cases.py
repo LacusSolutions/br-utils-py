@@ -118,7 +118,7 @@ class CpfFormatterTestCases(ABC):
     def test_cpf_formats_to_hidden_format(self):
         cpf = self.format("12345678910", hidden=True)
 
-        assert cpf == "123.***.***-**", f'Output: "{cpf}", Expected: "123.456.***-**"'
+        assert cpf == "123.***.***-**", f'Output: "{cpf}", Expected: "123.***.***-**"'
 
     def test_cpf_formats_to_hidden_format_with_start_range(self):
         cpf = self.format("12345678910", hidden=True, hidden_start=9)
