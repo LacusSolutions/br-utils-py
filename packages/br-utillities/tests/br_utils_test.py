@@ -67,7 +67,7 @@ class BrUtilsCnpjTest:
 
 class BrUtilsReexportsTest:
     def test_cpf_utils_reexports(self):
-        from br_utils import (
+        from br_utils.cpf import (
             CpfFormatter,
             CpfFormatterError,
             CpfFormatterHiddenRangeError,
@@ -104,7 +104,7 @@ class BrUtilsReexportsTest:
         assert cpf_val is not None
 
     def test_cnpj_utils_reexports(self):
-        from br_utils import (
+        from br_utils.cnpj import (
             CnpjFormatter,
             CnpjFormatterError,
             CnpjFormatterHiddenRangeError,

@@ -1,5 +1,5 @@
-from cnpj_utils import CnpjUtils
-from cpf_utils import CpfUtils
+from .cnpj import CnpjFormatterOptions, CnpjGeneratorOptions, CnpjUtils
+from .cpf import CpfFormatterOptions, CpfGeneratorOptions, CpfUtils
 
 
 class BrUtils:
@@ -7,6 +7,12 @@ class BrUtils:
 
     __slots__ = ("cnpj", "cpf")
 
-    def __init__(self):
-        self.cpf = CpfUtils()
-        self.cnpj = CnpjUtils()
+    def __init__(
+        self,
+        cnpj_formatter: CnpjFormatterOptions | None = None,
+        cnpj_generator: CnpjGeneratorOptions | None = None,
+        cpf_formatter: CpfFormatterOptions | None = None,
+        cpf_generator: CpfGeneratorOptions | None = None,
+    ):
+        self.cnpj = CnpjUtils(formatter=cnpj_formatter, generator=cnpj_generator)
+        self.cpf = CpfUtils(formatter=cpf_formatter, generator=cpf_generator)
