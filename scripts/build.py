@@ -40,6 +40,7 @@ def build_package(pkg_path, install_afterwards=False, quiet=False, version=None)
     if version:
         if not quiet:
             print(f"Setting version to {version} for {pkg_path.name}...")
+
         try:
             with VersionContext(pkg_path, version):
                 return _build_package_impl(pkg_path, install_afterwards, quiet)

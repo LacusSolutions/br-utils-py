@@ -17,7 +17,7 @@ class VersionContext:
 
     def __enter__(self):
         """Update the version and save original content."""
-        module_name = self.pkg_path.name.replace("-", "_")
+        module_name = self.pkg_path.name.replace("-", "_").replace("utilities", "utils")
         self.init_file = self.pkg_path / "src" / module_name / "__init__.py"
 
         if not self.init_file.exists():
