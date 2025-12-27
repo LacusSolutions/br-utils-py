@@ -17,7 +17,7 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: name-tests-test
-        exclude: ^packages/.*/tests/.*_test_cases\.py$
+        exclude: ^packages/.*/tests/(utils/.*|.*_test_cases\.py)$
       - id: trailing-whitespace
       - id: check-case-conflict
       - id: check-docstring-first
