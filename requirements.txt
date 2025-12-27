@@ -4,3 +4,7 @@ cnpj-gen>=1.0.1
 cnpj-val>=1.0.1
 cnpj-utils>=1.0.1
 cpf-cd>=1.0.0
+cpf-fmt>=1.0.0
+cpf-gen>=1.0.0
+cpf-val>=1.0.0
+cpf-utils>=1.0.0
