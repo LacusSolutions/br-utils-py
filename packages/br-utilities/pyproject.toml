@@ -1,5 +1,5 @@
 [project]
-name = "br-utillities"
+name = "br-utilities"
 dynamic = [ "version" ]
 description = "Utility resources to deal with Brazilian-related data."
 license = "MIT"
