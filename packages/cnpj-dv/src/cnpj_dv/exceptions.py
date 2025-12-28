@@ -1,5 +1,5 @@
 class CnpjCheckDigitsError(Exception):
-    """Base exception for all cnpj-cd related errors."""
+    """Base exception for all cnpj-dv related errors."""
 
 
 class CnpjTypeError(CnpjCheckDigitsError):

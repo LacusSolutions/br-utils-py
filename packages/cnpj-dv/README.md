@@ -1,38 +1,8 @@
-<table>
-<tr>
-<td>
+![cnpj-dv for Python](https://br-utils.vercel.app/img/cover_cnpj-dv.jpg)
 
-### ⛔ ⛔ ⛔ DEPRECATED PACKAGE ⛔ ⛔ ⛔
-
-**This package (`cnpj-cd`) is no longer maintained and will not receive further updates.**
-
-For consistency reasons across **BR Utils** initiative, this project was renamed to **[`cnpj-dv`](https://pypi.org/project/cnpj-dv/)**.
-
-```bash
-pip uninstall cnpj-cd
-pip install cnpj-dv
-```
-
-And since v1 of `cnpj-dv` follows the same API of `cnpj-cd`, updating the imports should be enough:
-
-```diff
-- from cnpj_cd import CnpjCheckDigits
-+ from cnpj_dv import CnpjCheckDigits
-```
-
-Visit the [cnpj-dv repository](https://github.com/LacusSolutions/br-utils-py/tree/main/packages/cnpj-dv) for additional information and support.
-
-</td>
-</tr>
-</table>
-
----
-
-![cnpj-cd for Python](https://br-utils.vercel.app/img/cover_cnpj-cd.jpg)
-
-[![PyPI Version](https://img.shields.io/pypi/v/cnpj-cd)](https://pypi.org/project/cnpj-cd)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-cd)](https://pypi.org/project/cnpj-cd)
-[![Python Version](https://img.shields.io/pypi/pyversions/cnpj-cd)](https://www.python.org/)
+[![PyPI Version](https://img.shields.io/pypi/v/cnpj-dv)](https://pypi.org/project/cnpj-dv)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-dv)](https://pypi.org/project/cnpj-dv)
+[![Python Version](https://img.shields.io/pypi/pyversions/cnpj-dv)](https://www.python.org/)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/br-utils-py/ci.yml?label=ci/cd)](https://github.com/LacusSolutions/br-utils-py/actions)
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
@@ -48,13 +18,13 @@ Utility class to calculate check digits on CNPJ (Brazilian employer ID).
 ## Installation
 
 ```bash
-$ pip install cnpj-cd
+$ pip install cnpj-dv
 ```
 
 ## Import
 
 ```python
-from cnpj_cd import CnpjCheckDigits
+from cnpj_dv import CnpjCheckDigits
 ```
 
 ## Usage
@@ -150,7 +120,7 @@ print(check_digits.to_string())  # returns '91415732000793'
 ### Examples
 
 ```python
-from cnpj_cd import CnpjCheckDigits
+from cnpj_dv import CnpjCheckDigits
 
 # Calculate check digits for a CNPJ base
 base = "914157320007"
@@ -181,7 +151,7 @@ The package raises specific exceptions for different error scenarios:
 Raised when the input type is not supported (must be `str`, `list[str]`, or `list[int]`).
 
 ```python
-from cnpj_cd import CnpjCheckDigits, CnpjTypeError
+from cnpj_dv import CnpjCheckDigits, CnpjTypeError
 
 try:
     CnpjCheckDigits(12345678901234)  # int not allowed
@@ -194,7 +164,7 @@ except CnpjTypeError as e:
 Raised when the input does not contain 12 to 14 digits.
 
 ```python
-from cnpj_cd import CnpjCheckDigits, CnpjInvalidLengthError
+from cnpj_dv import CnpjCheckDigits, CnpjInvalidLengthError
 
 try:
     CnpjCheckDigits("12345678901")  # only 11 digits
@@ -207,7 +177,7 @@ except CnpjInvalidLengthError as e:
 Raised when the check digit calculation fails due to invalid sequence length.
 
 ```python
-from cnpj_cd import CnpjCheckDigits, CnpjCheckDigitsCalculationError
+from cnpj_dv import CnpjCheckDigits, CnpjCheckDigitsCalculationError
 
 # This is an internal error that should not occur in normal usage
 # It happens when the sequence passed to _calculate() has invalid length
@@ -305,7 +275,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cnpj-cd/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cnpj-dv/CHANGELOG.md) for a list of changes and version history.
 
 ---
 

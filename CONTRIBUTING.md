@@ -104,7 +104,7 @@ br-utils-py/python/
 │   │   ├── pyproject.toml  # Package configuration
 │   │   ├── run             # Package-specific run script
 │   │   └── README.md       # Package documentation
-│   ├── cnpj-cd/            # CNPJ check digit calculator package
+│   ├── cnpj-dv/            # CNPJ check digit calculator package
 │   │   └── ...
 │   ├── cnpj-fmt/           # CNPJ formatter package
 │   │   └── ...
@@ -207,7 +207,7 @@ git commit -m "docs: update README with new examples"
 git commit -m "test(cpf-gen): add tests for prefix option"
 ```
 
-Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-cd`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-dv`, `cpf-gen`, `cpf-val`, `cpf-utils`, `internal`
+Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-dv`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-dv`, `cpf-gen`, `cpf-val`, `cpf-utils`, `internal`
 
 ### 5. Push and Create PR
 
