@@ -1,5 +1,5 @@
 import pytest
-from cnpj_cd import CnpjCheckDigits, CnpjInvalidLengthError, CnpjTypeError
+from cnpj_dv import CnpjCheckDigits, CnpjInvalidLengthError, CnpjTypeError
 
 test_cases = {
     "914157320007": "91415732000793",

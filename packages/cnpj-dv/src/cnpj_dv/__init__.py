@@ -1,5 +1,3 @@
-from warnings import warn
-
 from .cnpj_check_digits import CnpjCheckDigits
 from .exceptions import (
     CnpjCheckDigitsCalculationError,
@@ -17,9 +15,3 @@ __all__ = [
 ]
 
 __version__ = "0.0.0"
-
-warn(
-    "This package is deprecated and will not receive further updates. Please use package: `cnpj-dv` instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)
