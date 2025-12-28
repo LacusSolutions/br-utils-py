@@ -1,5 +1,3 @@
-from warnings import warn
-
 from .cpf_check_digits import CpfCheckDigits
 from .exceptions import (
     CpfCheckDigitsCalculationError,
@@ -19,9 +17,3 @@ __all__ = [
 ]
 
 __version__ = "0.0.0"
-
-warn(
-    "This package is deprecated and will not receive further updates. Please use package: `cpf-dv` instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)

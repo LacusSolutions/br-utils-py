@@ -1,5 +1,5 @@
 import pytest
-from cpf_cd import (
+from cpf_dv import (
     CpfCheckDigits,
     CpfCheckDigitsInputLengthError,
     CpfCheckDigitsInputNotValidError,

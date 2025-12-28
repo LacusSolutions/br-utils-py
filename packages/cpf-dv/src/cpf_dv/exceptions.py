@@ -1,5 +1,5 @@
 class CpfCheckDigitsError(Exception):
-    """Base exception for all cpf-cd related errors."""
+    """Base exception for all cpf-dv related errors."""
 
 
 class CpfCheckDigitsInputTypeError(CpfCheckDigitsError):
