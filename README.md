@@ -1,3 +1,33 @@
+<table>
+<tr>
+<td>
+
+### ⛔ ⛔ ⛔ DEPRECATED PACKAGE ⛔ ⛔ ⛔
+
+**This package (`cpf-cd`) is no longer maintained and will not receive further updates.**
+
+For consistency reasons across **BR Utils** initiative, this project was renamed to **[`cpf-dv`](https://pypi.org/project/cpf-dv/)**.
+
+```bash
+pip uninstall cpf-cd
+pip install cpf-dv
+```
+
+And since v1 pf `cpf-dv` follows the same API of `cpf-cd`, updating the imports should be enough:
+
+```diff
+- from cpf_cd import CpfCheckDigits
++ from cpf_dv import CpfCheckDigits
+```
+
+Visit the [cpf-dv repository](https://github.com/LacusSolutions/br-utils-py/tree/main/packages/cpf-dv) for additional information and support.
+
+</td>
+</tr>
+</table>
+
+---
+
 ![cpf-cd for Python](https://br-utils.vercel.app/img/cover_cpf-cd.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cpf-cd)](https://pypi.org/project/cpf-cd)
