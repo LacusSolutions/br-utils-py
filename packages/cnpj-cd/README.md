@@ -1,3 +1,33 @@
+<table>
+<tr>
+<td>
+
+### ⛔ ⛔ ⛔ DEPRECATED PACKAGE ⛔ ⛔ ⛔
+
+**This package (`cnpj-cd`) is no longer maintained and will not receive further updates.**
+
+For consistency reasons across **BR Utils** initiative, this project was renamed to **[`cnpj-dv`](https://pypi.org/project/cnpj-dv/)**.
+
+```bash
+pip uninstall cnpj-cd
+pip install cnpj-dv
+```
+
+And since v1 of `cnpj-dv` follows the same API of `cnpj-cd`, updating the imports should be enough:
+
+```diff
+- from cnpj_cd import CnpjCheckDigits
++ from cnpj_dv import CnpjCheckDigits
+```
+
+Visit the [cnpj-dv repository](https://github.com/LacusSolutions/br-utils-py/tree/main/packages/cnpj-dv) for additional information and support.
+
+</td>
+</tr>
+</table>
+
+---
+
 ![cnpj-cd for Python](https://br-utils.vercel.app/img/cover_cnpj-cd.jpg)
 
 [![PyPI Version](https://img.shields.io/pypi/v/cnpj-cd)](https://pypi.org/project/cnpj-cd)
