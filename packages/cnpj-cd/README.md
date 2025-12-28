@@ -13,7 +13,7 @@ pip uninstall cnpj-cd
 pip install cnpj-dv
 ```
 
-And since v1 pf `cnpj-dv` follows the same API of `cnpj-cd`, updating the imports should be enough:
+And since v1 of `cnpj-dv` follows the same API of `cnpj-cd`, updating the imports should be enough:
 
 ```diff
 - from cnpj_cd import CnpjCheckDigits
