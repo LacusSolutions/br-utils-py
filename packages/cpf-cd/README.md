@@ -13,7 +13,7 @@ pip uninstall cpf-cd
 pip install cpf-dv
 ```
 
-And since v1 pf `cpf-dv` follows the same API of `cpf-cd`, updating the imports should be enough:
+And since v1 of `cpf-dv` follows the same API of `cpf-cd`, updating the imports should be enough:
 
 ```diff
 - from cpf_cd import CpfCheckDigits
