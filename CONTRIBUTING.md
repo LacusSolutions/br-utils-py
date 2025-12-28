@@ -114,7 +114,7 @@ br-utils-py/python/
 │   │   └── ...
 │   ├── cnpj-val/           # CNPJ validator package
 │   │   └── ...
-│   ├── cpf-cd/             # CPF check digit calculator package
+│   ├── cpf-dv/             # CPF check digit calculator package
 │   │   └── ...
 │   ├── cpf-fmt/            # CPF formatter package
 │   │   └── ...
@@ -207,7 +207,7 @@ git commit -m "docs: update README with new examples"
 git commit -m "test(cpf-gen): add tests for prefix option"
 ```
 
-Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-cd`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-cd`, `cpf-gen`, `cpf-val`, `cpf-utils`, `internal`
+Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-cd`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-dv`, `cpf-gen`, `cpf-val`, `cpf-utils`, `internal`
 
 ### 5. Push and Create PR
 

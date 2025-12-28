@@ -1,38 +1,8 @@
-<table>
-<tr>
-<td>
+![cpf-dv for Python](https://br-utils.vercel.app/img/cover_cpf-dv.jpg)
 
-### ⛔ ⛔ ⛔ DEPRECATED PACKAGE ⛔ ⛔ ⛔
-
-**This package (`cpf-cd`) is no longer maintained and will not receive further updates.**
-
-For consistency reasons across **BR Utils** initiative, this project was renamed to **[`cpf-dv`](https://pypi.org/project/cpf-dv/)**.
-
-```bash
-pip uninstall cpf-cd
-pip install cpf-dv
-```
-
-And since v1 of `cpf-dv` follows the same API of `cpf-cd`, updating the imports should be enough:
-
-```diff
-- from cpf_cd import CpfCheckDigits
-+ from cpf_dv import CpfCheckDigits
-```
-
-Visit the [cpf-dv repository](https://github.com/LacusSolutions/br-utils-py/tree/main/packages/cpf-dv) for additional information and support.
-
-</td>
-</tr>
-</table>
-
----
-
-![cpf-cd for Python](https://br-utils.vercel.app/img/cover_cpf-cd.jpg)
-
-[![PyPI Version](https://img.shields.io/pypi/v/cpf-cd)](https://pypi.org/project/cpf-cd)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/cpf-cd)](https://pypi.org/project/cpf-cd)
-[![Python Version](https://img.shields.io/pypi/pyversions/cpf-cd)](https://www.python.org/)
+[![PyPI Version](https://img.shields.io/pypi/v/cpf-dv)](https://pypi.org/project/cpf-dv)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/cpf-dv)](https://pypi.org/project/cpf-dv)
+[![Python Version](https://img.shields.io/pypi/pyversions/cpf-dv)](https://www.python.org/)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/br-utils-py/ci.yml?label=ci/cd)](https://github.com/LacusSolutions/br-utils-py/actions)
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
@@ -48,13 +18,13 @@ Utility class to calculate check digits on CPF (Brazilian individual taxpayer ID
 ## Installation
 
 ```bash
-$ pip install cpf-cd
+$ pip install cpf-dv
 ```
 
 ## Import
 
 ```python
-from cpf_cd import CpfCheckDigits
+from cpf_dv import CpfCheckDigits
 ```
 
 ## Usage
@@ -149,7 +119,7 @@ print(check_digits.to_string())  # returns '05449651910'
 ### Examples
 
 ```python
-from cpf_cd import CpfCheckDigits
+from cpf_dv import CpfCheckDigits
 
 # Calculate check digits for a CPF base
 base = "054496519"
@@ -180,7 +150,7 @@ The package raises specific exceptions for different error scenarios:
 Raised when the input type is not supported (must be `str`, `list[str]`, or `list[int]`).
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputTypeError
+from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputTypeError
 
 try:
     CpfCheckDigits(12345678901)  # int not allowed
@@ -193,7 +163,7 @@ except CpfCheckDigitsInputTypeError as e:
 Raised when the input does not contain 9 to 11 digits.
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputLengthError
+from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputLengthError
 
 try:
     CpfCheckDigits("12345678")  # only 8 digits
@@ -206,7 +176,7 @@ except CpfCheckDigitsInputLengthError as e:
 Raised when the input is forbidden for some restriction, like repeated digits like `111.111.111`, `222.222.222`, `333.333.333` and so on.
 
 ```python
-from cpf_cd import CpfCheckDigits, CpfCheckDigitsInputNotValidError
+from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputNotValidError
 
 try:
     CpfCheckDigits(["999", "999", "999"])
@@ -219,7 +189,7 @@ except CpfCheckDigitsInputNotValidError as e:
 All errors extend from a common error instance `CpfCheckDigitsError`, so you can use this type to handle any error thrown by the module.
 
 ```python
-from cpf_cd import CpfCheckDigitsError
+from cpf_dv import CpfCheckDigitsError
 
 try:
   # some risky code run
@@ -319,7 +289,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-cd/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-dv/CHANGELOG.md) for a list of changes and version history.
 
 ---
 
