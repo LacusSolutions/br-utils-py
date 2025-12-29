@@ -1,6 +1,6 @@
 import random
 
-from cnpj_cd import CnpjCheckDigits
+from cnpj_dv import CnpjCheckDigits
 
 from .cnpj_generator_options import CnpjGeneratorOptions
 

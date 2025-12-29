@@ -1,5 +1,13 @@
 # cpf-val
 
+## 1.0.1
+
+- 8d48436: Migrate internal dependency from `cpf-cd` to `cpf-dv` to calculate check digits.
+- Dropped dependencies
+  - `cpf-cd`
+- Added dependencies
+  - `cpf-dv` (1.0.0)
+
 ## 1.0.0
 
 ### 🚀 Stable Version Released!

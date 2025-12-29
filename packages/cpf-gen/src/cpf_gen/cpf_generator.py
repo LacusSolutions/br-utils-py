@@ -1,6 +1,6 @@
 import random
 
-from cpf_cd import CpfCheckDigits
+from cpf_dv import CpfCheckDigits
 
 from .cpf_generator_options import CpfGeneratorOptions
 from .exceptions import CpfGeneratorPrefixNotValidError
