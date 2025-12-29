@@ -1,4 +1,4 @@
-from cnpj_cd import CnpjCheckDigits
+from cnpj_dv import CnpjCheckDigits
 
 CNPJ_LENGTH = 14
 
