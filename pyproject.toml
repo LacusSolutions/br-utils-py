@@ -39,9 +39,9 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cpf-fmt>=1.0.0",
-  "cpf-gen>=1.0.0",
-  "cpf-val>=1.0.0",
+  "cpf-fmt>=1.0.0,<2.0.0",
+  "cpf-gen>=1.0.1,<2.0.0",
+  "cpf-val>=1.0.1,<2.0.0",
 ]
 
   [[project.authors]]

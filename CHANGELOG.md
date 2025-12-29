@@ -1,5 +1,13 @@
 # cpf-utils
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies
+  - `cpf-gen`: 1.0.0 → 1.0.1
+  - `cpf-val`: 1.0.0 → 1.0.1
+
 ## 1.0.0
 
 ### 🚀 Stable Version Released!
