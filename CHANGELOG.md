@@ -1,5 +1,13 @@
 # br-utilities
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies
+  - `cnpj-utils`: 1.0.1 → 1.0.2
+  - `cpf-utils`: 1.0.0 → 1.0.1
+
 ## 1.0.0
 
 ### 🚀 Stable Version Released!
