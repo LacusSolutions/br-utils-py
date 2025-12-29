@@ -39,9 +39,9 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cnpj-fmt>=1.0.0",
-  "cnpj-gen>=1.0.1",
-  "cnpj-val>=1.0.1",
+  "cnpj-fmt>=1.0.0,<2.0.0",
+  "cnpj-gen>=1.0.2,<2.0.0",
+  "cnpj-val>=1.0.2,<2.0.0",
 ]
 
   [[project.authors]]
