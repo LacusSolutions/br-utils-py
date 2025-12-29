@@ -1,4 +1,4 @@
-from cpf_cd import CpfCheckDigits
+from cpf_dv import CpfCheckDigits
 
 CPF_LENGTH = 11
 

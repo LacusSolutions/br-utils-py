@@ -89,7 +89,7 @@ cpf_val('')                 # returns False (empty)
 - ✅ **Format Agnostic**: Accepts CPF with or without formatting (dots, dashes)
 - ✅ **Strict Validation**: Validates both check digits according to Brazilian CPF algorithm
 - ✅ **Type Safety**: Built with Python 3.10+ type hints
-- ✅ **Lightweight**: Minimal dependencies, only requires `cpf-cd` for check digit calculation
+- ✅ **Lightweight**: Minimal dependencies, only requires `cpf-dv` for check digit calculation
 - ✅ **Dual API**: Both object-oriented and functional programming styles supported
 
 ## API Reference
@@ -141,7 +141,7 @@ The validator is designed to be forgiving with input format but strict with vali
 ## Dependencies
 
 - **Python**: >= 3.10
-- **cpf-cd**: for check digit calculation
+- **cpf-dv**: for check digit calculation
 
 ## Contribution & Support
 
