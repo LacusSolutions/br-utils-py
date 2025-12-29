@@ -134,7 +134,7 @@ except CpfGeneratorError as e:
 - ✅ **Flexible Options**: Configure formatting and prefix at instance or method level
 - ✅ **Valid CPF Generation**: Always generates CPFs with correct check digits
 - ✅ **Type Safety**: Built with Python 3.10+ type hints
-- ✅ **Zero Dependencies**: Only depends on `cpf-cd` for check digit calculation
+- ✅ **Zero Dependencies**: Only depends on `cpf-dv` for check digit calculation
 - ✅ **Comprehensive Error Handling**: Specific exceptions for different error scenarios
 
 ## API Reference
@@ -222,7 +222,7 @@ cpf7 = generator.generate()  # '987.654.321-XX' (formatted with prefix)
 ## Dependencies
 
 - **Python**: >= 3.10
-- **cpf-cd**: for check digit calculation
+- **cpf-dv**: for check digit calculation
 
 ## Contribution & Support
 
