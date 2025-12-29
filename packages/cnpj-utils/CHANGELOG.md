@@ -1,5 +1,13 @@
 # cnpj-utils
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - `cnpj-gen`: 1.0.1 → 1.0.2
+  - `cnpj-val`: 1.0.1 → 1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
