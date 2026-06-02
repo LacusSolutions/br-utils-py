@@ -12,6 +12,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 env:
   TWINE_USERNAME: __token__
   TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
@@ -19,10 +22,10 @@ env:
 
 jobs:
   lint:
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/.lint.yml
 
   test:
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/.test.yml
     with:
       api-url: ${{ vars.BR_UTILS_API_URL }}
     secrets:
@@ -127,9 +130,9 @@ jobs:
 
   create-release:
     needs: [lint, test, validate]
-    runs-on: ubuntu-latest
     permissions:
       contents: write
+    runs-on: ubuntu-latest
     outputs:
       tag_name: ${{ needs.validate.outputs.tag_name }}
       package: ${{ needs.validate.outputs.package }}
