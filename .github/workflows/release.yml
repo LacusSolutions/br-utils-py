@@ -12,6 +12,10 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+  actions: write
+
 env:
   TWINE_USERNAME: __token__
   TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
@@ -127,9 +131,9 @@ jobs:
 
   create-release:
     needs: [lint, test, validate]
-    runs-on: ubuntu-latest
     permissions:
       contents: write
+    runs-on: ubuntu-latest
     outputs:
       tag_name: ${{ needs.validate.outputs.tag_name }}
       package: ${{ needs.validate.outputs.package }}
