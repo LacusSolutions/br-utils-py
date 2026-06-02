@@ -21,6 +21,10 @@ on:
         description: 'BR Utils API token (alternative to input)'
         required: false
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
