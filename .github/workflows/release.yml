@@ -14,7 +14,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 env:
   TWINE_USERNAME: __token__

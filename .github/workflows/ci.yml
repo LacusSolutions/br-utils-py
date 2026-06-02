@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - '**'
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch: # Allow manual dispatch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,7 +12,6 @@ concurrency:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   lint:
