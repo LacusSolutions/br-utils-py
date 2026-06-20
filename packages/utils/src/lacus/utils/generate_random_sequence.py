@@ -27,6 +27,9 @@ def generate_random_sequence(size: int, sequence_type: SequenceType) -> str:
         >>> generate_random_sequence(8, "alphanumeric")  # doctest: +SKIP
         '8ZFB2K09'
     """
+    if size < 0:
+        raise ValueError(f"size must be non-negative, got {size}")
+
     if sequence_type == "numeric":
         chars = _NUMERIC
     elif sequence_type == "alphabetic":
