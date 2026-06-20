@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: 'Package name to release'
+        description: 'Monorepo package directory name (e.g. cpf-val, utils). PyPI name is read from pyproject.toml.'
         required: true
         type: string
       version:
@@ -38,6 +38,7 @@ jobs:
       commit_sha: ${{ steps.validate.outputs.commit_sha }}
       tag_name: ${{ steps.validate.outputs.tag_name }}
       package: ${{ steps.validate.outputs.package }}
+      pypi_name: ${{ steps.validate.outputs.pypi_name }}
       version: ${{ steps.validate.outputs.version }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -45,26 +46,46 @@ jobs:
           fetch-depth: 0
 
       - id: validate
+        env:
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          PKG_NAME="${{ inputs.package }}"
-          PKG_VERSION="${{ inputs.version }}"
+          PKG_DIR="$INPUT_PACKAGE"
+          PKG_VERSION="$INPUT_VERSION"
+
+          if [[ ! "$PKG_DIR" =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
+            echo "❌ Invalid package directory name: '$PKG_DIR'"
+            exit 1
+          fi
 
           echo "🔍 Validating package and version..."
-          echo "Package: $PKG_NAME"
+          echo "Monorepo directory: $PKG_DIR"
           echo "Version: $PKG_VERSION"
 
-          if [ ! -d "packages/$PKG_NAME" ]; then
-            echo "❌ Package '$PKG_NAME' does not exist in packages/ directory"
+          if [ ! -d "packages/$PKG_DIR" ]; then
+            echo "❌ Package '$PKG_DIR' does not exist in packages/ directory"
             exit 1
           fi
 
-          if [ ! -f "packages/$PKG_NAME/pyproject.toml" ]; then
-            echo "❌ Package '$PKG_NAME' does not have a 'pyproject.toml' file"
+          if [ ! -f "packages/$PKG_DIR/pyproject.toml" ]; then
+            echo "❌ Package '$PKG_DIR' does not have a 'pyproject.toml' file"
             exit 1
           fi
 
-          echo "✅ Package '$PKG_NAME' exists"
-          echo "✅ Package '$PKG_NAME' has a 'pyproject.toml' file"
+          PYPI_NAME=$(grep -E '^name = ' "packages/$PKG_DIR/pyproject.toml" | head -1 | sed -E 's/^name = "(.*)"/\1/')
+
+          if [ -z "$PYPI_NAME" ]; then
+            echo "❌ Could not read PyPI package name from packages/$PKG_DIR/pyproject.toml"
+            exit 1
+          fi
+
+          echo "PyPI package name: $PYPI_NAME"
+          echo "✅ Package '$PKG_DIR' exists"
+          echo "✅ Package '$PKG_DIR' has a 'pyproject.toml' file"
+
+          if [ "$PYPI_NAME" != "$PKG_DIR" ]; then
+            echo "ℹ️  Monorepo directory and PyPI name differ (expected for some packages)"
+          fi
 
           # Accepted versions format:
           # - stable: \d+\.\d+\.\d+
@@ -78,7 +99,7 @@ jobs:
 
           echo "✅ Version format is valid"
 
-          TAG_NAME="${PKG_NAME}@${PKG_VERSION}"
+          TAG_NAME="${PYPI_NAME}@${PKG_VERSION}"
           echo "🔍 Checking if tag '$TAG_NAME' already exists..."
 
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
@@ -99,7 +120,7 @@ jobs:
           echo "✅ Tag '$TAG_NAME' is available"
           echo "✅ Release '$TAG_NAME' does not exist"
 
-          BRANCH_NAME="${PKG_NAME}/main"
+          BRANCH_NAME="${PKG_DIR}/main"
           echo "🔍 Checking if branch '$BRANCH_NAME' exists..."
 
           git fetch origin --quiet 2>/dev/null || true
@@ -108,7 +129,7 @@ jobs:
              ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
             echo "❌ Branch '$BRANCH_NAME' does not exist"
             echo "   Available branches:"
-            git branch -a | grep -E "(main|$PKG_NAME)" || echo "   (none found)"
+            git branch -a | grep -E "(main|$PKG_DIR)" || echo "   (none found)"
             exit 1
           fi
 
@@ -122,7 +143,8 @@ jobs:
 
           echo "📝 Branch '$BRANCH_NAME' points to commit: $COMMIT_SHA"
 
-          echo "package=$PKG_NAME" >> $GITHUB_OUTPUT
+          echo "package=$PKG_DIR" >> $GITHUB_OUTPUT
+          echo "pypi_name=$PYPI_NAME" >> $GITHUB_OUTPUT
           echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
@@ -136,6 +158,7 @@ jobs:
     outputs:
       tag_name: ${{ needs.validate.outputs.tag_name }}
       package: ${{ needs.validate.outputs.package }}
+      pypi_name: ${{ needs.validate.outputs.pypi_name }}
       version: ${{ needs.validate.outputs.version }}
       release_id: ${{ steps.create-release.outputs.release_id }}
     steps:
@@ -144,10 +167,13 @@ jobs:
           BRANCH_NAME="${{ needs.validate.outputs.branch_name }}"
           COMMIT_SHA="${{ needs.validate.outputs.commit_sha }}"
           TAG_NAME="${{ needs.validate.outputs.tag_name }}"
-          PKG_NAME="${{ needs.validate.outputs.package }}"
+          PKG_DIR="${{ needs.validate.outputs.package }}"
+          PYPI_NAME="${{ needs.validate.outputs.pypi_name }}"
           PKG_VERSION="${{ needs.validate.outputs.version }}"
 
           echo "🚀 Creating release '$TAG_NAME' on branch '$BRANCH_NAME'..."
+          echo "Monorepo directory: $PKG_DIR"
+          echo "PyPI package name: $PYPI_NAME"
 
           # Create release via GitHub API
           RELEASE_RESPONSE=$(curl -s -w "\n%{http_code}" \
@@ -200,11 +226,12 @@ jobs:
 
       - name: Build and Publish Package
         run: |
-          PKG_NAME="${{ needs.create-release.outputs.package }}"
+          PKG_DIR="${{ needs.create-release.outputs.package }}"
+          PYPI_NAME="${{ needs.create-release.outputs.pypi_name }}"
           PKG_VERSION="${{ needs.create-release.outputs.version }}"
 
-          echo "📦 Building package '$PKG_NAME' version '$PKG_VERSION'..."
-          python run build "$PKG_NAME" -v "$PKG_VERSION"
+          echo "📦 Building package '$PKG_DIR' (PyPI: $PYPI_NAME) version '$PKG_VERSION'..."
+          python run build "$PKG_DIR" -v "$PKG_VERSION"
 
-          echo "🚀 Publishing package '$PKG_NAME' to PyPI..."
-          python run publish "$PKG_NAME"
+          echo "🚀 Publishing '$PYPI_NAME' to PyPI..."
+          python run publish "$PKG_DIR"

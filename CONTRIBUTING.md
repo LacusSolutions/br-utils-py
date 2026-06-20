@@ -207,7 +207,7 @@ git commit -m "docs: update README with new examples"
 git commit -m "test(cpf-gen): add tests for prefix option"
 ```
 
-Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-dv`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-dv`, `cpf-gen`, `cpf-val`, `cpf-utils`, `internal`
+Valid scopes: `br-utils`, `cnpj-fmt`, `cnpj-dv`, `cnpj-gen`, `cnpj-val`, `cnpj-utils`, `cpf-fmt`, `cpf-dv`, `cpf-gen`, `cpf-val`, `cpf-utils`, `utils`, `internal`
 
 ### 5. Push and Create PR
 
