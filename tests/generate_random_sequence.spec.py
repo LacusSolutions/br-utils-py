@@ -53,3 +53,8 @@ def describe_generate_random_sequence():
             assert generate_random_sequence(0, "numeric") == ""
             assert generate_random_sequence(0, "alphabetic") == ""
             assert generate_random_sequence(0, "alphanumeric") == ""
+
+    def describe_validation():
+        def it_raises_value_error_for_negative_size():
+            with pytest.raises(ValueError, match="size must be non-negative"):
+                generate_random_sequence(-1, "numeric")
