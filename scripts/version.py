@@ -5,6 +5,42 @@ __all__ = ["VersionContext"]
 import re
 from pathlib import Path
 
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib  # type: ignore[no-redef]
+
+
+def _find_init_file(pkg_path: Path) -> Path:
+    """Resolve the __init__.py path from pyproject.toml's dynamic version attr.
+
+    Reads ``[tool.setuptools.dynamic.version] attr`` (e.g. ``lacus.utils.__version__``),
+    strips the trailing ``.__version__``, converts dots to path separators, and
+    returns ``<pkg_path>/src/<module/path>/__init__.py``.
+    """
+    pyproject = pkg_path / "pyproject.toml"
+
+    with open(pyproject, "rb") as f:
+        data = tomllib.load(f)
+
+    attr = (
+        data.get("tool", {})
+        .get("setuptools", {})
+        .get("dynamic", {})
+        .get("version", {})
+        .get("attr", "")
+    )
+
+    if not attr or not attr.endswith(".__version__"):
+        # Fallback: derive from directory name (legacy behaviour)
+        module_name = pkg_path.name.replace("-", "_").replace("utilities", "utils")
+
+        return pkg_path / "src" / module_name / "__init__.py"
+
+    module_path = attr[: -len(".__version__")].replace(".", "/")
+
+    return pkg_path / "src" / module_path / "__init__.py"
+
 
 class VersionContext:
     """Context manager to temporarily update __version__ and restore it afterwards."""
@@ -17,8 +53,7 @@ class VersionContext:
 
     def __enter__(self):
         """Update the version and save original content."""
-        module_name = self.pkg_path.name.replace("-", "_").replace("utilities", "utils")
-        self.init_file = self.pkg_path / "src" / module_name / "__init__.py"
+        self.init_file = _find_init_file(self.pkg_path)
 
         if not self.init_file.exists():
             print(f"Error: __init__.py not found at {self.init_file}")
