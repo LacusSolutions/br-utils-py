@@ -34,8 +34,7 @@ def main():
 
     if not args:
         print(f'Package management scripts for "{PACKAGE_NAME}"')
-        print(
-            """
+        print("""
 Usage:
     python run test        # Run tests
     python run lint        # Run linting and formatting
@@ -43,8 +42,7 @@ Usage:
     python run build -i    # Build and install package locally
     python run clean       # Remove build files
     python run publish     # Publish package to PyPI
-"""
-        )
+""")
         sys.exit(0)
 
     command = args[0]
