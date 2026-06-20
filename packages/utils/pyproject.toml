@@ -1,0 +1,65 @@
+[project]
+name = "lacus.utils"
+dynamic = [ "version" ]
+description = "Reusable utilities for Lacus Solutions Python packages"
+license = "MIT"
+license-files = [ "LICENSE" ]
+keywords = [
+  "utils",
+  "utilities",
+  "helpers",
+  "random",
+  "sequence",
+  "type",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: Unix",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Utilities",
+]
+requires-python = ">=3.10"
+
+  [[project.authors]]
+  name = "Julio L. Muller"
+
+  [project.readme]
+  file = "README.md"
+  content-type = "text/markdown"
+
+  [project.urls]
+  Homepage = "https://github.com/LacusSolutions/br-utils-py"
+  Source = "https://github.com/LacusSolutions/br-utils-py"
+  Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
+
+[build-system]
+requires = [ "setuptools>=82.0.1", "wheel" ]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic.version]
+attr = "lacus.utils.__version__"
+
+[tool.setuptools.packages.find]
+where = [ "src/" ]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = [ "--import-mode=importlib" ]
+testpaths = [ "tests/" ]
+python_files = [ "*.spec.py" ]
+python_functions = [ "it_*", "test_*" ]
+
+[tool.coverage.run]
+source = [ "src/" ]
+omit = [ "tests/*" ]
