@@ -46,9 +46,17 @@ jobs:
           fetch-depth: 0
 
       - id: validate
+        env:
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          PKG_DIR="${{ inputs.package }}"
-          PKG_VERSION="${{ inputs.version }}"
+          PKG_DIR="$INPUT_PACKAGE"
+          PKG_VERSION="$INPUT_VERSION"
+
+          if [[ ! "$PKG_DIR" =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
+            echo "❌ Invalid package directory name: '$PKG_DIR'"
+            exit 1
+          fi
 
           echo "🔍 Validating package and version..."
           echo "Monorepo directory: $PKG_DIR"
