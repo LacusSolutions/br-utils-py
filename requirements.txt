@@ -8,3 +8,4 @@ cpf-fmt>=1.0.0
 cpf-gen>=1.0.1
 cpf-val>=1.0.1
 cpf-utils>=1.0.1
+lacus.utils>=1.0.0
