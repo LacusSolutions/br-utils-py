@@ -2,6 +2,8 @@
 
 ## 1.0.2
 
+### Patch Changes
+
 - 1f3fdf5: Migrate internal dependency from `cnpj-cd` to `cnpj-dv` to calculate check digits.
 - Dropped dependencies
   - `cnpj-cd`
@@ -14,7 +16,7 @@
 
 - db1f01b: Fix documentation hero image source.
 - Updated dependencies
-  - `cnpj-dv`: 1.0.0 → 1.0.1
+  - `cnpj-cd`: 1.0.0 → 1.0.1
 
 ## 1.0.0
 
