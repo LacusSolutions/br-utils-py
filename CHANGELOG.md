@@ -2,6 +2,8 @@
 
 ## 1.0.1
 
+### Patch Changes
+
 - 344fbe7: Migrate internal dependency from `cpf-cd` to `cpf-dv` to calculate check digits.
 - Dropped dependencies
   - `cpf-cd`
