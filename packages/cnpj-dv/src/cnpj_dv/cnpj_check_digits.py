@@ -1,7 +1,7 @@
 """Calculates and exposes CNPJ check digits from a valid base input.
 
-Validates length, base ID, branch ID and rejects repeated-character
-sequences.
+Validates length, base ID, branch ID and rejects repeated numeric
+digits.
 """
 
 from .exceptions import (
@@ -34,8 +34,8 @@ _DIGIT_CHARS = "0123456789"
 class CnpjCheckDigits:
     """Calculates and exposes CNPJ check digits from a valid base input.
 
-    Validates length, base ID, branch ID and rejects repeated-character
-    sequences.
+    Validates length, base ID, branch ID and rejects repeated numeric
+    digits.
     """
 
     def __init__(self, cnpj_input: CnpjInput) -> None:
