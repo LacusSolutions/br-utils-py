@@ -14,15 +14,77 @@ permissions:
   contents: read
 
 jobs:
+  discover:
+    name: Discover Packages
+    runs-on: ubuntu-latest
+    outputs:
+      has-lint: ${{ steps.discover.outputs.has-lint }}
+      lint-packages: ${{ steps.discover.outputs.lint-packages }}
+      has-test: ${{ steps.discover.outputs.has-test }}
+      test-packages: ${{ steps.discover.outputs.test-packages }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - id: discover
+        run: |
+          set -euo pipefail
+
+          LINT_PACKAGES=()
+          TEST_PACKAGES=()
+
+          for dir in packages/*/; do
+            [ -d "$dir" ] || continue
+            pj="${dir%/}/pyproject.toml"
+            run="${dir%/}/run"
+            tests="${dir%/}/tests"
+            [ -f "$pj" ] || continue
+
+            pkg=$(basename "${dir%/}")
+
+            if [ -f "$run" ]; then
+              LINT_PACKAGES+=("$pkg")
+            fi
+
+            if [ -f "$run" ] && [ -d "$tests" ]; then
+              TEST_PACKAGES+=("$pkg")
+            fi
+          done
+
+          lint_json=$(jq -n -c --args '$ARGS.positional | sort' -- "${LINT_PACKAGES[@]}")
+          test_json=$(jq -n -c --args '$ARGS.positional | sort' -- "${TEST_PACKAGES[@]}")
+
+          if [ "${#LINT_PACKAGES[@]}" -gt 0 ]; then
+            echo "has-lint=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-lint=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ "${#TEST_PACKAGES[@]}" -gt 0 ]; then
+            echo "has-test=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-test=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "lint-packages=$lint_json" >> "$GITHUB_OUTPUT"
+          echo "test-packages=$test_json" >> "$GITHUB_OUTPUT"
+
+          echo "Packages with lint: $lint_json"
+          echo "Packages with test: $test_json"
+
   lint:
+    needs: discover
+    if: needs.discover.outputs.has-lint == 'true'
     uses: ./.github/workflows/.lint.yml
     with:
-      python-version: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
+      packages: ${{ needs.discover.outputs.lint-packages }}
+      python-versions: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
 
   test:
+    needs: discover
+    if: needs.discover.outputs.has-test == 'true'
     uses: ./.github/workflows/.test.yml
     with:
-      python-version: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
+      packages: ${{ needs.discover.outputs.test-packages }}
+      python-versions: '["3.10", "3.11", "3.12", "3.13", "3.14"]'
       api-url: ${{ vars.BR_UTILS_API_URL }}
     secrets:
       api-token: ${{ secrets.BR_UTILS_API_TOKEN }}

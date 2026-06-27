@@ -3,22 +3,26 @@ name: Run Unit Tests
 on:
   workflow_call:
     inputs:
-      python-version:
+      packages:
         type: string
-        description: 'Python version(s) to use (single version like "3.x" or JSON array like ["3.10", "3.11"])'
+        description: 'JSON array of package names to test (e.g. ["cpf-val","cnpj-dv"])'
+        required: true
+      python-versions:
+        type: string
+        description: 'JSON array of Python versions (e.g. ["3.10","3.11","3.12","3.13","3.14"])'
+        required: true
+      max-parallel:
+        type: number
+        description: 'Maximum number of parallel jobs'
         required: false
-        default: '3.x'
+        default: 5
       api-url:
         type: string
         description: 'BR Utils API URL'
         required: true
-      api-token:
-        type: string
-        description: 'BR Utils API token'
-        required: false
     secrets:
       api-token:
-        description: 'BR Utils API token (alternative to input)'
+        description: 'BR Utils API token'
         required: false
 
 permissions:
@@ -26,20 +30,28 @@ permissions:
 
 jobs:
   test:
+    name: Tests `${{ matrix.package }}` in Python v${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: ${{ inputs.max-parallel }}
       matrix:
-        python-version: ${{ inputs.python-version == '3.x' && fromJSON('["3.x"]') || fromJSON(inputs.python-version) }}
+        python-version: ${{ fromJSON(inputs.python-versions) }}
+        package: ${{ fromJSON(inputs.packages) }}
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          key: ${{ runner.os }}-python-test-${{ matrix.package }}-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt', format('packages/{0}/pyproject.toml', matrix.package)) }}
+          path: ~/.cache/pip
 
       - run: python -m pip install --upgrade pip
       - run: python require
 
-      - run: python run test
+      - run: python run test ${{ matrix.package }}
         env:
           API_URL: ${{ inputs.api-url }}
-          API_TOKEN: ${{ inputs.api-token || secrets.api-token }}
+          API_TOKEN: ${{ secrets.api-token }}

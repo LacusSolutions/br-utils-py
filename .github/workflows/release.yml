@@ -23,10 +23,15 @@ env:
 jobs:
   lint:
     uses: ./.github/workflows/.lint.yml
+    with:
+      packages: ${{ format('["{0}"]', inputs.package) }}
+      python-versions: ${{ format('["{0}","{1}"]', vars.MIN_PYTHON_VERSION, vars.MAX_PYTHON_VERSION) }}
 
   test:
     uses: ./.github/workflows/.test.yml
     with:
+      packages: ${{ format('["{0}"]', inputs.package) }}
+      python-versions: ${{ format('["{0}","{1}"]', vars.MIN_PYTHON_VERSION, vars.MAX_PYTHON_VERSION) }}
       api-url: ${{ vars.BR_UTILS_API_URL }}
     secrets:
       api-token: ${{ secrets.BR_UTILS_API_TOKEN }}
@@ -217,7 +222,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.x'
 
