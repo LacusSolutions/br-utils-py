@@ -5,7 +5,7 @@
 ### 🎉 v2 at a glance 🎊
 
 - 🆕 **Alphanumeric CNPJ** — Supports the new 14-character alphanumeric format (letters `A–Z` plus digits); check digits stay numeric.
-- 🛡️ **Structured errors** — Typed `TypeError` / `Exception` hierarchy with `actualInput`, `reason`, and length attributes on concrete classes.
+- 🛡️ **Structured errors** — Typed `TypeError` / `Exception` hierarchy with snake_case attributes such as `actual_input`, `actual_type`, `expected_type`, `evaluated_input`, `min_expected_length`, `max_expected_length`, and `reason` on concrete classes.
 - 📥 **Flexible input** — Accepts formatted `str` or `list[str]`; strips non-alphanumeric characters and uppercases letters.
 
 ### BREAKING CHANGES
