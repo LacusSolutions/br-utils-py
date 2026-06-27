@@ -395,8 +395,12 @@ def describe_cnpj_check_digits():
                 assert CnpjCheckDigits("91.415.732/0007").cnpj == "91415732000793"
 
         def describe_when_input_is_a_formatted_alphanumeric_cnpj_string():
-            def it_parses_and_calculates_check_digits():
-                assert CnpjCheckDigits("MG.KGM.J9X/0001-68").cnpj == "MGKGMJ9X000168"
+            @pytest.mark.parametrize(
+                "cnpj_input",
+                ["MG.KGM.J9X/0001-68", "mg.kgm.j9x/0001-68"],
+            )
+            def it_parses_and_calculates_check_digits(cnpj_input):
+                assert CnpjCheckDigits(cnpj_input).cnpj == "MGKGMJ9X000168"
 
         def describe_when_input_already_contains_check_digits():
             def it_ignores_provided_check_digits_and_recomputes():
