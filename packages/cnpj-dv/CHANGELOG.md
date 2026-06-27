@@ -1,11 +1,20 @@
 # cnpj-dv
 
-## 1.0.1
+## 2.0.0
 
-### Patch Changes
+### 🎉 v2 at a glance 🎊
 
-- fb8af97: Create copy of digits list when calculating check digits to avoid mutating it unexpectedly.
-- c7693cf: Fix documentation hero image source.
+- 🆕 **Alphanumeric CNPJ** — Supports the new 14-character alphanumeric format (letters `A–Z` plus digits); check digits stay numeric.
+- 🛡️ **Structured errors** — Typed `TypeError` / `Exception` hierarchy with snake_case attributes such as `actual_input`, `actual_type`, `expected_type`, `evaluated_input`, `min_expected_length`, `max_expected_length`, and `reason` on concrete classes.
+- 📥 **Flexible input** — Accepts formatted `str` or `list[str]`; strips non-alphanumeric characters and uppercases letters.
+
+### BREAKING CHANGES
+
+- **Result API**: Replaced `first_digit`/`second_digit` (`int`), `to_list()`, and `to_string()` with `first`/`second`/`both`/`cnpj` string properties.
+- **Exceptions**: Removed `CnpjCheckDigitsError`, `CnpjTypeError`, `CnpjInvalidLengthError`, and `CnpjCheckDigitsCalculationError`; import `CnpjCheckDigitsTypeError`, `CnpjCheckDigitsInputTypeError`, `CnpjCheckDigitsException`, `CnpjCheckDigitsInputLengthException`, and `CnpjCheckDigitsInputInvalidException` instead.
+- **Input types**: Constructor accepts only `str | list[str]`; `list[int]` is no longer supported.
+- **Validation rules**: Ineligible base ID (`00000000`), branch ID (`0000`), and repeated numeric digits now raise `CnpjCheckDigitsInputInvalidException`.
+- **Dependencies**: Requires `lacus.utils` for type-error messages; v1 had zero runtime dependencies.
 
 ## 1.0.0
 

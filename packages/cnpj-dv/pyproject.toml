@@ -1,7 +1,7 @@
 [project]
 name = "cnpj-dv"
 dynamic = [ "version" ]
-description = "Utility resources to calculate check digits on CNPJ (Brazilian employer ID)"
+description = "Utility to calculate check digits on CNPJ (Brazilian Business Tax ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -34,7 +34,10 @@ classifiers = [
   "Topic :: Software Development :: Libraries",
   "Topic :: Utilities",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+  "lacus.utils>=1.0.0,<2.0.0",
+]
 
   [[project.authors]]
   name = "Julio L. Muller"
@@ -49,7 +52,7 @@ requires-python = ">=3.10"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
 [build-system]
-requires = [ "setuptools>=80.9.0", "wheel" ]
+requires = [ "setuptools>=82.0.1", "wheel" ]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic.version]
@@ -60,10 +63,10 @@ where = [ "src/" ]
 
 [tool.pytest.ini_options]
 minversion = "9.0"
+addopts = [ "--import-mode=importlib" ]
 testpaths = [ "tests/" ]
-python_files = [ "*_test.py" ]
-python_functions = [ "test_*" ]
-python_classes = [ "*Test" ]
+python_files = [ "*.spec.py" ]
+python_functions = [ "it_*", "test_*" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
