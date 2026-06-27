@@ -186,7 +186,7 @@ def describe_cnpj_check_digits_input_length_exception():
 
             assert (
                 str(exception)
-                == 'CNPJ input "1.2.3.4.5" does not contain 12 to 14 digits. Got 5 in "12345".'
+                == 'CNPJ input "1.2.3.4.5" does not contain 12 to 14 characters. Got 5 in "12345".'
             )
 
 

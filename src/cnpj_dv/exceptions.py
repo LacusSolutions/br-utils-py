@@ -101,7 +101,7 @@ class CnpjCheckDigitsInputLengthException(CnpjCheckDigitsException):
 
         super().__init__(
             f"CNPJ input {fmt_actual_input} does not contain "
-            f"{min_expected_length} to {max_expected_length} digits. "
+            f"{min_expected_length} to {max_expected_length} characters. "
             f"Got {fmt_evaluated_input}."
         )
         self.actual_input = actual_input

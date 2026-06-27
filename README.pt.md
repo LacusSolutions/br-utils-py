@@ -112,7 +112,7 @@ except CnpjCheckDigitsInputTypeError as e:
 try:
     CnpjCheckDigits("12345678901")
 except CnpjCheckDigitsInputLengthException as e:
-    print(e)  # CNPJ input "12345678901" does not contain 12 to 14 digits. Got 11.
+    print(e)  # CNPJ input "12345678901" does not contain 12 to 14 characters. Got 11.
 
 # Inválido (ex.: base ou filial zeradas, ou dígitos numéricos repetidos)
 try:
