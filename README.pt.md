@@ -85,11 +85,11 @@ CnpjCheckDigits(["MG", "KGM", "J9X", "0001"])
 
 ### Erros e exceções
 
-Este pacote usa a distinção **TypeError vs Exception**: *erros de tipo* indicam uso incorreto da API (ex.: tipo errado); *exceções* indicam dados inválidos ou inelegíveis (ex.: tamanho ou regras de negócio). Você pode capturar classes específicas ou as bases abstratas.
+Este pacote usa a distinção **TypeError vs Exception**: *erros de tipo* indicam uso incorreto da API (ex.: tipo errado); *exceções* indicam dados inválidos ou inelegíveis (ex.: tamanho ou regras de negócio). Você pode capturar classes específicas ou as classes base.
 
-- **CnpjCheckDigitsTypeError** (_abstract_) — base para erros de tipo; estende o `TypeError` do Python
+- **CnpjCheckDigitsTypeError** — classe base para erros de tipo; estende o `TypeError` do Python
 - **CnpjCheckDigitsInputTypeError** — entrada não é `str` nem `list[str]` (ou a lista contém elemento que não é string)
-- **CnpjCheckDigitsException** (_abstract_) — base para exceções de dados/fluxo; estende `Exception`
+- **CnpjCheckDigitsException** — classe base para exceções de dados/fluxo; estende `Exception`
 - **CnpjCheckDigitsInputLengthException** — tamanho após sanitização não é 12–14
 - **CnpjCheckDigitsInputInvalidException** — base `00000000`, filial `0000`, ou 12 dígitos numéricos idênticos (padrão de repetição)
 
