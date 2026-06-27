@@ -8,8 +8,8 @@ from .exceptions import (
     CnpjCheckDigitsInputInvalidException,
     CnpjCheckDigitsInputLengthException,
     CnpjCheckDigitsInputTypeError,
-    CnpjInput,
 )
+from .types import CnpjInput
 
 CNPJ_MIN_LENGTH = 12
 """Minimum number of characters required for the CNPJ check digits

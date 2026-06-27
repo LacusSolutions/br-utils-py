@@ -13,7 +13,7 @@ from typing import Any
 
 from lacus.utils import describe_type
 
-CnpjInput = str | list[str]
+from .types import CnpjInput
 
 
 def _format_actual_input(actual_input: Any) -> str:

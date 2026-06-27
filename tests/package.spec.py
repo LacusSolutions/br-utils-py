@@ -38,6 +38,7 @@ def describe_the_cnpj_dv_package_api():
                 "CnpjCheckDigitsException",
                 "CnpjCheckDigitsInputInvalidException",
                 "CnpjCheckDigitsInputLengthException",
+                "CnpjInput",
                 "CNPJ_MIN_LENGTH",
                 "CNPJ_MAX_LENGTH",
             }
