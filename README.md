@@ -98,11 +98,11 @@ CnpjCheckDigits(["MG", "KGM", "J9X", "0001"])
 
 ### Errors & exceptions handling
 
-This package uses **TypeError vs Exception** semantics: *type errors* indicate incorrect API use (e.g. wrong type); *exceptions* indicate invalid or ineligible data (e.g. invalid length or business rules). You can catch specific classes or use the abstract bases.
+This package uses **TypeError vs Exception** semantics: *type errors* indicate incorrect API use (e.g. wrong type); *exceptions* indicate invalid or ineligible data (e.g. invalid length or business rules). You can catch specific classes or use the base classes.
 
-- **CnpjCheckDigitsTypeError** (_abstract_) — base for type errors; extends Python's `TypeError`
+- **CnpjCheckDigitsTypeError** — base class for type errors; extends Python's `TypeError`
 - **CnpjCheckDigitsInputTypeError** — input is not `str` or `list[str]` (or list contains a non-string element)
-- **CnpjCheckDigitsException** (_abstract_) — base for data/flow exceptions; extends `Exception`
+- **CnpjCheckDigitsException** — base class for data/flow exceptions; extends `Exception`
 - **CnpjCheckDigitsInputLengthException** — sanitized length is not 12–14
 - **CnpjCheckDigitsInputInvalidException** — base ID `00000000`, branch ID `0000`, or 12 identical numeric digits (repeated-digit pattern)
 
