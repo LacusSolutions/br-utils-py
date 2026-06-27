@@ -10,6 +10,7 @@ from .exceptions import (
     CnpjCheckDigitsInputTypeError,
     CnpjCheckDigitsTypeError,
 )
+from .types import CnpjInput
 
 __all__ = [
     "CNPJ_MAX_LENGTH",
@@ -20,6 +21,7 @@ __all__ = [
     "CnpjCheckDigitsInputLengthException",
     "CnpjCheckDigitsInputTypeError",
     "CnpjCheckDigitsTypeError",
+    "CnpjInput",
 ]
 
 __version__ = "0.0.0"
