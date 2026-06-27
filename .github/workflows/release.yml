@@ -8,9 +8,10 @@ on:
         required: true
         type: string
       version:
-        description: 'Version to release (e.g., 1.2.3 or 1.2.3.alpha1)'
-        required: true
+        description: 'Version to release (e.g., 1.2.3 or 1.2.3.alpha1). Leave empty to use the latest section in CHANGELOG.md'
+        required: false
         type: string
+        default: ''
 
 permissions:
   contents: read
@@ -36,75 +37,86 @@ jobs:
     secrets:
       api-token: ${{ secrets.BR_UTILS_API_TOKEN }}
 
+  prepare-release:
+    name: Prepare Release Notes
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.release.outputs.package }}
+      pypi_name: ${{ steps.release.outputs.pypi_name }}
+      version: ${{ steps.release.outputs.version }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_body: ${{ steps.release.outputs.release_body }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - id: release
+        env:
+          PACKAGE_NAME: ${{ inputs.package }}
+          PACKAGE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          [[ "$PACKAGE_NAME" =~ ^[a-z0-9][a-z0-9._-]*$ ]] || {
+            echo "❌ Invalid package directory name: '$PACKAGE_NAME'"
+            exit 1
+          }
+
+          echo "📦 Preparing release for package '$PACKAGE_NAME'..."
+
+          if [ -n "$PACKAGE_VERSION" ]; then
+            echo "📌 Using requested version: $PACKAGE_VERSION"
+            OUTPUT_PATH=$(python run release "$PACKAGE_NAME" --version "$PACKAGE_VERSION")
+          else
+            echo "📌 Using latest version from CHANGELOG.md"
+            OUTPUT_PATH=$(python run release "$PACKAGE_NAME")
+          fi
+
+          BASENAME=$(basename "$OUTPUT_PATH" .md)
+          VERSION="${BASENAME#*@}"
+
+          PYPI_NAME=$(grep -E '^name = ' "packages/$PACKAGE_NAME/pyproject.toml" | head -1 | sed -E 's/^name = "(.*)"/\1/')
+
+          if [ -z "$PYPI_NAME" ]; then
+            echo "❌ Could not read PyPI package name from packages/$PACKAGE_NAME/pyproject.toml"
+            exit 1
+          fi
+
+          echo "package=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "pypi_name=$PYPI_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${PYPI_NAME}@${VERSION}" >> "$GITHUB_OUTPUT"
+          {
+            echo 'release_body<<EOF'
+            cat "$OUTPUT_PATH"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+          echo "📝 Release notes written to ${OUTPUT_PATH}"
+          echo "✅ Release preparation complete"
+
   validate:
+    name: Validate Git State
+    needs: prepare-release
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.validate.outputs.branch_name }}
       commit_sha: ${{ steps.validate.outputs.commit_sha }}
-      tag_name: ${{ steps.validate.outputs.tag_name }}
-      package: ${{ steps.validate.outputs.package }}
-      pypi_name: ${{ steps.validate.outputs.pypi_name }}
-      version: ${{ steps.validate.outputs.version }}
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
       - id: validate
         env:
-          INPUT_PACKAGE: ${{ inputs.package }}
-          INPUT_VERSION: ${{ inputs.version }}
+          PACKAGE_NAME: ${{ needs.prepare-release.outputs.package }}
+          PACKAGE_VERSION: ${{ needs.prepare-release.outputs.version }}
+          TAG_NAME: ${{ needs.prepare-release.outputs.tag_name }}
         run: |
-          PKG_DIR="$INPUT_PACKAGE"
-          PKG_VERSION="$INPUT_VERSION"
+          set -euo pipefail
 
-          if [[ ! "$PKG_DIR" =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
-            echo "❌ Invalid package directory name: '$PKG_DIR'"
-            exit 1
-          fi
+          echo "🔍 Validating release for package '$PACKAGE_NAME' version '$PACKAGE_VERSION'..."
+          echo "🏷️  Tag: $TAG_NAME"
+          echo ""
 
-          echo "🔍 Validating package and version..."
-          echo "Monorepo directory: $PKG_DIR"
-          echo "Version: $PKG_VERSION"
-
-          if [ ! -d "packages/$PKG_DIR" ]; then
-            echo "❌ Package '$PKG_DIR' does not exist in packages/ directory"
-            exit 1
-          fi
-
-          if [ ! -f "packages/$PKG_DIR/pyproject.toml" ]; then
-            echo "❌ Package '$PKG_DIR' does not have a 'pyproject.toml' file"
-            exit 1
-          fi
-
-          PYPI_NAME=$(grep -E '^name = ' "packages/$PKG_DIR/pyproject.toml" | head -1 | sed -E 's/^name = "(.*)"/\1/')
-
-          if [ -z "$PYPI_NAME" ]; then
-            echo "❌ Could not read PyPI package name from packages/$PKG_DIR/pyproject.toml"
-            exit 1
-          fi
-
-          echo "PyPI package name: $PYPI_NAME"
-          echo "✅ Package '$PKG_DIR' exists"
-          echo "✅ Package '$PKG_DIR' has a 'pyproject.toml' file"
-
-          if [ "$PYPI_NAME" != "$PKG_DIR" ]; then
-            echo "ℹ️  Monorepo directory and PyPI name differ (expected for some packages)"
-          fi
-
-          # Accepted versions format:
-          # - stable: \d+\.\d+\.\d+
-          # - pre-release: \d+\.\d+\.\d+\.(dev|alpha|beta|rc)\d+
-          if [[ ! "$PKG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.(dev|alpha|beta|rc)[0-9]+)?$ ]]; then
-            echo "❌ Version '$PKG_VERSION' does not match expected format:"
-            echo "   Expected: X.Y.Z or X.Y.Z.{dev,alpha,beta,rc}N"
-            echo "   Example: 1.2.3 or 1.2.3.alpha1"
-            exit 1
-          fi
-
-          echo "✅ Version format is valid"
-
-          TAG_NAME="${PYPI_NAME}@${PKG_VERSION}"
           echo "🔍 Checking if tag '$TAG_NAME' already exists..."
 
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
@@ -112,9 +124,11 @@ jobs:
             exit 1
           fi
 
+          echo "🔍 Checking if GitHub Release '$TAG_NAME' already exists..."
+
+          ENCODED_TAG=$(jq -rn --arg t "$TAG_NAME" '$t|@uri')
           RELEASE_CHECK=$(curl -s \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${TAG_NAME}" \
-            -X GET \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${ENCODED_TAG}" \
             -H "Authorization: token $GITHUB_TOKEN")
 
           if echo "$RELEASE_CHECK" | jq -e '.id' >/dev/null 2>&1; then
@@ -124,8 +138,9 @@ jobs:
 
           echo "✅ Tag '$TAG_NAME' is available"
           echo "✅ Release '$TAG_NAME' does not exist"
+          echo ""
 
-          BRANCH_NAME="${PKG_DIR}/main"
+          BRANCH_NAME="${PACKAGE_NAME}/main"
           echo "🔍 Checking if branch '$BRANCH_NAME' exists..."
 
           git fetch origin --quiet 2>/dev/null || true
@@ -133,8 +148,8 @@ jobs:
           if ! git show-ref --verify --quiet "refs/heads/$BRANCH_NAME" && \
              ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
             echo "❌ Branch '$BRANCH_NAME' does not exist"
-            echo "   Available branches:"
-            git branch -a | grep -E "(main|$PKG_DIR)" || echo "   (none found)"
+            echo "ℹ️  Available branches:"
+            git branch -a | grep -E "(main|$PACKAGE_NAME)" || echo "   (none found)"
             exit 1
           fi
 
@@ -147,78 +162,90 @@ jobs:
           fi
 
           echo "📝 Branch '$BRANCH_NAME' points to commit: $COMMIT_SHA"
+          echo "✅ Git state validation complete"
 
-          echo "package=$PKG_DIR" >> $GITHUB_OUTPUT
-          echo "pypi_name=$PYPI_NAME" >> $GITHUB_OUTPUT
-          echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
-          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
   create-release:
-    needs: [lint, test, validate]
+    name: Create GitHub Release
+    needs:
+      - lint
+      - test
+      - prepare-release
+      - validate
     permissions:
       contents: write
     runs-on: ubuntu-latest
     outputs:
-      tag_name: ${{ needs.validate.outputs.tag_name }}
-      package: ${{ needs.validate.outputs.package }}
-      pypi_name: ${{ needs.validate.outputs.pypi_name }}
-      version: ${{ needs.validate.outputs.version }}
+      tag_name: ${{ needs.prepare-release.outputs.tag_name }}
+      package: ${{ needs.prepare-release.outputs.package }}
+      pypi_name: ${{ needs.prepare-release.outputs.pypi_name }}
+      version: ${{ needs.prepare-release.outputs.version }}
       release_id: ${{ steps.create-release.outputs.release_id }}
     steps:
       - id: create-release
+        env:
+          BRANCH_NAME: ${{ needs.validate.outputs.branch_name }}
+          COMMIT_SHA: ${{ needs.validate.outputs.commit_sha }}
+          TAG_NAME: ${{ needs.prepare-release.outputs.tag_name }}
+          PACKAGE_VERSION: ${{ needs.prepare-release.outputs.version }}
+          RELEASE_BODY: ${{ needs.prepare-release.outputs.release_body }}
         run: |
-          BRANCH_NAME="${{ needs.validate.outputs.branch_name }}"
-          COMMIT_SHA="${{ needs.validate.outputs.commit_sha }}"
-          TAG_NAME="${{ needs.validate.outputs.tag_name }}"
-          PKG_DIR="${{ needs.validate.outputs.package }}"
-          PYPI_NAME="${{ needs.validate.outputs.pypi_name }}"
-          PKG_VERSION="${{ needs.validate.outputs.version }}"
+          set -euo pipefail
 
-          echo "🚀 Creating release '$TAG_NAME' on branch '$BRANCH_NAME'..."
-          echo "Monorepo directory: $PKG_DIR"
-          echo "PyPI package name: $PYPI_NAME"
+          if [[ "$PACKAGE_VERSION" =~ \.(dev|alpha|beta|rc)[0-9]+$ ]]; then
+            PRERELEASE=true
+          else
+            PRERELEASE=false
+          fi
 
-          # Create release via GitHub API
+          echo "🚀 Creating GitHub Release '$TAG_NAME'..."
+          echo "🌿 Target branch: $BRANCH_NAME"
+          echo "📝 Target commit: $COMMIT_SHA"
+          echo "🏷️  Prerelease: $PRERELEASE"
+          echo ""
+
+          PAYLOAD=$(jq -n \
+            --arg target "$COMMIT_SHA" \
+            --arg tag "$TAG_NAME" \
+            --arg name "$TAG_NAME" \
+            --arg body "$RELEASE_BODY" \
+            --argjson prerelease "$PRERELEASE" \
+            '{target_commitish: $target, tag_name: $tag, name: $name, body: $body, draft: false, prerelease: $prerelease}')
+
           RELEASE_RESPONSE=$(curl -s -w "\n%{http_code}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" \
             -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            -d "{
-              \"target_commitish\": \"$COMMIT_SHA\",
-              \"tag_name\": \"$TAG_NAME\",
-              \"name\": \"$TAG_NAME\",
-              \"draft\": false,
-              \"prerelease\": $([[ "$PKG_VERSION" =~ \.(dev|alpha|beta|rc) ]] && echo "true" || echo "false")
-            }")
+            -d "$PAYLOAD")
 
           HTTP_CODE=$(echo "$RELEASE_RESPONSE" | tail -n1)
-          RELEASE_BODY=$(echo "$RELEASE_RESPONSE" | sed '$d')
+          RESPONSE_BODY=$(echo "$RELEASE_RESPONSE" | sed '$d')
 
           if [ "$HTTP_CODE" -ne 201 ]; then
             echo "❌ Failed to create release. HTTP status: $HTTP_CODE"
-            echo "Response: $RELEASE_BODY"
+            echo "Response: $RESPONSE_BODY"
             exit 1
           fi
 
-          RELEASE_ID=$(echo "$RELEASE_BODY" | jq -r '.id')
+          RELEASE_ID=$(echo "$RESPONSE_BODY" | jq -r '.id')
 
           if [ -z "$RELEASE_ID" ] || [ "$RELEASE_ID" = "null" ]; then
             echo "❌ Failed to get release ID from response"
-            echo "Response: $RELEASE_BODY"
+            echo "Response: $RESPONSE_BODY"
             exit 1
           fi
 
           echo "✅ Release created successfully (ID: $RELEASE_ID)"
-          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
 
   publish:
     needs: create-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: main
           fetch-depth: 0

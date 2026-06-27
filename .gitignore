@@ -123,6 +123,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# CI release notes scratch files
+.release/
+
 # IDE
 .vscode/
 .idea/

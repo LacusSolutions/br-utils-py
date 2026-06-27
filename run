@@ -14,6 +14,7 @@ Usage:
     python run clean             # Remove build files for all packages in current directory
     python run clean [pkg]       # Remove build files for specified package
     python run publish [pkg]     # Publish specified package to PyPI
+    python run release [pkg]     # Prepare release notes from package CHANGELOG
     python run hooks install     # Install `pre-commit` hooks
     python run hooks uninstall   # Uninstall `pre-commit` hooks
     python run hooks update      # Update `pre-commit` hooks
@@ -23,7 +24,7 @@ Usage:
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from scripts import build, clean, common, hooks, lint, publish, test
+from scripts import build, clean, common, hooks, lint, publish, release, test
 
 PACKAGES = common.PACKAGES
 PACKAGES_DIR = common.PACKAGES_DIR
@@ -50,6 +51,8 @@ Examples:
     python run clean
     python run clean cpf-fmt
     python run publish cpf-gen
+    python run release cnpj-dv
+    python run release cnpj-dv --version 1.0.1
 """,
     )
 
@@ -61,6 +64,7 @@ Examples:
     build.setup_commands(subparsers)
     clean.setup_commands(subparsers)
     publish.setup_commands(subparsers)
+    release.setup_commands(subparsers)
 
     args = parser.parse_args()
 
@@ -228,6 +232,9 @@ Examples:
         pkg_path = PACKAGES_DIR / args.package
 
         sys.exit(0) if publish.publish_package(pkg_path) else sys.exit(1)
+
+    if args.command == "release":
+        sys.exit(release.main(args.package, args.version))
 
     parser.print_help()
     sys.exit(1)
