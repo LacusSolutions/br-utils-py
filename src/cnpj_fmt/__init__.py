@@ -1,18 +1,29 @@
 from .cnpj_fmt import cnpj_fmt
 from .cnpj_formatter import CnpjFormatter
-from .cnpj_formatter_options import CnpjFormatterOptions
+from .cnpj_formatter_options import CNPJ_LENGTH, CnpjFormatterOptions
 from .exceptions import (
-    CnpjFormatterError,
-    CnpjFormatterHiddenRangeError,
-    CnpjFormatterInvalidLengthError,
+    CnpjFormatterException,
+    CnpjFormatterInputLengthException,
+    CnpjFormatterInputTypeError,
+    CnpjFormatterOptionsForbiddenKeyCharacterException,
+    CnpjFormatterOptionsHiddenRangeInvalidException,
+    CnpjFormatterOptionsTypeError,
+    CnpjFormatterTypeError,
 )
+from .types import CnpjInput
 
 __all__ = [
+    "CNPJ_LENGTH",
     "CnpjFormatter",
-    "CnpjFormatterError",
-    "CnpjFormatterHiddenRangeError",
-    "CnpjFormatterInvalidLengthError",
+    "CnpjFormatterException",
+    "CnpjFormatterInputLengthException",
+    "CnpjFormatterInputTypeError",
     "CnpjFormatterOptions",
+    "CnpjFormatterOptionsForbiddenKeyCharacterException",
+    "CnpjFormatterOptionsHiddenRangeInvalidException",
+    "CnpjFormatterOptionsTypeError",
+    "CnpjFormatterTypeError",
+    "CnpjInput",
     "cnpj_fmt",
 ]
 
