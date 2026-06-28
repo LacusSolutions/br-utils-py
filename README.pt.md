@@ -90,9 +90,8 @@ cnpj_fmt(                     # '03603568|0001_95'
 )
 cnpj_fmt(cnpj, {              # forma com mapeamento
     'hidden': True,
-    'hidden_key': '#,
+    'hidden_key': '#',
 })
-```
 
 ### Exemplos orientados a objeto
 
