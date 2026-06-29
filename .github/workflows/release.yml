@@ -167,13 +167,43 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
-  create-release:
-    name: Create GitHub Release
+  publish:
     needs:
       - lint
       - test
       - prepare-release
       - validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.x'
+
+      - run: python -m pip install --upgrade pip
+      - run: python require
+
+      - name: Build and Publish Package
+        run: |
+          PKG_DIR="${{ needs.prepare-release.outputs.package }}"
+          PYPI_NAME="${{ needs.prepare-release.outputs.pypi_name }}"
+          PKG_VERSION="${{ needs.prepare-release.outputs.version }}"
+
+          echo "📦 Building package '$PKG_DIR' (PyPI: $PYPI_NAME) version '$PKG_VERSION'..."
+          python run build "$PKG_DIR" -v "$PKG_VERSION"
+
+          echo "🚀 Publishing '$PYPI_NAME' to PyPI..."
+          python run publish "$PKG_DIR"
+
+  create-release:
+    name: Create GitHub Release
+    needs:
+      - prepare-release
+      - validate
+      - publish
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -240,30 +270,3 @@ jobs:
 
           echo "✅ Release created successfully (ID: $RELEASE_ID)"
           echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
-
-  publish:
-    needs: create-release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          ref: main
-          fetch-depth: 0
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
-        with:
-          python-version: '3.x'
-
-      - run: python -m pip install --upgrade pip
-      - run: python require
-
-      - name: Build and Publish Package
-        run: |
-          PKG_DIR="${{ needs.create-release.outputs.package }}"
-          PYPI_NAME="${{ needs.create-release.outputs.pypi_name }}"
-          PKG_VERSION="${{ needs.create-release.outputs.version }}"
-
-          echo "📦 Building package '$PKG_DIR' (PyPI: $PYPI_NAME) version '$PKG_VERSION'..."
-          python run build "$PKG_DIR" -v "$PKG_VERSION"
-
-          echo "🚀 Publishing '$PYPI_NAME' to PyPI..."
-          python run publish "$PKG_DIR"
