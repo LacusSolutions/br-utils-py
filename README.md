@@ -7,7 +7,11 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Utility function/class to generate valid CNPJ (Brazilian employer ID).
+> 🚀 **Full support for the [new alphanumeric CNPJ format](https://github.com/user-attachments/files/23937961/calculodvcnpjalfanaumerico.pdf).**
+
+> 🌎 [Acessar documentação em português](./README.pt.md)
+
+A Python utility to generate valid CNPJ (Brazilian Business Tax ID) values.
 
 ## Python Support
 
@@ -15,79 +19,184 @@ Utility function/class to generate valid CNPJ (Brazilian employer ID).
 |--- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
 
+## Features
+
+- ✅ **Alphanumeric CNPJ**: Generates 14-character CNPJ with optional numeric, alphabetic, or alphanumeric (default) character sets
+- ✅ **Optional prefix**: Provide 0–12 alphanumeric characters to fix the start of the CNPJ (e.g. base ID) and generate the rest with valid check digits
+- ✅ **Formatting**: Option to return the standard formatted string (`00.000.000/0000-00`)
+- ✅ **Reusable generator**: `CnpjGenerator` class with default options and per-call overrides
+- ✅ **Type hints**: Built for Python 3.10+ with full type annotations
+- ✅ **Minimal dependencies**: Only internal packages `lacus.utils` and `cnpj-dv` for random sequence generation and check-digit calculation
+- ✅ **Error handling**: Specific type errors and exceptions for invalid options
+
 ## Installation
 
 ```bash
 $ pip install cnpj-gen
 ```
 
-## Import
+## Quick Start
 
 ```python
-# Using class-based resource
-from cnpj_gen import CnpjGenerator
-
-# Or using function-based one
 from cnpj_gen import cnpj_gen
+```
+
+Basic usage:
+
+```python
+cnpj_gen()                    # e.g. 'AB123CDE000155' (14-char alphanumeric)
+
+cnpj_gen(format=True)         # e.g. 'AB.123.CDE/0001-55'
+
+cnpj_gen(prefix='45623767')   # e.g. '45623767000296'
+cnpj_gen(                     # e.g. '45.623.767/0002-96'
+    prefix='456237670002',
+    format=True,
+)
+
+cnpj_gen(type='numeric')      # e.g. '65453043000178' (digits only)
+cnpj_gen(type='alphabetic')   # e.g. 'ABCDEFGHIJKL80' (letters only, except check digits)
+```
+
+Options can also be passed as a mapping:
+
+```python
+cnpj_gen({'format': True, 'type': 'numeric'})
 ```
 
 ## Usage
 
-### Object-Oriented Usage
+### Generator options
+
+All options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CNPJ in standard format (`00.000.000/0000-00`). Non-boolean values are coerced with `bool()`. |
+| `prefix` | `str` | `''` | Partial start string (0–12 alphanumeric chars). Only alphanumeric characters are kept and uppercased; missing characters are generated randomly and check digits are computed. |
+| `type` | `'numeric'` \| `'alphabetic'` \| `'alphanumeric'` | `'alphanumeric'` | Character set for the randomly generated part (`prefix` is kept as-is after sanitization). **Check digits are always numeric.** |
+
+Prefix rules: base ID (first 8 chars) and branch ID (chars 9–12) cannot be all zeros; 12 repeated digits (e.g. `777777777777`) are also not allowed.
+
+### `cnpj_gen` (helper function)
+
+Generates a valid CNPJ string. With no options, returns a 14-character alphanumeric CNPJ. This is a convenience wrapper around `CnpjGenerator(options, ...).generate()`.
+
+- **`options`** (optional): `CnpjGeneratorOptionsInput` — a `CnpjGeneratorOptions` instance, a partial mapping, or `None`. See [Generator options](#generator-options).
+- **`format`**, **`prefix`**, **`type`** (keyword-only): Per-option overrides when `options` is omitted or to layer on top of a mapping.
+
+### `CnpjGenerator` (class)
+
+For reusable defaults or per-call overrides, use the class:
 
 ```python
-generator = CnpjGenerator()
-cnpj = generator.generate()  # returns '65453043000178'
+from cnpj_gen import CnpjGenerator
 
-# With options
-cnpj = generator.generate(
-    format=True
-)  # returns '65.453.043/0001-78'
+generator = CnpjGenerator(type='numeric', format=True)
 
-cnpj = generator.generate(
-    prefix='45623767'
-)  # returns '45623767000296'
-
-cnpj = generator.generate(
-    prefix='456237670002',
-    format=True
-)  # returns '45.623.767/0002-96'
+generator.generate()                    # e.g. '73.008.535/0005-06'
+generator.generate(prefix='12345678')   # override for this call only
+generator.options                       # current default options (CnpjGeneratorOptions)
 ```
 
-The options can be provided to the constructor or the `generate()` method. If passed to the constructor, the options will be attached to the `CnpjGenerator` instance. When passed to the `generate()` method, it only applies the options to that specific call.
+- **`__init__(options=None, *, format=None, prefix=None, type=None)`**: Optional default options (plain mapping, `CnpjGeneratorOptions` instance, or keyword arguments).
+- **`generate(options=None, *, format=None, prefix=None, type=None)`**: Returns a valid CNPJ; per-call options override instance defaults for that call only.
+- **`options`**: Property returning the default options used when per-call options are not provided (same instance as used internally; mutating it affects future `generate` calls).
+
+Default options on the instance; per-call overrides:
 
 ```python
 generator = CnpjGenerator(format=True)
 
-cnpj1 = generator.generate()  # '65.453.043/0001-78' (uses instance options)
-cnpj2 = generator.generate(format=False)  # '65453043000178' (overrides instance options)
-cnpj3 = generator.generate()  # '12.345.678/0001-95' (uses instance options again)
+generator.generate()              # formatted CNPJ
+generator.generate(format=False)  # this call only: unformatted
+generator.generate()              # formatted again (instance defaults preserved)
 ```
 
-### Functional programming
+### `CnpjGeneratorOptions` (class)
 
-The helper function `cnpj_gen()` is just a functional abstraction. Internally it creates an instance of `CnpjGenerator` and calls the `generate()` method right away.
+Holds options (`format`, `prefix`, `type`) with validation and merge support:
 
 ```python
-cnpj = cnpj_gen()  # returns '65453043000178'
+from cnpj_gen import CnpjGeneratorOptions
 
-cnpj = cnpj_gen(format=True)  # returns '65.453.043/0001-78'
-
-cnpj = cnpj_gen(prefix='45623767')  # returns '45623767000296'
-
-cnpj = cnpj_gen(prefix='456237670002', format=True)  # returns '45.623.767/0002-96'
+options = CnpjGeneratorOptions(
+    prefix='AB123XYZ',
+    type='numeric',
+    format=True,
+)
+options.prefix   # 'AB123XYZ'
+options.type     # 'numeric'
+options.format   # True
+options.set({'format': False})  # merge and return self
+options.all      # immutable shallow snapshot of current options
 ```
 
-### Generator Options
+- **`__init__(default_options=None, *overrides, format=None, prefix=None, type=None)`**: Options merged in order (later overrides win).
+- **`format`**, **`prefix`**, **`type`**: Properties with setters; `prefix` is validated (base/branch ineligible, repeated digits).
+- **`set(options)`**: Update multiple options at once; omitted fields keep their current value; returns `self`.
+- **`all`**: Read-only snapshot of current options (`MappingProxyType`).
+- **`DEFAULT_FORMAT`**, **`DEFAULT_PREFIX`**, **`DEFAULT_TYPE`**: Class-level default constants.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `format` | `bool \| None` | `False` | Whether to format the output with dots, slash, and dash |
-| `prefix` | `str \| None` | `''` | If you have CNPJ initials and want to complete it with valid digits. The string provided must contain between 0 and 12 digits. The branch ID (characters 8 to 11) cannot be "0000". |
+## API
+
+### Exports
+
+- **`cnpj_gen`**: `(options=None, *, format=None, prefix=None, type=None) -> str`
+- **`CnpjGenerator`**: Class to generate CNPJ with optional default options and per-call overrides.
+- **`CnpjGeneratorOptions`**: Class holding options (`format`, `prefix`, `type`) with validation and merge.
+- **`CNPJ_LENGTH`**: `14` (constant).
+- **`CNPJ_PREFIX_MAX_LENGTH`**: `12` (constant).
+- **Types**: `CnpjType`, `CnpjGeneratorOptionsInput`, `CnpjGeneratorOptionsType`.
+- **Exceptions**: `CnpjGeneratorTypeError`, `CnpjGeneratorOptionsTypeError`, `CnpjGeneratorException`, `CnpjGeneratorOptionPrefixInvalidException`, `CnpjGeneratorOptionTypeInvalidException`.
+
+### Errors & Exceptions
+
+This package uses **TypeError** subclasses for invalid option types and **Exception** subclasses for invalid option values (`prefix` or `type`). You can catch specific classes or the base types.
+
+- **CnpjGeneratorTypeError** (_abstract_) — base for option type errors
+- **CnpjGeneratorOptionsTypeError** — an option has the wrong type (e.g. `prefix` not a string)
+- **CnpjGeneratorException** (_abstract_) — base for option value exceptions
+- **CnpjGeneratorOptionPrefixInvalidException** — prefix invalid (e.g. all-zero base/branch, repeated digits)
+- **CnpjGeneratorOptionTypeInvalidException** — `type` is not one of `'numeric'`, `'alphabetic'`, `'alphanumeric'`
+
+```python
+from cnpj_gen import (
+    cnpj_gen,
+    CnpjGeneratorOptionsTypeError,
+    CnpjGeneratorOptionPrefixInvalidException,
+    CnpjGeneratorOptionTypeInvalidException,
+    CnpjGeneratorException,
+)
+
+# Option type (e.g. `prefix` must be string)
+try:
+    cnpj_gen(prefix=123)
+except CnpjGeneratorOptionsTypeError as e:
+    print(e.option_name, e.expected_type, e.actual_type)
+
+# Invalid prefix (e.g. all-zero base)
+try:
+    cnpj_gen(prefix='000000000001')
+except CnpjGeneratorOptionPrefixInvalidException as e:
+    print(e.reason, e.actual_input)
+
+# Invalid type value
+try:
+    cnpj_gen(type='invalid')
+except CnpjGeneratorOptionTypeInvalidException as e:
+    print(e.expected_values, e.actual_input)
+
+# Any exception from the package
+try:
+    cnpj_gen(prefix='000000000000')
+except CnpjGeneratorException as e:
+    print(e)
+```
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -100,7 +209,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cnpj-gen/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](./CHANGELOG.md) for a list of changes and version history.
 
 ---
 
