@@ -1,8 +1,9 @@
 """Type aliases for the ``cnpj_fmt`` package."""
 
-from collections.abc import Callable, Sequence
-from typing import Any, TypedDict
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, TypeAlias, TypedDict
 
+from .cnpj_formatter_options import CnpjFormatterOptions
 from .exceptions import CnpjFormatterException
 
 CnpjInput = str | Sequence[str]
@@ -25,7 +26,7 @@ issues. The callback receives the original input value and the exception
 object, and should return a string to use as the fallback output.
 """
 
-CnpjFormatterOptionsInput = "CnpjFormatterOptions | Mapping[str, Any] | None"
+CnpjFormatterOptionsInput: TypeAlias = CnpjFormatterOptions | Mapping[str, Any] | None
 
 
 class CnpjFormatterOptionsType(TypedDict):
