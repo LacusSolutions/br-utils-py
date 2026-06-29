@@ -300,7 +300,10 @@ def describe_cnpj_formatter():
 
                     return f'ERROR: "{value}"'
 
-                _format(input_value, {"on_fail": on_fail})
+                assert (
+                    _format(input_value, {"on_fail": on_fail})
+                    == f'ERROR: "{input_value}"'
+                )
 
             def it_returns_the_string_from_on_fail():
                 assert (
