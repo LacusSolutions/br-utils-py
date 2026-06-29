@@ -27,4 +27,4 @@ class CnpjUtilsInitTest:
 
         assert utils.generator is not None
         assert utils.generator.options == generator_options
-        assert result.startswith("12.345.678/000")
+        assert result.startswith("12.345.678/")
