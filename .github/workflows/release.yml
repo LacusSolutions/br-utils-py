@@ -184,7 +184,7 @@ jobs:
           python-version: '3.x'
 
       - run: python -m pip install --upgrade pip
-      - run: python require
+      - run: python require --dev-only
 
       - name: Build and Publish Package
         run: |

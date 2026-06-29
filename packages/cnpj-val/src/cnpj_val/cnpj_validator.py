@@ -1,4 +1,5 @@
 from cnpj_dv import CnpjCheckDigits
+from cnpj_dv.exceptions import CnpjCheckDigitsException
 
 CNPJ_LENGTH = 14
 
@@ -13,12 +14,9 @@ class CnpjValidator:
         if len(cnpj_str_digits) != CNPJ_LENGTH:
             return False
 
-        cnpj_num_digits = [int(digit) for digit in cnpj_str_digits]
-        cnpj_first_check_digit = cnpj_num_digits[-2]
-        cnpj_second_check_digit = cnpj_num_digits[-1]
-        cnpj_check_digits = CnpjCheckDigits(cnpj_num_digits)
+        try:
+            cnpj_check_digits = CnpjCheckDigits(cnpj_str_digits)
+        except CnpjCheckDigitsException:
+            return False
 
-        return (
-            cnpj_first_check_digit == cnpj_check_digits.first_digit
-            and cnpj_second_check_digit == cnpj_check_digits.second_digit
-        )
+        return cnpj_str_digits == cnpj_check_digits.cnpj

@@ -26,9 +26,7 @@ VERSION_HEADING_PATTERN = re.compile(
     r"(.*?)(?=^## \d+\.\d+\.\d+(?:\.(?:dev|alpha|beta|rc)\d+)?\s*\r?\n|\Z)",
     re.MULTILINE | re.DOTALL,
 )
-VERSION_FORMAT = re.compile(
-    r"^\d+\.\d+\.\d+(?:\.(?:dev|alpha|beta|rc)\d+)?$"
-)
+VERSION_FORMAT = re.compile(r"^\d+\.\d+\.\d+(?:\.(?:dev|alpha|beta|rc)\d+)?$")
 
 
 def setup_commands(parser: ArgumentParser) -> None:
@@ -74,11 +72,11 @@ def prepare_release_notes(package: str, requested_version: str | None = None) ->
     """Write release notes for a package version to .release/."""
     if package not in PACKAGES:
         available = ", ".join(PACKAGES)
-        raise ValueError(
-            f"Invalid package: {package}. Available packages: {available}"
-        )
+        raise ValueError(f"Invalid package: {package}. Available packages: {available}")
 
-    if requested_version is not None and not VERSION_FORMAT.fullmatch(requested_version):
+    if requested_version is not None and not VERSION_FORMAT.fullmatch(
+        requested_version
+    ):
         raise ValueError(
             "Invalid version format: "
             f"{requested_version}. Expected X.Y.Z or X.Y.Z.{{dev,alpha,beta,rc}}N"
@@ -89,7 +87,9 @@ def prepare_release_notes(package: str, requested_version: str | None = None) ->
     if not changelog_path.is_file():
         raise FileNotFoundError(f"Changelog not found: {changelog_path}")
 
-    version_bodies = extract_changelog_bodies(changelog_path.read_text(encoding="utf-8"))
+    version_bodies = extract_changelog_bodies(
+        changelog_path.read_text(encoding="utf-8")
+    )
 
     if not version_bodies:
         raise ValueError(f"No version sections found in changelog: {changelog_path}")

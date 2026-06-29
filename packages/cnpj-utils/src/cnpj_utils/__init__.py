@@ -1,16 +1,15 @@
 from cnpj_fmt import (
     CnpjFormatter,
-    CnpjFormatterError,
-    CnpjFormatterHiddenRangeError,
-    CnpjFormatterInvalidLengthError,
+    CnpjFormatterException,
+    CnpjFormatterInputLengthException,
     CnpjFormatterOptions,
+    CnpjFormatterOptionsHiddenRangeInvalidException,
     cnpj_fmt,
 )
 from cnpj_gen import (
     CnpjGenerator,
-    CnpjGeneratorError,
-    CnpjGeneratorInvalidPrefixBranchIdError,
-    CnpjGeneratorInvalidPrefixLengthError,
+    CnpjGeneratorException,
+    CnpjGeneratorOptionPrefixInvalidException,
     CnpjGeneratorOptions,
     cnpj_gen,
 )
@@ -18,16 +17,28 @@ from cnpj_val import CnpjValidator, cnpj_val
 
 from .cnpj_utils import CnpjUtils
 
+CnpjFormatterError = CnpjFormatterException
+CnpjFormatterHiddenRangeError = CnpjFormatterOptionsHiddenRangeInvalidException
+CnpjFormatterInvalidLengthError = CnpjFormatterInputLengthException
+CnpjGeneratorError = CnpjGeneratorException
+CnpjGeneratorInvalidPrefixBranchIdError = CnpjGeneratorOptionPrefixInvalidException
+CnpjGeneratorInvalidPrefixLengthError = CnpjGeneratorOptionPrefixInvalidException
+
 __all__ = [
     "CnpjFormatter",
     "CnpjFormatterError",
+    "CnpjFormatterException",
     "CnpjFormatterHiddenRangeError",
+    "CnpjFormatterInputLengthException",
     "CnpjFormatterInvalidLengthError",
     "CnpjFormatterOptions",
+    "CnpjFormatterOptionsHiddenRangeInvalidException",
     "CnpjGenerator",
     "CnpjGeneratorError",
+    "CnpjGeneratorException",
     "CnpjGeneratorInvalidPrefixBranchIdError",
     "CnpjGeneratorInvalidPrefixLengthError",
+    "CnpjGeneratorOptionPrefixInvalidException",
     "CnpjGeneratorOptions",
     "CnpjUtils",
     "CnpjValidator",

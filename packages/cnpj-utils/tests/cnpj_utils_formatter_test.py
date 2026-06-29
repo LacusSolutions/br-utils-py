@@ -20,13 +20,13 @@ class CnpjUtilsFormatterTest:
         assert result == "12.345.678/0001-90"
         utils.formatter.format.assert_called_once_with(
             "12345678000190",
-            True,
-            "X",
-            None,
-            None,
-            None,
-            None,
-            None,
-            True,
-            ANY,
+            hidden=True,
+            hidden_key="X",
+            hidden_start=None,
+            hidden_end=None,
+            dot_key=None,
+            slash_key=None,
+            dash_key=None,
+            escape=True,
+            on_fail=ANY,
         )

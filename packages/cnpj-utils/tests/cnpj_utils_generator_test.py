@@ -13,6 +13,6 @@ class CnpjUtilsGeneratorTest:
 
         assert result == "12.345.678/0001-90"
         utils.generator.generate.assert_called_once_with(
-            True,
-            "12345678",
+            format=True,
+            prefix="12345678",
         )

@@ -1,5 +1,16 @@
 # cnpj-utils
 
+## 2.0.0
+
+### BREAKING CHANGES
+
+- **Dependencies** — Requires `cnpj-gen` 2.x for generation; upgrade the CNPJ stack (`cnpj-gen`, `cnpj-dv`, `cnpj-val`) together.
+
+### Improvements
+
+- **`CnpjUtils`**: Construct formatter and generator from options instances and forward v2 keyword-based `format` / `generate` calls.
+- **Exports**: Re-export underlying v2 exception types and keep legacy alias names (`CnpjGeneratorError`, `CnpjFormatterError`, etc.).
+
 ## 1.0.2
 
 ### Patch Changes

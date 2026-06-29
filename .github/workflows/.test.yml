@@ -45,11 +45,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          key: ${{ runner.os }}-python-test-${{ matrix.package }}-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt', format('packages/{0}/pyproject.toml', matrix.package)) }}
+          key: ${{ runner.os }}-python-test-${{ matrix.package }}-${{ matrix.python-version }}-${{ hashFiles('requirements-dev.txt', 'packages/**/pyproject.toml') }}
           path: ~/.cache/pip
 
       - run: python -m pip install --upgrade pip
-      - run: python require
+      - run: python require ${{ matrix.package }}
 
       - run: python run test ${{ matrix.package }}
         env:
