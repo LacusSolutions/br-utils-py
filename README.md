@@ -69,7 +69,7 @@ The main entry points are the class `CnpjFormatter`, the options class `CnpjForm
 
   If the input is not a `str` or a sequence of `str`, **`CnpjFormatterInputTypeError`** is raised.
 
-  Per-call options are merged over the instance defaults for that call only (instance defaults are unchanged). Pass a `CnpjFormatterOptions` instance or a mapping as the second argument, in addition to keyword arguments; later overrides win.
+  Per-call options are merged over the instance defaults for that call only (instance defaults are unchanged). Pass a `CnpjFormatterOptions` instance or a mapping as the second argument, in addition to keyword arguments; when both are provided, the `options` argument wins.
 
 ### `CnpjFormatterOptions`
 

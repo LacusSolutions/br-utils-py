@@ -236,7 +236,8 @@ class CnpjFormatter:
 
         Per-call ``options`` are merged over the instance default
         options for this call only; the instance defaults are
-        unchanged.
+        unchanged. When both the ``options`` argument and named
+        keyword parameters are provided, ``options`` takes precedence.
 
         Raises:
             CnpjFormatterInputTypeError: If the input is not a ``str``
