@@ -1,4 +1,4 @@
-cnpj-dv>=1.0.0
+cnpj-dv>=2.0.0,<3.0.0
 cnpj-fmt>=1.0.0
 cnpj-gen>=1.0.2
 cnpj-val>=1.0.2
