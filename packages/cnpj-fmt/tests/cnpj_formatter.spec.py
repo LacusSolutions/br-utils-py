@@ -60,8 +60,8 @@ def _assert_options_snapshots_match(actual: dict, expected: dict) -> None:
             assert actual[key] == expected_value
 
 
-def _format(cnpj_input, options=None):
-    return CnpjFormatter().format(cnpj_input, options)
+def _format(cnpj_input, options=None, **kwargs):
+    return CnpjFormatter().format(cnpj_input, options, **kwargs)
 
 
 def describe_cnpj_formatter():
@@ -334,6 +334,32 @@ def describe_cnpj_formatter():
                 assert (
                     str(error)
                     == f'CNPJ formatting option "on_fail" must be of type string. Got {actual_type}.'
+                )
+
+        def describe_when_using_per_call_keyword_overrides():
+            def it_applies_keyword_overrides_without_mutating_default_options():
+                formatter = CnpjFormatter({"slash_key": "|"})
+
+                assert formatter.format("12ABC34500DE99", hidden=True).count("*") > 0
+                assert formatter.options.slash_key == "|"
+
+            def it_gives_options_precedence_over_named_keyword_arguments():
+                assert (
+                    _format(
+                        "12ABC34500DE99",
+                        {"hidden": False},
+                        hidden=True,
+                    ).count("*")
+                    == 0
+                )
+
+            def it_applies_encode_via_keyword_override():
+                assert _format("12ABC34500DE99", encode=True) == "12.ABC.345%2F00DE-99"
+
+            def it_applies_on_fail_via_keyword_override():
+                assert (
+                    _format("short", on_fail=lambda _value, _error: "fallback")
+                    == "fallback"
                 )
 
         def describe_when_using_hidden_option():
