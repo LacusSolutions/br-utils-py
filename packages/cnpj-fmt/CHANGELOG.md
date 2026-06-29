@@ -23,7 +23,7 @@
 
 - **Alphanumeric CNPJ** — Both numeric and alphanumeric 14-character CNPJs are supported after stripping punctuation and uppercasing letters.
 - **`encode` option** — When `True`, the formatted CNPJ is URL-encoded (similar to JavaScript's `encodeURIComponent`).
-- **`format()` per-call options** — Second argument may be a `CnpjFormatterOptions` instance or a mapping, merged with named parameters over instance defaults for that call only.
+- **`format()` per-call options** — Accept a `CnpjFormatterOptions` instance or mapping plus named kwargs; all merge over instance defaults for that call only, with `options` winning over keyword arguments when both are set.
 - **Explicit error model** — `CnpjFormatterInputTypeError`, `CnpjFormatterOptionsTypeError`, `CnpjFormatterInputLengthException`, `CnpjFormatterOptionsHiddenRangeInvalidException`, and `CnpjFormatterOptionsForbiddenKeyCharacterException` for typed errors and clearer handling.
 - **`CnpjFormatterOptions.DISALLOWED_KEY_CHARACTERS`** — Reserved characters for `hidden_key`, `dot_key`, `slash_key`, and `dash_key` (internal masking pipeline).
 - **`get_default_on_fail()`** — Shared default failure callback used by `CnpjFormatterOptions.DEFAULT_ON_FAIL`.
@@ -32,6 +32,7 @@
 
 - **Options as properties** — `CnpjFormatterOptions` uses validated properties and `set()` / `set_hidden_range()` instead of a frozen dataclass with `merge()`.
 - **Shared options instance** — Passing a `CnpjFormatterOptions` instance to `CnpjFormatter` shares it by reference; mutating it affects future `format()` calls without per-call overrides.
+- **Per-call precedence docs** — README (EN/PT) and the `format()` docstring document that the `options` argument overrides named keyword parameters on conflict.
 
 ## 1.0.0
 

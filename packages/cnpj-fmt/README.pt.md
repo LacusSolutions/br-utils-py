@@ -56,7 +56,7 @@ Os pontos principais são a classe `CnpjFormatter`, a classe de opções `CnpjFo
 
   Se a entrada não for `str` nem sequência de `str`, é lançada **`CnpjFormatterInputTypeError`**.
 
-  As opções por chamada são mescladas sobre os padrões da instância apenas naquela chamada (os padrões da instância não mudam). É possível passar uma instância de `CnpjFormatterOptions` ou um mapeamento como segundo argumento, além de argumentos nomeados; sobrescritas posteriores prevalecem.
+  As opções por chamada são mescladas sobre os padrões da instância apenas naquela chamada (os padrões da instância não mudam). É possível passar uma instância de `CnpjFormatterOptions` ou um mapeamento como segundo argumento, além de argumentos nomeados; quando ambos forem fornecidos, o argumento `options` prevalece.
 
 ### `CnpjFormatterOptions`
 
