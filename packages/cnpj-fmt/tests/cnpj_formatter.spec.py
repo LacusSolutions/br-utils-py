@@ -344,6 +344,7 @@ def describe_cnpj_formatter():
                 formatter = CnpjFormatter({"slash_key": "|"})
 
                 assert formatter.format("12ABC34500DE99", hidden=True).count("*") > 0
+                assert formatter.options.hidden is False
                 assert formatter.options.slash_key == "|"
 
             def it_gives_options_precedence_over_named_keyword_arguments():
