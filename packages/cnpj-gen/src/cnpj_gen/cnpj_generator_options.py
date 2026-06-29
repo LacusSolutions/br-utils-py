@@ -62,8 +62,8 @@ class CnpjGeneratorOptions:
 
     def __init__(
         self,
-        default_options: CnpjGeneratorOptionsInput | None = None,
-        *overrides: CnpjGeneratorOptionsInput,
+        options: CnpjGeneratorOptionsInput = None,
+        *extra_overrides: CnpjGeneratorOptionsInput,
         format: bool | None = None,
         prefix: str | None = None,
         type: CnpjType | None = None,
@@ -90,20 +90,20 @@ class CnpjGeneratorOptions:
         """
         self._options: dict[str, Any] = {}
 
-        if isinstance(default_options, CnpjGeneratorOptions):
-            self.format = default_options.format
-            self.prefix = default_options.prefix
-            self.type = default_options.type
-        elif isinstance(default_options, dict):
-            self.format = default_options.get("format")  # type: ignore[assignment]
-            self.prefix = default_options.get("prefix")  # type: ignore[assignment]
-            self.type = default_options.get("type")  # type: ignore[assignment]
+        if isinstance(options, CnpjGeneratorOptions):
+            self.format = options.format
+            self.prefix = options.prefix
+            self.type = options.type
+        elif isinstance(options, dict):
+            self.format = options.get("format")  # type: ignore[assignment]
+            self.prefix = options.get("prefix")  # type: ignore[assignment]
+            self.type = options.get("type")  # type: ignore[assignment]
         else:
             self.format = format
             self.prefix = prefix
             self.type = type
 
-        for override in overrides:
+        for override in extra_overrides:
             self.set(override)
 
     @property
