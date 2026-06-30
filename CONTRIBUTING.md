@@ -137,7 +137,7 @@ br-utils-py/python/
 │   ├── hooks.py            # Git hooks management
 │   ├── lint.py             # Linting script
 │   ├── publish.py          # Publishing script
-│   ├── require.py          # Dependency installation script
+│   ├── require/            # Dependency installation (``core.py``, ``__init__.py``)
 │   └── test.py             # Testing script
 ├── .pre-commit-config.yaml # Pre-commit hooks configuration
 ├── requirements-dev.txt    # Development dependencies (pytest, ruff, etc.)
