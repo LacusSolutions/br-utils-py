@@ -2,13 +2,28 @@
 
 ## 2.0.0
 
+### 🎉 v2 at a glance 🎊
+
+- 🆕 **Alphanumeric CNPJ** — Full support for the [14-character alphanumeric CNPJ](https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2023/julho/cnpj-alfa-numerico); default mode is alphanumeric, with optional `type="numeric"` for digits-only.
+- ✨ **`type` and `case_sensitive` options** — Control validation mode and whether lowercase letters are accepted on alphanumeric input.
+- 🛡️ **Structured errors** — Typed exception hierarchy for invalid input or options; invalid CNPJ data still returns `False`.
+- 📥 **Flexible input** — Accepts `str` or `Sequence[str]` (formatted or raw); non-alphanumeric characters are stripped per `type`.
+
 ### BREAKING CHANGES
 
-- **Dependencies** — Requires `cnpj-dv` 2.x; upgrade `cnpj-dv` before installing this version.
+- **Default validation is alphanumeric and case-sensitive** — Without options, letters are kept and lowercase yields `False`; use `type="numeric"` for legacy numeric-only behavior and `case_sensitive=False` to accept lowercase.
+- **Invalid input type now raises** — `cnpj_val()` and `CnpjValidator.is_valid()` raise `CnpjValidatorInputTypeError` when input is not a string or sequence of strings (v1 returned `False` or had unspecified behavior).
+- **Expanded signatures** — `cnpj_val()` / `is_valid()` accept `str | Sequence[str]` and optional per-call options; v1 accepted only a single `str`.
+- **New exports** — Package now exposes `CnpjValidatorOptions`, exception classes, type aliases, and `CNPJ_LENGTH` alongside `cnpj_val` and `CnpjValidator`.
+- **Dependencies** — Requires `cnpj-dv` 2.x and adds runtime dependency `lacus.utils`; upgrade `cnpj-dv` before installing.
+- **Stricter eligibility** — Zeroed base ID, zeroed branch ID, and 12 repeated numeric digits return `False` via `cnpj-dv` 2.x rules.
 
-### Bug fixes
+### New features
 
-- **`CnpjValidator`**: Pass a digit string to `CnpjCheckDigits` so validation works with the `cnpj-dv` 2.x API.
+- **`CnpjValidatorOptions`** — Reusable options with `set()` merge, read-only frozen `all` snapshot, and static defaults `DEFAULT_CASE_SENSITIVE` / `DEFAULT_TYPE`.
+- **Exception hierarchy** — `CnpjValidatorTypeError`, `CnpjValidatorInputTypeError`, `CnpjValidatorOptionsTypeError`, `CnpjValidatorException`, and `CnpjValidatorOptionTypeInvalidException`.
+- **Per-call keyword options** — `CnpjValidator`, `cnpj_val()`, and `is_valid()` accept keyword-only `case_sensitive` and `type` besides an `options` mapping, matching `cnpj-fmt` and `cnpj-gen`.
+- **Verifier-digit rule** — Rejects CNPJs whose last two characters are not digits (`0`–`9`).
 
 ## 1.0.2
 
