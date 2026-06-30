@@ -1,5 +1,15 @@
 # cnpj-val
 
+## 2.0.0
+
+### BREAKING CHANGES
+
+- **Dependencies** — Requires `cnpj-dv` 2.x; upgrade `cnpj-dv` before installing this version.
+
+### Bug fixes
+
+- **`CnpjValidator`**: Pass a digit string to `CnpjCheckDigits` so validation works with the `cnpj-dv` 2.x API.
+
 ## 1.0.2
 
 ### Patch Changes

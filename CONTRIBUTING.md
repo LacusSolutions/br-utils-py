@@ -51,8 +51,11 @@ cd br-utils-py/python
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install development dependencies
-pip install -r requirements-dev.txt
+# Install development tools and all monorepo packages (editable, from source)
+python require
+
+# Or install only what a single package needs
+python require cnpj-gen
 
 # Install pre-commit hooks
 python run hooks install
@@ -66,6 +69,9 @@ python run test
 
 ```bash
 # Development
+python require               # Install dev tools and all monorepo packages (editable)
+python require [pkg]         # Install dev tools and a package dependency closure
+python require --dev-only    # Install development tools only
 python run lint              # Run linting and formatting for all packages
 python run lint [pkg|path]   # Run linting and formatting for package, path, or file
 python run test              # Run tests for all packages
@@ -131,10 +137,11 @@ br-utils-py/python/
 │   ├── hooks.py            # Git hooks management
 │   ├── lint.py             # Linting script
 │   ├── publish.py          # Publishing script
+│   ├── require/            # Dependency installation (``core.py``, ``__init__.py``)
 │   └── test.py             # Testing script
 ├── .pre-commit-config.yaml # Pre-commit hooks configuration
-├── requirements-dev.txt    # Development dependencies
-├── requirements.txt        # Production dependencies
+├── requirements-dev.txt    # Development dependencies (pytest, ruff, etc.)
+├── require                 # Install monorepo dependencies (editable)
 ├── run                     # Main monorepo run script
 ├── setup.cfg               # Black configuration
 └── README.md               # Project documentation

@@ -1,7 +1,7 @@
 [project]
 name = "cnpj-gen"
 dynamic = [ "version" ]
-description = "Utility function to generate valid CNPJ (Brazilian employer ID)"
+description = "Utility to generate CNPJ (Brazilian Business Tax ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -35,7 +35,8 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cnpj-dv>=1.0.0,<2.0.0",
+  "cnpj-dv>=2.0.0,<2.1.0",
+  "lacus.utils>=1.0.0,<2.0.0",
 ]
 
   [[project.authors]]
@@ -62,10 +63,10 @@ where = [ "src/" ]
 
 [tool.pytest.ini_options]
 minversion = "9.0"
+addopts = [ "--import-mode=importlib" ]
 testpaths = [ "tests/" ]
-python_files = [ "*_test.py" ]
-python_functions = [ "test_*" ]
-python_classes = [ "*Test" ]
+python_files = [ "*.spec.py" ]
+python_functions = [ "it_*", "test_*" ]
 
 [tool.coverage.run]
 source = [ "src/" ]

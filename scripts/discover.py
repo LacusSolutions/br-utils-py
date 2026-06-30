@@ -1,6 +1,13 @@
 """Discover packages and resolve dependencies for topological sorting."""
 
-__all__ = ["get_sorted_packages"]
+__all__ = [
+    "build_distribution_map",
+    "discover_packages",
+    "get_dependency_closure",
+    "get_distribution_name",
+    "get_package_dependencies",
+    "get_sorted_packages",
+]
 
 from pathlib import Path
 
@@ -18,6 +25,8 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent.parent
 PACKAGES_DIR = ROOT_DIR / "packages"
 
+_DEPENDENCY_OPERATORS = ["~=", ">=", "<=", "==", "!=", "<", ">"]
+
 
 def discover_packages() -> list[str]:
     packages = []
@@ -32,6 +41,61 @@ def discover_packages() -> list[str]:
     return sorted(packages)
 
 
+def _parse_dependency_name(dependency: str) -> str:
+    dep_name = dependency.strip()
+
+    for operator in _DEPENDENCY_OPERATORS:
+        if operator in dep_name:
+            dep_name = dep_name.split(operator)[0].strip()
+            break
+
+    if "[" in dep_name:
+        dep_name = dep_name.split("[")[0].strip()
+
+    return dep_name
+
+
+def get_distribution_name(package_name: str) -> str | None:
+    """Return the PyPI distribution name for a monorepo package folder."""
+    pyproject_path = PACKAGES_DIR / package_name / "pyproject.toml"
+
+    if not pyproject_path.exists():
+        return None
+
+    try:
+        with open(pyproject_path, "rb") as f:
+            data = tomllib.load(f)
+
+        return data.get("project", {}).get("name")
+    except (KeyError, FileNotFoundError, TOMLDecodeError):
+        return None
+
+
+def build_distribution_map() -> dict[str, str]:
+    """Map PyPI distribution names to monorepo package folder names."""
+    distribution_map: dict[str, str] = {}
+
+    for package_name in discover_packages():
+        distribution_name = get_distribution_name(package_name)
+
+        if distribution_name:
+            distribution_map[distribution_name] = package_name
+
+        distribution_map[package_name] = package_name
+
+    return distribution_map
+
+
+def _resolve_internal_dependency(
+    dependency_name: str,
+    distribution_map: dict[str, str],
+) -> str | None:
+    if dependency_name in distribution_map:
+        return distribution_map[dependency_name]
+
+    return None
+
+
 def get_package_dependencies(package_name: str) -> list[str]:
     pyproject_path = PACKAGES_DIR / package_name / "pyproject.toml"
 
@@ -43,23 +107,15 @@ def get_package_dependencies(package_name: str) -> list[str]:
             data = tomllib.load(f)
 
         dependencies = data.get("project", {}).get("dependencies", [])
-        all_packages = discover_packages()
+        distribution_map = build_distribution_map()
         internal_deps = []
-        operators = ["~=", ">=", "<=", "==", "!=", "<", ">"]
 
         for dep in dependencies:
-            dep_name = dep.strip()
+            dep_name = _parse_dependency_name(dep)
+            internal_dep = _resolve_internal_dependency(dep_name, distribution_map)
 
-            for op in operators:
-                if op in dep_name:
-                    dep_name = dep_name.split(op)[0].strip()
-                    break
-
-            if "[" in dep_name:
-                dep_name = dep_name.split("[")[0].strip()
-
-            if dep_name in all_packages:
-                internal_deps.append(dep_name)
+            if internal_dep is not None:
+                internal_deps.append(internal_dep)
 
         return internal_deps
     except (KeyError, FileNotFoundError, TOMLDecodeError):
@@ -113,3 +169,27 @@ def get_sorted_packages() -> list[str]:
     graph = get_dependency_graph()
 
     return topological_sort(packages, graph)
+
+
+def get_dependency_closure(package_name: str) -> list[str]:
+    """Return a package and its internal dependencies in topological order."""
+    if package_name not in discover_packages():
+        return []
+
+    graph = get_dependency_graph()
+    closure: set[str] = set()
+
+    def collect(pkg: str) -> None:
+        if pkg in closure:
+            return
+
+        for dep in graph.get(pkg, []):
+            collect(dep)
+
+        closure.add(pkg)
+
+    collect(package_name)
+
+    subgraph = {pkg: graph[pkg] for pkg in closure}
+
+    return topological_sort(sorted(closure), subgraph)

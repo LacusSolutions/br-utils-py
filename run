@@ -4,27 +4,30 @@
 Monorepo management scripts.
 
 Usage:
-    python run lint              # Run linting and formatting for all packages in current directory
-    python run lint [pkg|path]   # Run linting and formatting for package, path, or file
-    python run test              # Run tests for all packages in current directory
-    python run test [pkg]        # Run tests for specified package
-    python run build             # Build all packages in current directory
-    python run build [pkg]       # Build specified package
-    python run build -i [pkg]    # Build and install specified package
-    python run clean             # Remove build files for all packages in current directory
-    python run clean [pkg]       # Remove build files for specified package
-    python run publish [pkg]     # Publish specified package to PyPI
-    python run release [pkg]     # Prepare release notes from package CHANGELOG
-    python run hooks install     # Install `pre-commit` hooks
-    python run hooks uninstall   # Uninstall `pre-commit` hooks
-    python run hooks update      # Update `pre-commit` hooks
-    python run hooks run         # Run `pre-commit` hooks on all files
+    python run lint                 # Run linting and formatting for all packages in current directory
+    python run lint [pkg|path]      # Run linting and formatting for package, path, or file
+    python run test                 # Run tests for all packages in current directory
+    python run test [pkg]           # Run tests for specified package
+    python run build                # Build all packages in current directory
+    python run build [pkg]          # Build specified package
+    python run build -i [pkg]       # Build and install specified package
+    python run clean                # Remove build files for all packages in current directory
+    python run clean [pkg]          # Remove build files for specified package
+    python run publish [pkg]        # Publish specified package to PyPI
+    python run release [pkg]        # Prepare release notes from package CHANGELOG
+    python run require              # Install dev tools and all monorepo packages (editable)
+    python run require [pkg]        # Install dev tools and a package dependency closure
+    python run require --dev-only   # Install development tools only
+    python run hooks install        # Install `pre-commit` hooks
+    python run hooks uninstall      # Uninstall `pre-commit` hooks
+    python run hooks update         # Update `pre-commit` hooks
+    python run hooks run            # Run `pre-commit` hooks on all files
 """
 
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from scripts import build, clean, common, hooks, lint, publish, release, test
+from scripts import build, clean, common, hooks, lint, publish, release, require, test
 
 PACKAGES = common.PACKAGES
 PACKAGES_DIR = common.PACKAGES_DIR
@@ -40,6 +43,9 @@ Examples:
     python run hooks install
     python run hooks update
     python run hooks run
+    python run require
+    python run require cnpj-gen
+    python run require --dev-only
     python run lint
     python run lint cpf-fmt
     python run test
@@ -65,6 +71,7 @@ Examples:
     clean.setup_commands(subparsers)
     publish.setup_commands(subparsers)
     release.setup_commands(subparsers)
+    require.setup_commands(subparsers)
 
     args = parser.parse_args()
 
@@ -235,6 +242,10 @@ Examples:
 
     if args.command == "release":
         sys.exit(release.main(args.package, args.version))
+
+    if args.command == "require":
+        require.require(args.package, dev_only=args.dev_only)
+        sys.exit(0)
 
     parser.print_help()
     sys.exit(1)

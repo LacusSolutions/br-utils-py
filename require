@@ -1,48 +1,25 @@
-"""Install package dependencies."""
+#!/usr/bin/env python3
+"""Install development and monorepo package dependencies.
 
-import subprocess
+Standalone entrypoint for CI and fresh environments. Imports only
+``scripts.require.core``, which uses the stdlib and does not depend on other
+``scripts`` modules or on dev packages such as ``tomli`` until they are needed
+(after ``requirements-dev.txt`` is installed, or via a one-off ``tomli`` bootstrap
+on Python 3.10).
+"""
+
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
-CURRENT_WORKING_DIR = Path.cwd().resolve()
-REQUIREMENTS_BASE_FILE = CURRENT_WORKING_DIR / "requirements.txt"
-REQUIREMENTS_DEV_FILE = CURRENT_WORKING_DIR / "requirements-dev.txt"
+ROOT_DIR = Path(__file__).resolve().parent
 
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
-def install_dependencies(file: Path):
-    """Install dependencies from requirements*.txt files."""
-    if not file.exists():
-        print(f'⚠️  "{file.name}" not found. Skipping...')
-        return
-
-    result = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--upgrade",
-            "-r",
-            str(file),
-        ],
-        capture_output=True,
-        text=True,
-    )
-
-    if result.returncode == 0:
-        print(f'✅ "{file.name}" dependencies installed successfully.')
-    else:
-        print(f'❌ "{file.name}" failed to install dependencies.')
-        print(result.stderr) if result.stderr else None
-        sys.exit(result.returncode)
-
-
-def install_all():
-    """Install all dependencies."""
-    print("Installing dependencies...")
-    install_dependencies(REQUIREMENTS_DEV_FILE)
-    install_dependencies(REQUIREMENTS_BASE_FILE)
+from scripts.require.core import main  # noqa: E402
 
 
 if __name__ == "__main__":
-    install_all()
+    main()
