@@ -1,7 +1,7 @@
 [project]
 name = "cnpj-val"
 dynamic = [ "version" ]
-description = "Utility function to validate CNPJ (Brazilian employer ID)"
+description = "Utility to validate CNPJ (Brazilian Business Tax ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -35,6 +35,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
   "cnpj-dv>=2.0.0,<2.1.0",
+  "lacus.utils>=1.0.0,<2.0.0",
 ]
 
   [[project.authors]]
