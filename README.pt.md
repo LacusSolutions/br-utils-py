@@ -221,7 +221,6 @@ Todos os símbolos públicos estão disponíveis no pacote `cnpj_val`:
 
 ### Outros recursos disponíveis
 
-- **`CnpjValidatorOptions.CNPJ_LENGTH`**: `14`.
 - **`CnpjValidatorOptions.DEFAULT_CASE_SENSITIVE`**: `True`.
 - **`CnpjValidatorOptions.DEFAULT_TYPE`**: `'alphanumeric'`.
 

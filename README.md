@@ -234,7 +234,6 @@ All public symbols are available from the `cnpj_val` package:
 
 ### Other available resources
 
-- **`CnpjValidatorOptions.CNPJ_LENGTH`**: `14`.
 - **`CnpjValidatorOptions.DEFAULT_CASE_SENSITIVE`**: `True`.
 - **`CnpjValidatorOptions.DEFAULT_TYPE`**: `'alphanumeric'`.
 
