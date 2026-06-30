@@ -20,6 +20,5 @@ if str(ROOT_DIR) not in sys.path:
 
 from scripts.require.core import main  # noqa: E402
 
-
 if __name__ == "__main__":
     main()
