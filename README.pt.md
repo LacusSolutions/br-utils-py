@@ -48,8 +48,11 @@ cnpj_gen()                    # ex.: 'AB123CDE000155' (14 caracteres alfanuméri
 
 cnpj_gen(format=True)         # ex.: 'AB.123.CDE/0001-55'
 
-cnpj_gen(prefix='45623767')   # ex.: '45623767000296'
-cnpj_gen(prefix='456237670002', format=True)  # ex.: '45.623.767/0002-96'
+cnpj_gen(prefix='45623767')   # ex.: '45623767ABCD96' (com type alfanumérico padrão)
+cnpj_gen(                     # ex.: '45.623.767/ABCD-96'
+    prefix='45623767',
+    format=True,
+)
 
 cnpj_gen(type='numeric')      # ex.: '65453043000178' (apenas dígitos)
 cnpj_gen(type='alphabetic')   # ex.: 'ABCDEFGHIJKL80' (apenas letras, exceto dígitos verificadores)
