@@ -225,9 +225,7 @@ class CnpjGeneratorOptions:
 
         self._options["type"] = actual_type
 
-    def set(
-        self, options: CnpjGeneratorOptionsInput | None = None
-    ) -> CnpjGeneratorOptions:
+    def set(self, options: CnpjGeneratorOptionsInput) -> CnpjGeneratorOptions:
         """Update multiple options at once, preserving omitted fields.
 
         Only the provided options are updated; options not included in
