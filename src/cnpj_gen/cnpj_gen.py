@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def cnpj_gen(
-    options: CnpjGeneratorOptionsInput | None = None,
+    options: CnpjGeneratorOptionsInput = None,
     *,
     format: bool | None = None,
     prefix: str | None = None,
