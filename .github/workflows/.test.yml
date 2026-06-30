@@ -49,9 +49,12 @@ jobs:
           path: ~/.cache/pip
 
       - run: python -m pip install --upgrade pip
-      - run: python require ${{ matrix.package }}
-
-      - run: python run test ${{ matrix.package }}
+      - run: python require "$PACKAGE"
         env:
+          PACKAGE: ${{ matrix.package }}
+
+      - run: python run test -- "$PACKAGE"
+        env:
+          PACKAGE: ${{ matrix.package }}
           API_URL: ${{ inputs.api-url }}
           API_TOKEN: ${{ secrets.api-token }}
