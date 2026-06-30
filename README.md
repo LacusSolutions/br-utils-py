@@ -50,7 +50,7 @@ cnpj_gen(format=True)         # e.g. 'AB.123.CDE/0001-55'
 
 cnpj_gen(prefix='45623767')   # e.g. '45623767ABCD96'
 cnpj_gen(                     # e.g. '45.623.767/ABCD-96'
-    prefix='456237670002',
+    prefix='45623767',
     format=True,
 )
 
