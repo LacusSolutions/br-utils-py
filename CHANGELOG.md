@@ -1,5 +1,12 @@
 # cnpj-gen
 
+## 2.0.1
+
+### Patch Changes
+
+- cafaf27: **Type hints** — Align `cnpj_gen`'s `options` parameter annotation with `CnpjGeneratorOptionsInput`.
+- 1b6c59c: **`CnpjGeneratorOptions::set()` signature** — Require `options` on `CnpjGeneratorOptions.set()`; bare `.set()` calls now raise `TypeError`.
+
 ## 2.0.0
 
 ### 🎉 v2 at a glance 🎊
