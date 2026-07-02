@@ -1,19 +1,27 @@
-from .cpf_check_digits import CpfCheckDigits
-from .exceptions import (
-    CpfCheckDigitsCalculationError,
-    CpfCheckDigitsError,
-    CpfCheckDigitsInputLengthError,
-    CpfCheckDigitsInputNotValidError,
-    CpfCheckDigitsInputTypeError,
+from .cpf_check_digits import (
+    CPF_MAX_LENGTH,
+    CPF_MIN_LENGTH,
+    CpfCheckDigits,
 )
+from .exceptions import (
+    CpfCheckDigitsException,
+    CpfCheckDigitsInputInvalidException,
+    CpfCheckDigitsInputLengthException,
+    CpfCheckDigitsInputTypeError,
+    CpfCheckDigitsTypeError,
+)
+from .types import CpfInput
 
 __all__ = [
+    "CPF_MAX_LENGTH",
+    "CPF_MIN_LENGTH",
     "CpfCheckDigits",
-    "CpfCheckDigitsCalculationError",
-    "CpfCheckDigitsError",
-    "CpfCheckDigitsInputLengthError",
-    "CpfCheckDigitsInputNotValidError",
+    "CpfCheckDigitsException",
+    "CpfCheckDigitsInputInvalidException",
+    "CpfCheckDigitsInputLengthException",
     "CpfCheckDigitsInputTypeError",
+    "CpfCheckDigitsTypeError",
+    "CpfInput",
 ]
 
 __version__ = "0.0.0"
