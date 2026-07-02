@@ -1,5 +1,13 @@
 # cpf-val
 
+## 1.0.2
+
+### Patch Changes
+
+- **cpf-dv 2.x**: Validation compares sanitized input to `CpfCheckDigits(...).cpf`.
+- Updated dependencies
+  - `cpf-dv`: 1.0.x → 2.0.0
+
 ## 1.0.1
 
 ### Patch Changes
