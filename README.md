@@ -7,13 +7,28 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Toolkit to deal with CNPJ data (Brazilian employer ID): validation, formatting and generation of valid IDs.
+> 🚀 **Full support for the [new alphanumeric CNPJ format](https://github.com/user-attachments/files/23937961/calculodvcnpjalfanaumerico.pdf).**
+
+> 🌎 [Acessar documentação em português](./README.pt.md)
+
+Utilities to deal with CNPJ (Brazilian Business Tax ID). This package wraps [`cnpj-fmt`](https://pypi.org/project/cnpj-fmt), [`cnpj-gen`](https://pypi.org/project/cnpj-gen), and [`cnpj-val`](https://pypi.org/project/cnpj-val) in a single API and re-exports their public resources.
 
 ## Python Support
 
 | ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
+
+## Features
+
+- ✅ **Unified API**: One default instance with `format`, `generate`, and `is_valid`; or use the underlying `cnpj_fmt`, `cnpj_gen`, and `cnpj_val` helpers
+- ✅ **Alphanumeric CNPJ**: Format, generate, and validate 14-character numeric or alphanumeric CNPJ
+- ✅ **Reusable instance**: `CnpjUtils` class with optional default settings (formatter, generator, validator options or instances)
+- ✅ **Full re-exports**: All formatter, generator, and validator classes, options, and exceptions from the three component packages
+- ✅ **Type hints**: Built for Python 3.10+ with full type annotations
+- ✅ **Flexible input**: `format()` and `is_valid()` accept `str` or a sequence of `str` (elements concatenated in order)
+- ✅ **Per-call overrides**: Instance defaults plus keyword or mapping overrides on each method call
+- ✅ **Error handling**: Same type errors and exceptions as the underlying packages
 
 ## Installation
 
@@ -21,255 +36,235 @@ Toolkit to deal with CNPJ data (Brazilian employer ID): validation, formatting a
 $ pip install cnpj-utils
 ```
 
-## Import
+This installs **`cnpj-utils`** together with [`cnpj-fmt`](https://pypi.org/project/cnpj-fmt), [`cnpj-gen`](https://pypi.org/project/cnpj-gen), and [`cnpj-val`](https://pypi.org/project/cnpj-val). You do **not** need separate `pip install` calls for the component packages when using **`cnpj-utils`**.
+
+## Quick Start
 
 ```python
-# Using class-based resource
-from cnpj_utils import CnpjUtils
+from cnpj_utils import CnpjUtils, cnpj_fmt, cnpj_gen, cnpj_val, cnpj_utils
+```
 
-# Or using function-based approach
-from cnpj_utils import cnpj_fmt, cnpj_gen, cnpj_val
+Basic usage with the default singleton:
 
-# Or using the default instance
+```python
 from cnpj_utils import cnpj_utils
+
+cnpj = '03603568000195'
+
+cnpj_utils.format(cnpj)                # '03.603.568/0001-95'
+cnpj_utils.format(cnpj, hidden=True)   # '03.603.***/****-**'
+cnpj_utils.format(                     # '03603568|0001_95'
+    cnpj,
+    dot_key='',
+    slash_key='|',
+    dash_key='_',
+)
+
+cnpj_utils.generate()                    # e.g. 'AB123CDE000155' (14-char alphanumeric)
+cnpj_utils.generate(format=True)         # e.g. 'AB.123.CDE/0001-55'
+cnpj_utils.generate(prefix='45623767')   # e.g. '45623767000296'
+cnpj_utils.generate(type='numeric')      # e.g. '65453043000178' (digits only)
+
+cnpj_utils.is_valid('98765432000198')       # True
+cnpj_utils.is_valid('98.765.432/0001-98')   # True
+cnpj_utils.is_valid('1QB5UKALPYFP59')       # True (alphanumeric)
+cnpj_utils.is_valid('98765432000199')       # False
 ```
 
 ## Usage
 
-### Object-Oriented Usage
+You can work in three equivalent ways:
 
-The `CnpjUtils` class provides a unified interface for all CNPJ operations:
+1. **`cnpj_utils`** — pre-built singleton for quick one-off calls.
+2. **`CnpjUtils`** — configurable instance with shared defaults across format, generate, and validate.
+3. **Component classes and helpers** — `CnpjFormatter`, `CnpjGenerator`, `CnpjValidator`, and `cnpj_fmt()`, `cnpj_gen()`, `cnpj_val()` (same classes used internally by `CnpjUtils`).
+
+All three approaches expose the same options and behavior. For exhaustive option tables and component-specific details, see the README of each [bundled package](#bundled-packages).
+
+### Formatter options
+
+When calling `format(cnpj_input, options=None, …)`, all options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `hidden` | `bool` | `False` | When `True`, mask characters in `hidden_start`–`hidden_end` with `hidden_key` |
+| `hidden_key` | `str` | `'*'` | Character(s) used to replace masked characters |
+| `hidden_start` | `int` | `5` | Start index (0–13, inclusive) of the range to hide |
+| `hidden_end` | `int` | `13` | End index (0–13, inclusive) of the range to hide |
+| `dot_key` | `str` | `'.'` | Dot delimiter (e.g. in `12.345.678`) |
+| `slash_key` | `str` | `'/'` | Slash delimiter (e.g. before branch `…/0001-90`) |
+| `dash_key` | `str` | `'-'` | Dash delimiter (e.g. before check digits `…-90`) |
+| `escape` | `bool` | `False` | When `True`, escape HTML special characters in the result |
+| `encode` | `bool` | `False` | When `True`, URL-encode the result (similar to JavaScript `encodeURIComponent`) |
+| `on_fail` | `Callable` | returns `''` | Callback when sanitized input length ≠ 14; return value is used as result |
+
+### Generator options
+
+When calling `generate(options=None, …)`, all options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CNPJ in standard format (`00.000.000/0000-00`) |
+| `prefix` | `str` | `''` | Partial start string (0–12 alphanumeric chars). Missing characters are generated and check digits computed. |
+| `type` | `'numeric'` \| `'alphabetic'` \| `'alphanumeric'` | `'alphanumeric'` | Character set for the randomly generated part. **Check digits are always numeric.** |
+
+Prefix rules: base ID (first 8 chars) and branch ID (chars 9–12) cannot be all zeros; 12 repeated digits (e.g. `111111111111`) are also not allowed.
+
+### Validator options
+
+When calling `is_valid(cnpj_input, options=None, …)`, all options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `case_sensitive` | `bool` | `True` | When `False`, lowercase letters are accepted for alphanumeric CNPJ (input is uppercased before validation). |
+| `type` | `'numeric'` \| `'alphanumeric'` | `'alphanumeric'` | `'numeric'`: only digits (0–9); `'alphanumeric'`: digits and letters (0–9, A–Z). |
+
+### `cnpj_utils` (default instance)
+
+The module-level `cnpj_utils` is a pre-built `CnpjUtils` instance. Use it for quick one-off calls:
+
+- **`format(cnpj_input, options=None, …)`**: Formats a CNPJ string or sequence of strings. Delegates to the internal formatter. Input must be 14 alphanumeric characters (after sanitization); otherwise `on_fail` is used.
+- **`generate(options=None, …)`**: Generates a valid CNPJ. Delegates to the internal generator.
+- **`is_valid(cnpj_input, options=None, …)`**: Returns `True` if the CNPJ is valid. Delegates to the internal validator.
+
+### `CnpjUtils` (class)
+
+For custom default formatter, generator, or validator, create your own instance:
 
 ```python
-cnpj_utils = CnpjUtils()
-cnpj = '03603568000195'
+from cnpj_utils import CnpjUtils
 
-# Format CNPJ
-print(cnpj_utils.format(cnpj))       # returns '03.603.568/0001-95'
+utils = CnpjUtils(
+    formatter={'hidden': True, 'hidden_key': '#'},
+    generator={'type': 'numeric', 'format': True},
+    validator={'type': 'numeric', 'case_sensitive': False},
+)
 
-# Validate CNPJ
-print(cnpj_utils.is_valid(cnpj))      # returns True
+utils.format('RK0CMT3W000100')        # 'RK.0CM.###/####-##'
+utils.generate()                      # e.g. '73.008.535/0005-06'
+utils.is_valid('98.765.432/0001-98')  # True
 
-# Generate CNPJ
-print(cnpj_utils.generate())          # returns '65453043000178'
+# Access or replace internal instances
+utils.formatter  # CnpjFormatter
+utils.generator  # CnpjGenerator
+utils.validator  # CnpjValidator
 ```
 
-#### With Configuration Options
+- **`__init__(*, formatter=None, generator=None, validator=None)`**: Each keyword may be an options mapping, a `CnpjFormatterOptions` / `CnpjGeneratorOptions` / `CnpjValidatorOptions` instance (stored by reference — mutating it later affects subsequent calls with no per-call override), a component instance, or omitted for defaults. Passing `None` for a component creates a new instance with default options.
+- **`format(cnpj_input, options=None, …)`**: Same as the default instance; per-call options override the formatter's defaults for that call only.
+- **`generate(options=None, …)`**: Same as the default instance; per-call options override the generator's defaults.
+- **`is_valid(cnpj_input, options=None, …)`**: Same as the default instance; per-call options override the validator's defaults.
+- **`formatter`**, **`generator`**, **`validator`**: Properties with getters and setters for the internal formatter, generator, and validator. Setters accept the same shapes as the constructor. To change a single option without replacing the instance, mutate the component's options (e.g. `utils.formatter.options.hidden = True`).
 
-You can configure the formatter and generator options in the constructor:
+Instance defaults and per-call overrides:
 
 ```python
-from cnpj_fmt import CnpjFormatterOptions
-from cnpj_gen import CnpjGeneratorOptions
-
-cnpj_utils = CnpjUtils(
-    formatter=CnpjFormatterOptions(
-        hidden=True,
-        hidden_key='#',
-        hidden_start=5,
-        hidden_end=13
-    ),
-    generator=CnpjGeneratorOptions(format=True)
+utils = CnpjUtils(
+    formatter={'hidden': True, 'hidden_key': '#'},
+    generator={'format': True},
+    validator={'type': 'numeric'},
 )
 
 cnpj = '03603568000195'
-print(cnpj_utils.format(cnpj))       # returns '03.603.###/####-##'
-print(cnpj_utils.generate())          # returns '73.008.535/0005-06'
+
+utils.format(cnpj)                 # masked (instance formatter defaults)
+utils.format(cnpj, hidden=False)   # this call only: unmasked
+utils.generate(format=False)       # this call only: compact output
+utils.is_valid('1QB5UKALPYFP59')   # False (instance validator is numeric-only)
+utils.is_valid(                    # True for this call
+    '1QB5UKALPYFP59',
+    type='alphanumeric',
+)
 ```
 
-The options can be provided to the constructor or the respective methods. If passed to the constructor, the options will be attached to the `CnpjUtils` instance. When passed to the methods, it only applies the options to that specific call.
+Options can also be passed as a mapping on each method:
 
 ```python
-cnpj_utils = CnpjUtils(
-    formatter=CnpjFormatterOptions(hidden=True)
+utils.format(cnpj, {'slash_key': '|'})
+utils.generate({'prefix': '12345', 'type': 'numeric'})
+utils.is_valid('1QB5UKALPYFP59', {'case_sensitive': False})
+```
+
+### Using the underlying helpers and classes
+
+You can use the re-exported formatter, generator, and validator directly:
+
+```python
+from cnpj_utils import (
+    cnpj_fmt,
+    CnpjFormatter,
+    cnpj_gen,
+    CnpjGenerator,
+    cnpj_val,
+    CnpjValidator,
 )
 
-cnpj = '03603568000195'
-print(cnpj_utils.format(cnpj))                  # '03.603.***/****-**'
-print(cnpj_utils.format(cnpj, hidden=False))    # '03.603.568/0001-95' (overrides instance options)
-print(cnpj_utils.format(cnpj))                  # '03.603.***/****-**' (uses instance options again)
+cnpj_fmt('01ABC234000X56', slash_key='|')   # '01.ABC.234|000X-56'
+cnpj_gen(type='numeric')                    # e.g. '65453043000178'
+cnpj_val('9JN7MGLJZXIO50')                  # True
+
+formatter = CnpjFormatter({'hidden': True})
+formatter.format('AB123XYZ000123')          # 'AB.123.***/****-**'
 ```
 
-### Functional Programming
+See [`cnpj-fmt`](./../cnpj-fmt/README.md), [`cnpj-gen`](./../cnpj-gen/README.md), and [`cnpj-val`](./../cnpj-val/README.md) for full option and error details.
 
-The package also provides standalone functions for each operation:
+## API
+
+### Exports
+
+- **`cnpj_utils`**: Pre-built `CnpjUtils` instance with `format`, `generate`, and `is_valid`.
+- **`CnpjUtils`**: Class to create a utils instance with optional default formatter, generator, and validator settings.
+- **Formatter**: `cnpj_fmt`, `CnpjFormatter`, `CnpjFormatterOptions`, and formatter exceptions (see [cnpj-fmt](./../cnpj-fmt/README.md)).
+- **Generator**: `cnpj_gen`, `CnpjGenerator`, `CnpjGeneratorOptions`, and generator exceptions (see [cnpj-gen](./../cnpj-gen/README.md)).
+- **Validator**: `cnpj_val`, `CnpjValidator`, `CnpjValidatorOptions`, and validator exceptions (see [cnpj-val](./../cnpj-val/README.md)).
+
+### Errors & Exceptions
+
+`CnpjUtils` does not define its own exception types; it propagates errors from the bundled packages:
+
+- **Formatting**: `CnpjFormatterInputTypeError`, `CnpjFormatterOptionsTypeError`, `CnpjFormatterOptionsHiddenRangeInvalidException`, `CnpjFormatterOptionsForbiddenKeyCharacterException`, and related classes.
+- **Generation**: `CnpjGeneratorOptionsTypeError`, `CnpjGeneratorOptionPrefixInvalidException`, `CnpjGeneratorOptionTypeInvalidException`, and related classes.
+- **Validation**: `CnpjValidatorInputTypeError`, `CnpjValidatorOptionsTypeError`, `CnpjValidatorOptionTypeInvalidException`, and related classes.
+
+Invalid option types are **`TypeError`** subclasses; invalid option values are **`Exception`** subclasses. Validation failure returns `False`; formatting length failure is handled by **`on_fail`** (default returns an empty string).
 
 ```python
-cnpj = '03603568000195'
+from cnpj_utils import CnpjUtils, cnpj_fmt
+from cnpj_fmt import CnpjFormatterInputTypeError
+from cnpj_val import CnpjValidatorInputTypeError
 
-# Format CNPJ
-print(cnpj_fmt(cnpj))                 # returns '03.603.568/0001-95'
+try:
+    CnpjUtils().format(12345)
+except CnpjFormatterInputTypeError as e:
+    print(e)
 
-# Validate CNPJ
-print(cnpj_val(cnpj))                 # returns True
+try:
+    CnpjUtils().is_valid(12345678000198)
+except CnpjValidatorInputTypeError as e:
+    print(e)
 
-# Generate CNPJ
-print(cnpj_gen())                     # returns '65453043000178'
+# Custom on_fail for invalid length
+def custom_fail(value, exception=None):
+    return f'Invalid CNPJ: {value}'
+
+cnpj_fmt('123', on_fail=custom_fail)  # 'Invalid CNPJ: 123'
+cnpj_fmt('123')                       # '' (default on_fail)
 ```
 
-Or use the default instance:
+### Bundled packages
 
-```python
-from cnpj_utils import cnpj_utils
+| Package | Main resources | README |
+|---------|----------------|--------|
+| [`cnpj-fmt`](https://pypi.org/project/cnpj-fmt) | `CnpjFormatter`, `CnpjFormatterOptions`, `cnpj_fmt()` | [docs](./../cnpj-fmt/README.md) |
+| [`cnpj-gen`](https://pypi.org/project/cnpj-gen) | `CnpjGenerator`, `CnpjGeneratorOptions`, `cnpj_gen()` | [docs](./../cnpj-gen/README.md) |
+| [`cnpj-val`](https://pypi.org/project/cnpj-val) | `CnpjValidator`, `CnpjValidatorOptions`, `cnpj_val()` | [docs](./../cnpj-val/README.md) |
 
-cnpj = '03603568000195'
-print(cnpj_utils.format(cnpj))        # returns '03.603.568/0001-95'
-print(cnpj_utils.is_valid(cnpj))      # returns True
-print(cnpj_utils.generate())          # returns '65453043000178'
-```
-
-## API Reference
-
-### Formatting (`cnpj_fmt` / `CnpjUtils.format`)
-
-Formats a CNPJ string with customizable delimiters and masking options.
-
-```python
-cnpj_utils.format(
-    cnpj_string: str,
-    hidden: bool | None = None,
-    hidden_key: str | None = None,
-    hidden_start: int | None = None,
-    hidden_end: int | None = None,
-    dot_key: str | None = None,
-    slash_key: str | None = None,
-    dash_key: str | None = None,
-    escape: bool | None = None,
-    on_fail: Callable | None = None,
-) -> str
-```
-
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `hidden` | `bool \| None` | `False` | Whether to hide digits with a mask |
-| `hidden_key` | `str \| None` | `'*'` | Character to replace hidden digits |
-| `hidden_start` | `int \| None` | `5` | Starting index for hidden range (0-13) |
-| `hidden_end` | `int \| None` | `13` | Ending index for hidden range (0-13) |
-| `dot_key` | `str \| None` | `'.'` | String to replace dot characters |
-| `slash_key` | `str \| None` | `'/'` | String to replace slash character |
-| `dash_key` | `str \| None` | `'-'` | String to replace dash character |
-| `escape` | `bool \| None` | `False` | Whether to HTML escape the result |
-| `on_fail` | `Callable \| None` | `lambda value, error=None: value` | Fallback function for invalid input |
-
-**Examples:**
-
-```python
-cnpj = '03603568000195'
-
-# Basic formatting
-print(cnpj_fmt(cnpj))                 # '03.603.568/0001-95'
-
-# With hidden digits
-print(cnpj_fmt(cnpj, hidden=True))    # '03.603.***/****-**'
-
-# Custom delimiters
-print(cnpj_fmt(cnpj, dot_key='', slash_key='|', dash_key='_'))  # '03603568|0001_95'
-
-# Custom hidden range
-print(cnpj_fmt(cnpj, hidden=True, hidden_start=2, hidden_end=8, hidden_key='#'))  # '03###.###/0001-95'
-```
-
-### Generation (`cnpj_gen` / `CnpjUtils.generate`)
-
-Generates valid CNPJ numbers with optional formatting and prefix completion.
-
-```python
-cnpj_utils.generate(
-    format: bool | None = None,
-    prefix: str | None = None,
-) -> str
-```
-
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `format` | `bool \| None` | `False` | Whether to format the output |
-| `prefix` | `str \| None` | `''` | Prefix to complete with valid digits (1-12 digits) |
-
-**Examples:**
-
-```python
-# Generate random CNPJ
-print(cnpj_gen())                     # '65453043000178'
-
-# Generate formatted CNPJ
-print(cnpj_gen(format=True))          # '73.008.535/0005-06'
-
-# Complete a prefix
-print(cnpj_gen(prefix='45623767'))    # '45623767000296'
-
-# Complete and format
-print(cnpj_gen(prefix='456237670002', format=True))  # '45.623.767/0002-96'
-```
-
-### Validation (`cnpj_val` / `CnpjUtils.is_valid`)
-
-Validates CNPJ numbers using the official algorithm.
-
-```python
-cnpj_utils.is_valid(cnpj_string: str) -> bool
-```
-
-**Examples:**
-
-```python
-# Valid CNPJ
-print(cnpj_val('98765432000198'))      # True
-print(cnpj_val('98.765.432/0001-98'))  # True
-
-# Invalid CNPJ
-print(cnpj_val('98765432000199'))      # False
-```
-
-## Advanced Usage
-
-### Accessing Individual Components
-
-You can access the individual formatter, generator, and validator instances:
-
-```python
-cnpj_utils = CnpjUtils()
-
-# Access individual components
-formatter = cnpj_utils.formatter
-generator = cnpj_utils.generator
-validator = cnpj_utils.validator
-
-# Use them directly
-formatter.format('03603568000195', hidden=True)
-generator.generate(format=True)
-validator.is_valid('03603568000195')
-```
-
-### Custom Error Handling
-
-```python
-cnpj = '123'  # Invalid length
-
-# Custom fallback
-def custom_fail(value, error=None):
-    return f"Invalid CNPJ: {value}"
-
-print(cnpj_fmt(cnpj, on_fail=custom_fail))  # 'Invalid CNPJ: 123'
-
-# Return original value (default behavior)
-print(cnpj_fmt(cnpj))  # '123'
-```
-
-## Dependencies
-
-This package is built on top of the following specialized packages:
-
-- [`cnpj-fmt`](https://pypi.org/project/cnpj-fmt) - CNPJ formatting
-- [`cnpj-gen`](https://pypi.org/project/cnpj-gen) - CNPJ generation
-- [`cnpj-val`](https://pypi.org/project/cnpj-val) - CNPJ validation
+All of the above are pulled in as dependencies of **`cnpj-utils`**. For exhaustive option tables, exception lists, and edge-case behavior, see each package README.
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -282,7 +277,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cnpj-utils/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](./CHANGELOG.md) for a list of changes and version history.
 
 ---
 
