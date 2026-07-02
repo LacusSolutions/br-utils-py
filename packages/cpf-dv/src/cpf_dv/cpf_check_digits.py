@@ -1,153 +1,177 @@
-import re
+"""Calculates and exposes CPF check digits from a valid base input.
+
+Validates length and rejects repeated-digit sequences.
+"""
 
 from .exceptions import (
-    CpfCheckDigitsCalculationError,
-    CpfCheckDigitsInputLengthError,
-    CpfCheckDigitsInputNotValidError,
+    CpfCheckDigitsInputInvalidException,
+    CpfCheckDigitsInputLengthException,
     CpfCheckDigitsInputTypeError,
 )
+from .types import CpfInput
 
 CPF_MIN_LENGTH = 9
+"""Minimum number of digits required for the CPF check digits calculation."""
+
 CPF_MAX_LENGTH = 11
+"""Maximum number of digits accepted as input for the CPF check digits
+calculation.
+"""
+
+_DELTA_FACTOR = ord("0")
+_FIRST_WEIGHTS = (10, 9, 8, 7, 6, 5, 4, 3, 2)
+_SECOND_WEIGHTS = (11, 10, 9, 8, 7, 6, 5, 4, 3, 2)
+_DIGIT_CHARS = "0123456789"
 
 
 class CpfCheckDigits:
-    """Class to calculate CPF check digits."""
+    """Calculates and exposes CPF check digits from a valid base input.
 
-    __slots__ = ("_cpf_digits", "_first_digit", "_second_digit")
+    Validates length and rejects repeated-digit sequences.
+    """
 
-    def __init__(self, cpf_input: str | list[str] | list[int]) -> None:
-        original_input = cpf_input
+    def __init__(self, cpf_input: CpfInput) -> None:
+        """Create a calculator for the given CPF base (9 to 11 digits).
 
-        if not isinstance(cpf_input, (str, list)):
-            raise CpfCheckDigitsInputTypeError(original_input)
+        Args:
+            ``cpf_input``: Digits with or without formatting, or a list of
+                strings.
 
+        Raises:
+            ``CpfCheckDigitsInputTypeError``: When input is not a ``str`` or
+                ``list[str]``.
+            ``CpfCheckDigitsInputLengthException``: When digit count is not
+                between 9 and 11.
+            ``CpfCheckDigitsInputInvalidException``: When all digits are the
+                same (repeated digits, e.g. ``777.777.777-...``).
+        """
+        parsed_input = self._parse_input(cpf_input)
+
+        self._validate_length(parsed_input, cpf_input)
+        self._validate_non_repeated_digits(parsed_input, cpf_input)
+
+        self._cpf_digits: tuple[str, ...] = tuple(parsed_input[:CPF_MIN_LENGTH])
+        self._cached_first_digit: int | None = None
+        self._cached_second_digit: int | None = None
+
+    @property
+    def first(self) -> str:
+        """First check digit (10th digit of the full CPF)."""
+        if self._cached_first_digit is None:
+            self._cached_first_digit = self._calculate(self._cpf_digits)
+
+        return _DIGIT_CHARS[self._cached_first_digit]
+
+    @property
+    def second(self) -> str:
+        """Second check digit (11th digit of the full CPF)."""
+        if self._cached_second_digit is None:
+            self._cached_second_digit = self._calculate((*self._cpf_digits, self.first))
+
+        return _DIGIT_CHARS[self._cached_second_digit]
+
+    @property
+    def both(self) -> str:
+        """Both check digits concatenated (10th and 11th digits)."""
+        return self.first + self.second
+
+    @property
+    def cpf(self) -> str:
+        """Full 11-digit CPF (base 9 digits concatenated with the 2 check
+        digits).
+        """
+        return "".join(self._cpf_digits) + self.both
+
+    def _parse_input(self, cpf_input: object) -> list[str]:
+        """Parse a string or list of strings into digit characters.
+
+        Raises:
+            ``CpfCheckDigitsInputTypeError``: When input is not a ``str`` or
+                ``list[str]``.
+        """
         if isinstance(cpf_input, str):
-            cpf_input = self._handle_string_input(cpf_input)
-        else:
-            cpf_input = self._handle_list_input(cpf_input, original_input)
+            return self._parse_string_input(cpf_input)
 
-        self._validate_length(cpf_input, original_input)
-        self._validate_non_repeated_digits(cpf_input, original_input)
+        if isinstance(cpf_input, list):
+            return self._parse_list_input(cpf_input)
 
-        self._cpf_digits = cpf_input[:CPF_MIN_LENGTH]
-        self._first_digit: int | None = None
-        self._second_digit: int | None = None
+        raise CpfCheckDigitsInputTypeError(cpf_input, "string or string[]")
 
-    @property
-    def first_digit(self) -> int:
-        """Calculates and returns the first check digit.As it's immutable, it caches the calculation result."""
-        if self._first_digit is None:
-            base_digits_sequence = self._cpf_digits.copy()
-            self._first_digit = self._calculate(base_digits_sequence)
+    def _parse_string_input(self, cpf_string: str) -> list[str]:
+        """Strip non-digit characters and keep the remainder as characters."""
+        result: list[str] = []
+        append = result.append
 
-        return self._first_digit
+        for char in cpf_string:
+            code = ord(char)
+            if 48 <= code <= 57:
+                append(char)
 
-    @property
-    def second_digit(self) -> int:
-        """Calculates and returns the second check digit.As it's immutable, it caches the calculation result. And, as it depends on the first check digit, it's also calculated."""
-        if self._second_digit is None:
-            base_digits_sequence = [*self._cpf_digits, self.first_digit]
-            self._second_digit = self._calculate(base_digits_sequence)
+        return result
 
-        return self._second_digit
+    def _parse_list_input(self, cpf_list: list[object]) -> list[str]:
+        """Concatenate a list of strings and parse the result.
 
-    def to_list(self) -> list[int]:
-        """Returns the complete CPF as a list of 11 integers (9 base digits + 2 check digits)."""
-        return [*self._cpf_digits, self.first_digit, self.second_digit]
+        Raises:
+            ``CpfCheckDigitsInputTypeError``: When input is not a ``str`` or
+                ``list[str]``.
+        """
+        if not cpf_list:
+            return []
 
-    def to_string(self) -> str:
-        """Returns the complete CPF as a string of 11 digits (9 base digits + 2 check digits)."""
-        return "".join(str(digit) for digit in self.to_list())
+        is_string_list = all(isinstance(item, str) for item in cpf_list)
 
-    def _handle_string_input(self, cpf_string: str) -> list[int]:
-        """When CPF is provided as a string, it is sanitized, validated and converted to a list of integers."""
-        digits_only_string = re.sub(r"[^0-9]", "", cpf_string)
+        if not is_string_list:
+            raise CpfCheckDigitsInputTypeError(cpf_list, "string or string[]")
 
-        return [int(digit_string) for digit_string in digits_only_string]
+        return self._parse_string_input("".join(cpf_list))
 
-    def _handle_list_input(
-        self,
-        cpf_list: list[str] | list[int],
-        original_input: list,
-    ) -> list[int]:
-        """When CPF is provided as a list of strings or integers, it is sanitized, validated and converted to a list of integers for further processing."""
-        if all(isinstance(digit, str) for digit in cpf_list):
-            return self._handle_string_list_input(cpf_list)
+    def _validate_length(self, cpf_digits: list[str], original_input: CpfInput) -> None:
+        """Ensure digit count is between ``CPF_MIN_LENGTH`` and
+        ``CPF_MAX_LENGTH``.
 
-        if all(isinstance(digit, int) for digit in cpf_list):
-            return self._flatten_digits(cpf_list)
-
-        raise CpfCheckDigitsInputTypeError(original_input)
-
-    def _handle_string_list_input(self, cpf_string_list: list[str]) -> list[int]:
-        """When CPF is provided as a list of strings, it is sanitized, validated and converted to a list of integers for further processing."""
-        final_cpf_int_list = []
-
-        for list_item in cpf_string_list:
-            cpf_int_list = self._handle_string_input(list_item)
-            final_cpf_int_list.extend(cpf_int_list)
-
-        return final_cpf_int_list
-
-    def _flatten_digits(self, int_list: list[int]) -> list[int]:
-        """Breaks down multiple digits within the array into individual ones. Negative numbers are converted to their absolute value."""
-        final_cpf_int_list = []
-
-        for number in int_list:
-            abs_number = abs(number)
-            final_cpf_int_list.extend(
-                [int(digit_string) for digit_string in str(abs_number)]
-            )
-
-        return final_cpf_int_list
-
-    def _validate_length(
-        self,
-        cpf_int_list: list[int],
-        original_input: str | list[str] | list[int],
-    ) -> None:
-        """Validates the length of the CPF digits."""
-        digits_count = len(cpf_int_list)
+        Raises:
+            ``CpfCheckDigitsInputLengthException``: When digit count is not
+                between 9 and 11.
+        """
+        digits_count = len(cpf_digits)
 
         if digits_count < CPF_MIN_LENGTH or digits_count > CPF_MAX_LENGTH:
-            raise CpfCheckDigitsInputLengthError(
+            raise CpfCheckDigitsInputLengthException(
                 original_input,
-                "".join(str(digit) for digit in cpf_int_list),
+                "".join(cpf_digits),
                 CPF_MIN_LENGTH,
                 CPF_MAX_LENGTH,
             )
 
     def _validate_non_repeated_digits(
-        self,
-        cpf_int_list: list[int],
-        original_input: str | list[str] | list[int],
+        self, cpf_digits: list[str], original_input: CpfInput
     ) -> None:
-        """Validates that the CPF digits are not all the same."""
-        eligible_cpf_int_list = cpf_int_list[:CPF_MIN_LENGTH]
-        digits_set = set(eligible_cpf_int_list)
+        """Reject inputs where all first 9 digits are the same.
 
-        if len(digits_set) == 1:
-            raise CpfCheckDigitsInputNotValidError(
+        Raises:
+            ``CpfCheckDigitsInputInvalidException``: When all digits are the
+                same (repeated digits, e.g. ``777.777.777-...``).
+        """
+        first_char = cpf_digits[0]
+
+        if all(char == first_char for char in cpf_digits[1:CPF_MIN_LENGTH]):
+            raise CpfCheckDigitsInputInvalidException(
                 original_input,
                 "Repeated digits are not considered valid.",
             )
 
-    def _calculate(self, cpf_sequence: list[int]) -> int:
-        """Calculates the CPF check digits using the official Brazilian algorithm. For the first check digit, it uses the digits 1 through 9 of the CPF base. For the second one, it uses the digits 1 through 10 (with the first check digit)."""
-        min_length = CPF_MIN_LENGTH
-        max_length = CPF_MAX_LENGTH - 1
-        sequence_length = len(cpf_sequence)
-
-        if sequence_length < min_length or sequence_length > max_length:
-            raise CpfCheckDigitsCalculationError(cpf_sequence)
-
-        factor = sequence_length + 1
+    def _calculate(self, cpf_sequence: tuple[str, ...] | list[str]) -> int:
+        """Compute a single check digit using the standard CPF modulo-11
+        algorithm.
+        """
+        length = len(cpf_sequence)
+        weights = _FIRST_WEIGHTS if length == CPF_MIN_LENGTH else _SECOND_WEIGHTS
         sum_result = 0
 
-        for num in cpf_sequence:
-            sum_result += num * factor
-            factor -= 1
+        for index in range(length):
+            char_value = ord(cpf_sequence[index]) - _DELTA_FACTOR
+            sum_result += char_value * weights[index]
 
         remainder = 11 - (sum_result % 11)
 
