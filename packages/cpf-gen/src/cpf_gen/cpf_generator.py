@@ -1,9 +1,9 @@
 import random
 
 from cpf_dv import CpfCheckDigits
+from cpf_dv.exceptions import CpfCheckDigitsException
 
-from .cpf_generator_options import CpfGeneratorOptions
-from .exceptions import CpfGeneratorPrefixNotValidError
+from .cpf_generator_options import PREFIX_MAX_LENGTH, CpfGeneratorOptions
 
 
 class CpfGenerator:
@@ -18,31 +18,23 @@ class CpfGenerator:
         """Executes the CPF generation, overriding any given options with the ones set on the generator instance."""
         actual_options = self._options.merge(format, prefix)
 
-        prefix_numbers = [int(digit) for digit in actual_options.prefix]
-        cpf_sequence = self._generate_id(prefix_numbers)
+        digits_to_generate = PREFIX_MAX_LENGTH - len(actual_options.prefix)
+        generated_cpf = actual_options.prefix + self._generate_random_digits(
+            digits_to_generate
+        )
 
         try:
-            CpfGeneratorOptions(prefix=cpf_sequence)
-        except CpfGeneratorPrefixNotValidError:
+            generated_cpf = CpfCheckDigits(generated_cpf).cpf
+        except CpfCheckDigitsException:
             return self.generate(format, prefix)
 
-        cpf_check_digits = CpfCheckDigits(cpf_sequence)
-        cpf_generated = cpf_check_digits.to_string()
-
         if actual_options.format:
-            return self._format(cpf_generated)
+            return self._format(generated_cpf)
 
-        return cpf_generated
+        return generated_cpf
 
-    def _generate_id(self, prefix_numbers: list[int]) -> list[int]:
-        id_length = 9
-
-        id_start = prefix_numbers[:id_length]
-        id_start_length = len(id_start)
-
-        id_end = [random.randint(0, 9) for _ in range(id_length - id_start_length)]
-
-        return id_start + id_end
+    def _generate_random_digits(self, count: int) -> str:
+        return "".join(str(random.randint(0, 9)) for _ in range(count))
 
     def _format(self, cpf_string: str) -> str:
         return (
