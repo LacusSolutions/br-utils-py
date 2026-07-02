@@ -1,7 +1,7 @@
 [project]
 name = "cnpj-utils"
 dynamic = [ "version" ]
-description = "Utility functions to deal with CNPJ (Brazilian employer ID)"
+description = "Utilities to deal with CNPJ (Brazilian Business Tax ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -39,9 +39,9 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cnpj-fmt>=1.0.0,<2.0.0",
-  "cnpj-gen>=2.0.0,<2.1.0",
-  "cnpj-val>=1.0.2,<2.0.0",
+  "cnpj-fmt>=2.0.0,<2.1.0",
+  "cnpj-gen>=2.0.1,<2.1.0",
+  "cnpj-val>=2.0.0,<2.1.0",
 ]
 
   [[project.authors]]
