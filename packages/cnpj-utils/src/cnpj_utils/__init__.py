@@ -1,9 +1,19 @@
+"""Unified CNPJ formatting, generation, and validation API.
+
+Re-exports component classes, options, exceptions, helpers, and a default
+:data:`cnpj_utils` instance of :class:`CnpjUtils`.
+"""
+
 from cnpj_fmt import (
     CnpjFormatter,
     CnpjFormatterException,
     CnpjFormatterInputLengthException,
+    CnpjFormatterInputTypeError,
     CnpjFormatterOptions,
+    CnpjFormatterOptionsForbiddenKeyCharacterException,
     CnpjFormatterOptionsHiddenRangeInvalidException,
+    CnpjFormatterOptionsTypeError,
+    CnpjFormatterTypeError,
     cnpj_fmt,
 )
 from cnpj_gen import (
@@ -11,37 +21,49 @@ from cnpj_gen import (
     CnpjGeneratorException,
     CnpjGeneratorOptionPrefixInvalidException,
     CnpjGeneratorOptions,
+    CnpjGeneratorOptionsTypeError,
+    CnpjGeneratorOptionTypeInvalidException,
+    CnpjGeneratorTypeError,
     cnpj_gen,
 )
-from cnpj_val import CnpjValidator, cnpj_val
+from cnpj_val import (
+    CnpjValidator,
+    CnpjValidatorException,
+    CnpjValidatorInputTypeError,
+    CnpjValidatorOptions,
+    CnpjValidatorOptionsTypeError,
+    CnpjValidatorOptionTypeInvalidException,
+    CnpjValidatorTypeError,
+    cnpj_val,
+)
 
 from .cnpj_utils import CnpjUtils
 
-CnpjFormatterError = CnpjFormatterException
-CnpjFormatterHiddenRangeError = CnpjFormatterOptionsHiddenRangeInvalidException
-CnpjFormatterInvalidLengthError = CnpjFormatterInputLengthException
-CnpjGeneratorError = CnpjGeneratorException
-CnpjGeneratorInvalidPrefixBranchIdError = CnpjGeneratorOptionPrefixInvalidException
-CnpjGeneratorInvalidPrefixLengthError = CnpjGeneratorOptionPrefixInvalidException
-
 __all__ = [
     "CnpjFormatter",
-    "CnpjFormatterError",
     "CnpjFormatterException",
-    "CnpjFormatterHiddenRangeError",
     "CnpjFormatterInputLengthException",
-    "CnpjFormatterInvalidLengthError",
+    "CnpjFormatterInputTypeError",
     "CnpjFormatterOptions",
+    "CnpjFormatterOptionsForbiddenKeyCharacterException",
     "CnpjFormatterOptionsHiddenRangeInvalidException",
+    "CnpjFormatterOptionsTypeError",
+    "CnpjFormatterTypeError",
     "CnpjGenerator",
-    "CnpjGeneratorError",
     "CnpjGeneratorException",
-    "CnpjGeneratorInvalidPrefixBranchIdError",
-    "CnpjGeneratorInvalidPrefixLengthError",
     "CnpjGeneratorOptionPrefixInvalidException",
+    "CnpjGeneratorOptionTypeInvalidException",
     "CnpjGeneratorOptions",
+    "CnpjGeneratorOptionsTypeError",
+    "CnpjGeneratorTypeError",
     "CnpjUtils",
     "CnpjValidator",
+    "CnpjValidatorException",
+    "CnpjValidatorInputTypeError",
+    "CnpjValidatorOptionTypeInvalidException",
+    "CnpjValidatorOptions",
+    "CnpjValidatorOptionsTypeError",
+    "CnpjValidatorTypeError",
     "cnpj_fmt",
     "cnpj_gen",
     "cnpj_utils",
@@ -50,5 +72,7 @@ __all__ = [
 
 __version__ = "0.0.0"
 
-# Default instance of CnpjUtils
 cnpj_utils = CnpjUtils()
+"""Default :class:`CnpjUtils` instance with default formatter,
+generator, and validator options.
+"""

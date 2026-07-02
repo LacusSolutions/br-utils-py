@@ -42,17 +42,29 @@ class BrUtilsReexportsTest:
     def test_cnpj_utils_reexports(self):
         from br_utils.cnpj import (
             CnpjFormatter,
-            CnpjFormatterError,
-            CnpjFormatterHiddenRangeError,
-            CnpjFormatterInputLengthError,
+            CnpjFormatterException,
+            CnpjFormatterInputLengthException,
+            CnpjFormatterInputTypeError,
             CnpjFormatterOptions,
+            CnpjFormatterOptionsForbiddenKeyCharacterException,
+            CnpjFormatterOptionsHiddenRangeInvalidException,
+            CnpjFormatterOptionsTypeError,
+            CnpjFormatterTypeError,
             CnpjGenerator,
-            CnpjGeneratorError,
+            CnpjGeneratorException,
+            CnpjGeneratorOptionPrefixInvalidException,
             CnpjGeneratorOptions,
-            CnpjGeneratorPrefixBranchIdError,
-            CnpjGeneratorPrefixLengthError,
+            CnpjGeneratorOptionsTypeError,
+            CnpjGeneratorOptionTypeInvalidException,
+            CnpjGeneratorTypeError,
             CnpjUtils,
             CnpjValidator,
+            CnpjValidatorException,
+            CnpjValidatorInputTypeError,
+            CnpjValidatorOptions,
+            CnpjValidatorOptionsTypeError,
+            CnpjValidatorOptionTypeInvalidException,
+            CnpjValidatorTypeError,
             cnpj_fmt,
             cnpj_gen,
             cnpj_utils,
@@ -60,17 +72,29 @@ class BrUtilsReexportsTest:
         )
 
         assert CnpjFormatter is not None
-        assert CnpjFormatterError is not None
-        assert CnpjFormatterHiddenRangeError is not None
-        assert CnpjFormatterInputLengthError is not None
+        assert CnpjFormatterException is not None
+        assert CnpjFormatterInputLengthException is not None
+        assert CnpjFormatterInputTypeError is not None
         assert CnpjFormatterOptions is not None
+        assert CnpjFormatterOptionsForbiddenKeyCharacterException is not None
+        assert CnpjFormatterOptionsHiddenRangeInvalidException is not None
+        assert CnpjFormatterOptionsTypeError is not None
+        assert CnpjFormatterTypeError is not None
         assert CnpjGenerator is not None
-        assert CnpjGeneratorError is not None
-        assert CnpjGeneratorPrefixBranchIdError is not None
-        assert CnpjGeneratorPrefixLengthError is not None
+        assert CnpjGeneratorException is not None
+        assert CnpjGeneratorOptionPrefixInvalidException is not None
+        assert CnpjGeneratorOptionTypeInvalidException is not None
         assert CnpjGeneratorOptions is not None
+        assert CnpjGeneratorOptionsTypeError is not None
+        assert CnpjGeneratorTypeError is not None
         assert CnpjUtils is not None
         assert CnpjValidator is not None
+        assert CnpjValidatorException is not None
+        assert CnpjValidatorInputTypeError is not None
+        assert CnpjValidatorOptions is not None
+        assert CnpjValidatorOptionsTypeError is not None
+        assert CnpjValidatorOptionTypeInvalidException is not None
+        assert CnpjValidatorTypeError is not None
         assert cnpj_fmt is not None
         assert cnpj_gen is not None
         assert cnpj_utils is not None

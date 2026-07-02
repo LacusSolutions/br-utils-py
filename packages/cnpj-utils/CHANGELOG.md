@@ -2,14 +2,30 @@
 
 ## 2.0.0
 
+### 🎉 v2 at a glance 🎊
+
+- 🆕 **Alphanumeric CNPJ** — Full support for the [14-character alphanumeric CNPJ](https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2023/julho/cnpj-alfa-numerico); `format()`, `generate()`, and `is_valid()` handle numeric and alphanumeric IDs via upgraded `cnpj-fmt`, `cnpj-gen`, and `cnpj-val` v2 dependencies.
+- ⚙️ **Validator options** — New `CnpjValidatorOptions`; configure `type` and `case_sensitive` on the `CnpjUtils` or `CnpjValidator` constructor, or per `is_valid()` call.
+- 🔧 **Component setters** — Replace `formatter`, `generator`, and `validator` on a `CnpjUtils` instance (component instance, `*Options`, or mapping).
+- 📦 **Full re-exports** — Component classes, `*Options`, typed exceptions, and `cnpj_fmt` / `cnpj_gen` / `cnpj_val` helpers from bundled v2 packages.
+
 ### BREAKING CHANGES
 
-- **Dependencies** — Requires `cnpj-gen` 2.x for generation; upgrade the CNPJ stack (`cnpj-gen`, `cnpj-dv`, `cnpj-val`) together.
+- **Keyword-only constructor** — `CnpjUtils` parameters are keyword-only (`formatter`, `generator`, `validator`); positional `CnpjFormatterOptions` / `CnpjGeneratorOptions` arguments no longer work.
+- **Dependencies** — Requires `cnpj-fmt`, `cnpj-gen`, and `cnpj-val` v2; upgrade the CNPJ stack together (`cnpj-dv` 2.x for alphanumeric check digits).
+- **Legacy aliases** — Removed `CnpjFormatterError`, `CnpjGeneratorError`, and related alias names; use the `*Exception` types from bundled components.
+- **Default generation** — `generate()` returns alphanumeric CNPJ by default; pass `type="numeric"` for numeric-only output.
+- **Method signatures** — `format()`, `generate()`, and `is_valid()` accept an optional options object plus keyword overrides instead of v1 positional option parameters; `format()` and `is_valid()` accept `str | Sequence[str]`.
+- **Invalid input in `is_valid()`** — Non-string input raises `CnpjValidatorInputTypeError` instead of returning `False`.
+
+### New features
+
+- **`encode` option** — `format()` can URL-encode the formatted CNPJ (from `cnpj-fmt` v2).
+- **`type` generation modes** — `generate()` supports `numeric`, `alphabetic`, and `alphanumeric` output via the `type` option.
 
 ### Improvements
 
-- **`CnpjUtils`**: Construct formatter and generator from options instances and forward v2 keyword-based `format` / `generate` calls.
-- **Exports**: Re-export underlying v2 exception types and keep legacy alias names (`CnpjGeneratorError`, `CnpjFormatterError`, etc.).
+- **`CnpjUtils` API** — Constructor and façade methods forward v2 options objects and per-call keyword overrides without mutating instance defaults.
 
 ## 1.0.2
 
