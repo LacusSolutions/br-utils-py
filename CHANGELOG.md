@@ -1,5 +1,12 @@
 # br-utilities
 
+## 2.0.0
+
+### BREAKING CHANGES
+
+- **CNPJ re-exports** — `br_utils.cnpj` now mirrors `cnpj-utils` v2 (`*Exception` types, validator options, and full component surface); legacy `*Error` alias names are removed.
+- **Dependencies** — Requires `cnpj-utils` v2 (with `cnpj-fmt`, `cnpj-gen`, and `cnpj-val` v2).
+
 ## 1.0.1
 
 ### Patch Changes
