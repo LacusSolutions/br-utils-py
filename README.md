@@ -7,13 +7,27 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Utility class to calculate check digits on CPF (Brazilian individual taxpayer ID).
+> 🌎 [Acessar documentação em português](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-dv/README.pt.md)
+
+A Python utility to calculate check digits on CPF (Brazilian Individual's Taxpayer ID).
 
 ## Python Support
 
 | ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
+
+## Features
+
+- ✅ **Flexible input**: Accepts `str` or `list[str]`
+- ✅ **Format agnostic**: Strips non-numeric characters from string input
+- ✅ **Auto-expansion**: Multi-character strings in lists are joined and parsed like a single string
+- ✅ **Input validation**: Rejects ineligible CPFs (9 identical digits in the base — repeated-digit pattern)
+- ✅ **Lazy evaluation**: Check digits are calculated only when accessed (via properties)
+- ✅ **Caching**: Calculated values are cached for subsequent access
+- ✅ **Type hints**: Built with Python 3.10+ type annotations
+- ✅ **Minimal dependencies**: Only [`lacus.utils`](https://pypi.org/project/lacus.utils)
+- ✅ **Error handling**: Specific types for type, length, and invalid CPF scenarios (`TypeError` vs `Exception` semantics)
 
 ## Installation
 
@@ -21,262 +35,116 @@ Utility class to calculate check digits on CPF (Brazilian individual taxpayer ID
 $ pip install cpf-dv
 ```
 
-## Import
+## Quick Start
 
 ```python
 from cpf_dv import CpfCheckDigits
+```
+
+Basic usage:
+
+```python
+check_digits = CpfCheckDigits("054496519")
+
+check_digits.first   # '1'
+check_digits.second  # '0'
+check_digits.both    # '10'
+check_digits.cpf     # '05449651910'
 ```
 
 ## Usage
 
-### Basic Usage
+The main resource of this package is the class `CpfCheckDigits`. Through an instance, you access CPF check-digit information:
 
-```python
-# Calculate check digits from a 9-digit CPF base
-check_digits = CpfCheckDigits("054496519")
+- **`__init__`**: `CpfCheckDigits(str | list[str])` — 9–11 digits after sanitization (formatting stripped from strings). Only the **first 9** digits are used as the base; if you pass 10 or 11 digits (e.g. a full CPF including prior check digits), digits 10–11 are **ignored** and the check digits are recalculated.
+- **`first`**: First check digit (10th digit of the full CPF). Lazy, cached.
+- **`second`**: Second check digit (11th digit of the full CPF). Lazy, cached.
+- **`both`**: Both check digits concatenated as a string.
+- **`cpf`**: The complete CPF as a string of 11 digits (9 base digits + 2 check digits).
 
-print(check_digits.first_digit)    # returns 1
-print(check_digits.second_digit)   # returns 0
-print(check_digits.to_string())    # returns '05449651910'
-print(check_digits.to_list())      # returns [0, 5, 4, 4, 9, 6, 5, 1, 9, 1, 0]
-```
-
-### Input Formats
+### Input formats
 
 The `CpfCheckDigits` class accepts multiple input formats:
 
-#### String Input
+**String input:** plain digits or formatted CPF (e.g. `054.496.519-10`, `123.456.789`). Non-numeric characters are removed. Leading zeros are preserved.
+
+**List of strings:** each element must be a string; values are concatenated and then parsed like a single string (e.g. `["0","5","4",…]`, `["054","496","519"]`, `["054496519"]`). Non-string elements are not allowed.
 
 ```python
-# Plain string (non-numeric characters are automatically stripped)
-check_digits = CpfCheckDigits("054496519")
-check_digits = CpfCheckDigits("054.496.519-10")  # formatting is ignored
-check_digits = CpfCheckDigits("054496519")        # 9 digits
-check_digits = CpfCheckDigits("05449651910")     # 11 digits (only first 9 are used)
+# String — plain, formatted, or with existing check digits (only first 9 digits used)
+CpfCheckDigits("054496519")
+CpfCheckDigits("054.496.519-10")
+CpfCheckDigits("05449651910")
+
+# List of strings — single- or multi-character elements
+CpfCheckDigits(["0", "5", "4", "4", "9", "6", "5", "1", "9"])
+CpfCheckDigits(["054", "496", "519"])
+CpfCheckDigits(["054496519"])
 ```
 
-#### List of Strings
+### Errors & exceptions handling
+
+This package uses **TypeError vs Exception** semantics: *type errors* indicate incorrect API use (e.g. wrong type); *exceptions* indicate invalid or ineligible data (e.g. invalid length or business rules). You can catch specific classes or use the base classes.
+
+- **CpfCheckDigitsTypeError** — base class for type errors; extends Python's `TypeError`
+- **CpfCheckDigitsInputTypeError** — input is not `str` or `list[str]` (or list contains a non-string element)
+- **CpfCheckDigitsException** — base class for data/flow exceptions; extends `Exception`
+- **CpfCheckDigitsInputLengthException** — sanitized length is not 9–11
+- **CpfCheckDigitsInputInvalidException** — first 9 digits are all identical (repeated-digit pattern)
 
 ```python
-# List of single-character strings
-check_digits = CpfCheckDigits(["0", "5", "4", "4", "9", "6", "5", "1", "9"])
+from cpf_dv import (
+    CpfCheckDigits,
+    CpfCheckDigitsException,
+    CpfCheckDigitsInputInvalidException,
+    CpfCheckDigitsInputLengthException,
+    CpfCheckDigitsInputTypeError,
+)
 
-# List with multi-digit strings (automatically flattened)
-check_digits = CpfCheckDigits(["054496519"])      # flattens to individual digits
-check_digits = CpfCheckDigits(["054", "496", "519"])  # also flattens
-```
-
-#### List of Integers
-
-```python
-# List of single-digit integers
-check_digits = CpfCheckDigits([1, 2, 3, 4, 5, 6, 7, 8, 9])
-
-# List with multi-digit integers (automatically flattened)
-check_digits = CpfCheckDigits([123456789])         # flattens to individual digits
-check_digits = CpfCheckDigits([123, 456, 789])     # also flattens
-
-### Properties
-
-#### `first_digit: int`
-
-Returns the first check digit (10th digit of the CPF).
-
-```python
-check_digits = CpfCheckDigits("054496519")
-print(check_digits.first_digit)  # returns 1
-```
-
-#### `second_digit: int`
-
-Returns the second check digit (11th digit of the CPF).
-
-```python
-check_digits = CpfCheckDigits("054496519")
-print(check_digits.second_digit)  # returns 0
-```
-
-### Methods
-
-#### `to_list() -> list[int]`
-
-Returns the complete CPF as a list of integers (9 base digits + 2 check digits).
-
-```python
-check_digits = CpfCheckDigits("054496519")
-print(check_digits.to_list())  # returns [0, 5, 4, 4, 9, 6, 5, 1, 9, 1, 0]
-```
-
-#### `to_string() -> str`
-
-Returns the complete CPF as a string (9 base digits + 2 check digits).
-
-```python
-check_digits = CpfCheckDigits("054496519")
-print(check_digits.to_string())  # returns '05449651910'
-```
-
-### Examples
-
-```python
-from cpf_dv import CpfCheckDigits
-
-# Calculate check digits for a CPF base
-base = "054496519"
-check_digits = CpfCheckDigits(base)
-
-# Get individual check digits
-first = check_digits.first_digit    # 1
-second = check_digits.second_digit   # 0
-
-# Get complete CPF
-complete = check_digits.to_string()  # '05449651910'
-
-# Work with formatted input
-formatted = CpfCheckDigits("054.496.519-10")
-print(formatted.to_string())  # '05449651910'
-
-# Work with list input
-list_input = CpfCheckDigits([0, 5, 4, 4, 9, 6, 5, 1, 9])
-print(list_input.to_string())  # '05449651910'
-```
-
-## Error Handling
-
-The package raises specific exceptions for different error scenarios:
-
-### `CpfCheckDigitsInputTypeError`
-
-Raised when the input type is not supported (must be `str`, `list[str]`, or `list[int]`).
-
-```python
-from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputTypeError
-
+# Input type (e.g. integer not allowed)
 try:
-    CpfCheckDigits(12345678901)  # int not allowed
+    CpfCheckDigits(12345678901)
 except CpfCheckDigitsInputTypeError as e:
-    print(e)  # CPF input must be of type str, list[str] or list[int]. Got int.
-```
+    print(e)  # CPF input must be of type string or string[]. Got integer number.
 
-### `CpfCheckDigitsInputLengthError`
-
-Raised when the input does not contain 9 to 11 digits.
-
-```python
-from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputLengthError
-
+# Length (must be 9–11 digits after sanitization)
 try:
-    CpfCheckDigits("12345678")  # only 8 digits
-except CpfCheckDigitsInputLengthError as e:
-    print(e)  # CPF input "12345678" does not contain 9 to 11 digits. Got 8 in "12345678".
-```
+    CpfCheckDigits("12345678")
+except CpfCheckDigitsInputLengthException as e:
+    print(e)  # CPF input "12345678" does not contain 9 to 11 digits. Got 8.
 
-### `CpfCheckDigitsInputNotValidError`
-
-Raised when the input is forbidden for some restriction, like repeated digits like `111.111.111`, `222.222.222`, `333.333.333` and so on.
-
-```python
-from cpf_dv import CpfCheckDigits, CpfCheckDigitsInputNotValidError
-
+# Invalid (e.g. repeated digits)
 try:
     CpfCheckDigits(["999", "999", "999"])
-except CpfCheckDigitsInputNotValidError as e:
-    print(e)  # CPF input ['999', '999', '999'] is invalid. Repeated digits are not considered valid.
-```
+except CpfCheckDigitsInputInvalidException as e:
+    print(e)  # CPF input ["999","999","999"] is invalid. Repeated digits are not considered valid.
 
-### Catch any error from the package
-
-All errors extend from a common error instance `CpfCheckDigitsError`, so you can use this type to handle any error thrown by the module.
-
-```python
-from cpf_dv import CpfCheckDigitsError
-
+# Any data exception from the package
 try:
-  # some risky code run
-except CpfCheckDigitsError as e:
-  # do something
+    CpfCheckDigits(["999", "999", "999"])
+except CpfCheckDigitsException as e:
+    print(e)
 ```
 
-## Features
+### Other available resources
 
-- ✅ **Multiple Input Formats**: Accepts strings, lists of strings, or lists of integers
-- ✅ **Format Agnostic**: Automatically strips non-numeric characters from string input
-- ✅ **Auto-Expansion**: Automatically expands multi-digit numbers in lists to individual digits
-- ✅ **Lazy Evaluation**: Check digits are calculated only when accessed (via properties)
-- ✅ **Type Safety**: Built with Python 3.10+ type hints
-- ✅ **Zero Dependencies**: No external dependencies required
-- ✅ **Comprehensive Error Handling**: Specific exceptions for different error scenarios
+Import from `cpf_dv`:
 
-## API Reference
+- **`CPF_MIN_LENGTH`**: `9`
+- **`CPF_MAX_LENGTH`**: `11`
+- **`CpfInput`**: type alias (`str | list[str]`)
+- **Exceptions**: see above
 
-### CpfCheckDigits Class
+## Calculation algorithm
 
-#### Constructor
+The package calculates CPF check digits using the official Brazilian modulo-11 algorithm:
 
-```python
-CpfCheckDigits(cpf_digits: str | list[str] | list[int]) -> CpfCheckDigits
-```
-
-Creates a new `CpfCheckDigits` instance from the provided CPF base digits.
-
-**Parameters:**
-- `cpf_digits` (str | list[str] | list[int]): The CPF base digits (9-11 digits). Can be:
-  - A string with 9-11 digits (formatting characters are ignored)
-  - A list of strings (each string can be a single digit or multi-digit number)
-  - A list of integers (each integer can be a single digit or multi-digit number)
-
-**Raises:**
-- `CpfCheckDigitsInputTypeError`: If the input type is not supported
-- `CpfCheckDigitsInputLengthError`: If the input does not contain 9-11 digits
-
-**Returns:**
-- `CpfCheckDigits`: A new instance ready to calculate check digits
-
-#### Properties
-
-##### `first_digit: int`
-
-The first check digit (10th digit of the CPF). Calculated lazily on first access.
-
-##### `second_digit: int`
-
-The second check digit (11th digit of the CPF). Calculated lazily on first access.
-
-#### Methods
-
-##### `to_list() -> list[int]`
-
-Returns the complete CPF as a list of 11 integers (9 base digits + 2 check digits).
-
-##### `to_string() -> str`
-
-Returns the complete CPF as a string of 11 digits (9 base digits + 2 check digits).
-
-## Calculation Algorithm
-
-The package calculates CPF check digits using the official Brazilian algorithm:
-
-1. **First Check Digit (10th position)**:
-   - Uses digits 1-9 of the CPF base
-   - Applies weights: 10, 9, 8, 7, 6, 5, 4, 3, 2 (from left to right)
-   - Calculates: `sum(digit × weight) % 11`
-   - Result: `0` if remainder > 9, otherwise `11 - remainder`
-
-2. **Second Check Digit (11th position)**:
-   - Uses digits 1-9 + first check digit
-   - Applies weights: 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 (from left to right)
-   - Calculates: `sum(digit × weight) % 11`
-   - Result: `0` if remainder > 9, otherwise `11 - remainder`
-
-## Dependencies
-
-- **Python**: >= 3.10
-
-No external dependencies required.
+1. **First check digit (10th position):** apply to the first **9** base digits; weights **10, 9, 8, 7, 6, 5, 4, 3, 2** (left to right); let `remainder = 11 - (sum(digit × weight) % 11)`. The digit is `0` if `remainder > 9`, otherwise `remainder`.
+2. **Second check digit (11th position):** apply to the first 9 base digits **plus** the first check digit; weights **11, 10, 9, 8, 7, 6, 5, 4, 3, 2** (left to right); same formula for `remainder`.
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -285,7 +153,7 @@ We welcome contributions! Please see our [Contributing Guidelines](https://githu
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE) file for details.
 
 ## Changelog
 
