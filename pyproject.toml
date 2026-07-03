@@ -65,7 +65,7 @@ minversion = "9.0"
 addopts = [ "--import-mode=importlib" ]
 testpaths = [ "tests/" ]
 python_files = [ "*.spec.py" ]
-python_functions = [ "it_*", "test_*" ]
+python_functions = [ "describe_*", "it_*", "test_*" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
