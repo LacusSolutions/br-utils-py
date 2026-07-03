@@ -1,5 +1,11 @@
 # cnpj-gen
 
+## 2.0.2
+
+### Improvements
+
+- **requires-python** — Declares support for Python `>=3.10,<4.0`.
+
 ## 2.0.1
 
 ### Patch Changes
