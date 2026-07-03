@@ -1,5 +1,11 @@
 # lacus.utils
 
+## 1.0.1
+
+### Improvements
+
+- **requires-python** — Declares support for Python `>=3.10,<4.0`.
+
 ## 1.0.0
 
 ### 🚀 Stable Version Released!
