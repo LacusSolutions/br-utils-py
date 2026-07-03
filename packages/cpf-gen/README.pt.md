@@ -123,7 +123,7 @@ options.set({'format': False})  # mescla e retorna self
 options.all      # snapshot imutável e superficial das opções atuais
 ```
 
-- **`__init__(default_options=None, *overrides, format=None, prefix=None)`**: Opções mescladas em ordem (as últimas sobrescritas prevalecem).
+- **`__init__(options=None, *extra_overrides, format=None, prefix=None)`**: Opções mescladas em ordem (as últimas sobrescritas prevalecem).
 - **`format`**, **`prefix`**: Propriedades com setters; `prefix` é validado (base inelegível, dígitos repetidos).
 - **`set(options)`**: Atualiza várias opções de uma vez; campos omitidos mantêm o valor atual; retorna `self`.
 - **`all`**: Snapshot somente leitura das opções atuais (`MappingProxyType`).
