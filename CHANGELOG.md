@@ -2,17 +2,29 @@
 
 ## 2.0.0
 
+### 🎉 v2 at a glance 🎊
+
+- 🏗️ **Class-based API** — `CpfGenerator` holds default options; `generate()` accepts optional per-call overrides; `cpf_gen()` remains for one-off usage.
+- ✨ **Reusable options** — `CpfGeneratorOptions` with getters/setters, `set()` for bulk updates, and read-only `all` snapshot.
+- 🛡️ **Structured errors** — Typed `CpfGeneratorTypeError` / `CpfGeneratorException` hierarchies for options and prefix validation.
+- 📐 **Stricter prefix validation** — Prefix rejects zeroed base (9 zeros) and 9 repeated digits.
+
+### BREAKING CHANGES
+
+- **Constructor signatures** — `CpfGenerator` and `cpf_gen` now accept an optional options object/mapping plus keyword-only `format` and `prefix` instead of positional `format`/`prefix`.
+- **Exception classes** — Removed `CpfGeneratorError`, `CpfGeneratorPrefixLengthError`, and `CpfGeneratorPrefixNotValidError`; migrate `except` clauses to `CpfGeneratorOptionsTypeError`, `CpfGeneratorOptionPrefixInvalidException`, and related subclasses.
+- **Prefix behavior** — Prefix overflow truncates to 9 characters instead of raising a length error; zeroed base and 9 repeated-digit prefixes raise `CpfGeneratorOptionPrefixInvalidException`.
+- **`CpfGeneratorOptions` refactor** — Replaced `merge()` with `set()` and layered constructor overrides; read-only `all` snapshot; static defaults `DEFAULT_FORMAT`, `DEFAULT_PREFIX`.
+- **Dependencies** — Added runtime dependency `lacus.utils`; requires `cpf-dv` 2.x for check-digit calculation and retry.
+
+### New features
+
+- **Exports** — `CPF_LENGTH`, `CPF_PREFIX_MAX_LENGTH`, and options type aliases (`CpfGeneratorOptionsInput`, `CpfGeneratorOptionsType`).
+- **Retry on invalid sequence** — Generator retries when `cpf-dv` rejects a random body candidate.
+
 ### Improvements
 
 - **requires-python** — Declares support for Python `>=3.10,<4.0`.
-
-## 1.0.2
-
-### Patch Changes
-
-- **cpf-dv 2.x**: Generation uses `CpfCheckDigits(...).cpf` and retries on `CpfCheckDigitsException`.
-- Updated dependencies
-  - `cpf-dv`: 1.0.x → 2.0.0
 
 ## 1.0.1
 
