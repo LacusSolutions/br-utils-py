@@ -1,7 +1,7 @@
 [project]
 name = "cpf-dv"
 dynamic = [ "version" ]
-description = "Utility resources to calculate check digits on CPF (Brazilian personal ID)"
+description = "Utility to calculate check digits on CPF (Brazilian Individual's Taxpayer ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -34,7 +34,10 @@ classifiers = [
   "Topic :: Software Development :: Libraries",
   "Topic :: Utilities",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+  "lacus.utils>=1.0.0,<2.0.0",
+]
 
   [[project.authors]]
   name = "Julio L. Muller"
@@ -44,7 +47,7 @@ requires-python = ">=3.10"
   content-type = "text/markdown"
 
   [project.urls]
-  Homepage = "https://cnpj-utils.vercel.app/"
+  Homepage = "https://cpf-utils.vercel.app/"
   Source = "https://github.com/LacusSolutions/br-utils-py"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
@@ -60,10 +63,10 @@ where = [ "src/" ]
 
 [tool.pytest.ini_options]
 minversion = "9.0"
+addopts = [ "--import-mode=importlib" ]
 testpaths = [ "tests/" ]
-python_files = [ "*_test.py" ]
-python_classes = [ "*Test" ]
-python_functions = [ "test_*" ]
+python_files = [ "*.spec.py" ]
+python_functions = [ "describe_*", "it_*", "test_*" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
