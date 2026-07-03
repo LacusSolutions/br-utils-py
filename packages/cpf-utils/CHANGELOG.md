@@ -2,8 +2,26 @@
 
 ## 2.0.0
 
+### 🎉 v2 at a glance 🎊
+
+- ⚙️ **Flexible formatter API** — `format()` accepts an options object plus keyword overrides; supports `encode` and `str | Sequence[str]` input via upgraded `cpf-fmt` v2.
+- 🔧 **Component setters** — Replace `formatter`, `generator`, and `validator` on a `CpfUtils` instance (component instance, `*Options`, or mapping).
+- 📦 **Full re-exports** — Component classes, `*Options`, typed exceptions, and `cpf_fmt` / `cpf_gen` / `cpf_val` helpers from bundled v2 `cpf-fmt`.
+
+### BREAKING CHANGES
+
+- **Keyword-only constructor** — `CpfUtils` parameters are keyword-only (`formatter`, `generator`, `validator`); positional `CpfFormatterOptions` / `CpfGeneratorOptions` arguments no longer work.
+- **Dependencies** — Requires `cpf-fmt` v2; upgrade the CPF formatter stack together with this package.
+- **Legacy aliases** — Removed `CpfFormatterError`, `CpfFormatterInputLengthError`, and `CpfFormatterHiddenRangeError`; use the `*Exception` types from bundled components.
+- **Method signatures** — `format()` accepts an optional options object plus keyword overrides instead of v1 positional option parameters; `format()` accepts `str | Sequence[str]`.
+
+### New features
+
+- **`encode` option** — `format()` can URL-encode the formatted CPF (from `cpf-fmt` v2).
+
 ### Improvements
 
+- **`CpfUtils` API** — Constructor and façade methods forward v2 options objects and per-call keyword overrides without mutating instance defaults.
 - **requires-python** — Declares support for Python `>=3.10,<4.0`.
 
 ## 1.0.1
