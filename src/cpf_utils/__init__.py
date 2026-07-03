@@ -1,9 +1,19 @@
+"""Unified CPF formatting, generation, and validation API.
+
+Re-exports component classes, options, exceptions, helpers, and a default
+:data:`cpf_utils` instance of :class:`CpfUtils`.
+"""
+
 from cpf_fmt import (
     CpfFormatter,
-    CpfFormatterError,
-    CpfFormatterHiddenRangeError,
-    CpfFormatterInputLengthError,
+    CpfFormatterException,
+    CpfFormatterInputLengthException,
+    CpfFormatterInputTypeError,
     CpfFormatterOptions,
+    CpfFormatterOptionsForbiddenKeyCharacterException,
+    CpfFormatterOptionsHiddenRangeInvalidException,
+    CpfFormatterOptionsTypeError,
+    CpfFormatterTypeError,
     cpf_fmt,
 )
 from cpf_gen import (
@@ -20,10 +30,14 @@ from .cpf_utils import CpfUtils
 
 __all__ = [
     "CpfFormatter",
-    "CpfFormatterError",
-    "CpfFormatterHiddenRangeError",
-    "CpfFormatterInputLengthError",
+    "CpfFormatterException",
+    "CpfFormatterInputLengthException",
+    "CpfFormatterInputTypeError",
     "CpfFormatterOptions",
+    "CpfFormatterOptionsForbiddenKeyCharacterException",
+    "CpfFormatterOptionsHiddenRangeInvalidException",
+    "CpfFormatterOptionsTypeError",
+    "CpfFormatterTypeError",
     "CpfGenerator",
     "CpfGeneratorError",
     "CpfGeneratorOptions",
@@ -39,5 +53,7 @@ __all__ = [
 
 __version__ = "0.0.0"
 
-# Default instance of CpfUtils
 cpf_utils = CpfUtils()
+"""Default :class:`CpfUtils` instance with default formatter,
+generator, and validator options.
+"""
