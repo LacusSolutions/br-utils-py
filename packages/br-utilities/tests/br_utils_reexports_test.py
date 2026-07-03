@@ -14,10 +14,11 @@ class BrUtilsReexportsTest:
             CpfFormatterOptionsTypeError,
             CpfFormatterTypeError,
             CpfGenerator,
-            CpfGeneratorError,
+            CpfGeneratorException,
+            CpfGeneratorOptionPrefixInvalidException,
             CpfGeneratorOptions,
-            CpfGeneratorPrefixLengthError,
-            CpfGeneratorPrefixNotValidError,
+            CpfGeneratorOptionsTypeError,
+            CpfGeneratorTypeError,
             CpfUtils,
             CpfValidator,
             cpf_fmt,
@@ -36,10 +37,11 @@ class BrUtilsReexportsTest:
         assert CpfFormatterOptionsTypeError is not None
         assert CpfFormatterTypeError is not None
         assert CpfGenerator is not None
-        assert CpfGeneratorError is not None
+        assert CpfGeneratorException is not None
+        assert CpfGeneratorOptionPrefixInvalidException is not None
         assert CpfGeneratorOptions is not None
-        assert CpfGeneratorPrefixLengthError is not None
-        assert CpfGeneratorPrefixNotValidError is not None
+        assert CpfGeneratorOptionsTypeError is not None
+        assert CpfGeneratorTypeError is not None
         assert CpfUtils is not None
         assert CpfValidator is not None
         assert cpf_fmt is not None
