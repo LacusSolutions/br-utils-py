@@ -1,42 +1,29 @@
 from .cpf_fmt import cpf_fmt
 from .cpf_formatter import CpfFormatter
-from .cpf_formatter_options import (
-    DEFAULT_DASH_KEY,
-    DEFAULT_DOT_KEY,
-    DEFAULT_ESCAPE,
-    DEFAULT_HIDDEN,
-    DEFAULT_HIDDEN_END,
-    DEFAULT_HIDDEN_KEY,
-    DEFAULT_HIDDEN_START,
-    DEFAULT_ON_FAIL,
-    CpfFormatterOptions,
-)
+from .cpf_formatter_options import CPF_LENGTH, CpfFormatterOptions
 from .exceptions import (
-    CpfFormatterError,
-    CpfFormatterHiddenRangeError,
-    CpfFormatterInputLengthError,
+    CpfFormatterException,
+    CpfFormatterInputLengthException,
     CpfFormatterInputTypeError,
-    CpfFormatterOptionTypeError,
+    CpfFormatterOptionsForbiddenKeyCharacterException,
+    CpfFormatterOptionsHiddenRangeInvalidException,
+    CpfFormatterOptionsTypeError,
     CpfFormatterTypeError,
 )
+from .types import CpfInput
 
 __all__ = [
-    "DEFAULT_DASH_KEY",
-    "DEFAULT_DOT_KEY",
-    "DEFAULT_ESCAPE",
-    "DEFAULT_HIDDEN",
-    "DEFAULT_HIDDEN_END",
-    "DEFAULT_HIDDEN_KEY",
-    "DEFAULT_HIDDEN_START",
-    "DEFAULT_ON_FAIL",
+    "CPF_LENGTH",
     "CpfFormatter",
-    "CpfFormatterError",
-    "CpfFormatterHiddenRangeError",
-    "CpfFormatterInputLengthError",
+    "CpfFormatterException",
+    "CpfFormatterInputLengthException",
     "CpfFormatterInputTypeError",
-    "CpfFormatterOptionTypeError",
     "CpfFormatterOptions",
+    "CpfFormatterOptionsForbiddenKeyCharacterException",
+    "CpfFormatterOptionsHiddenRangeInvalidException",
+    "CpfFormatterOptionsTypeError",
     "CpfFormatterTypeError",
+    "CpfInput",
     "cpf_fmt",
 ]
 
