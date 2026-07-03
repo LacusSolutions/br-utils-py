@@ -7,7 +7,9 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Utility function/class to generate valid CPF (Brazilian personal ID).
+> 🌎 [Acessar documentação em português](./README.pt.md)
+
+A Python utility to generate valid CPF (Brazilian Individual's Taxpayer ID) values.
 
 ## Python Support
 
@@ -15,218 +17,169 @@ Utility function/class to generate valid CPF (Brazilian personal ID).
 |--- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
 
+## Features
+
+- ✅ **Optional prefix**: Provide 0–9 digits to fix the start of the CPF and generate the rest with valid check digits
+- ✅ **Formatting**: Option to return the standard formatted string (`000.000.000-00`)
+- ✅ **Reusable generator**: `CpfGenerator` class with default options and per-call overrides
+- ✅ **Type hints**: Built for Python 3.10+ with full type annotations
+- ✅ **Minimal dependencies**: Only internal packages `lacus.utils` and `cpf-dv` for random sequence generation and check-digit calculation
+- ✅ **Error handling**: Specific type errors and exceptions for invalid options
+
 ## Installation
 
 ```bash
 $ pip install cpf-gen
 ```
 
-## Import
+## Quick Start
 
 ```python
-# Using class-based resource
-from cpf_gen import CpfGenerator
-
-# Or using function-based one
 from cpf_gen import cpf_gen
+```
+
+Basic usage:
+
+```python
+cpf_gen()                    # e.g. '47844241055' (11-digit numeric)
+
+cpf_gen(format=True)         # e.g. '005.265.352-88'
+
+cpf_gen(prefix='528250911')  # e.g. '52825091138'
+cpf_gen(                     # e.g. '528.250.911-38'
+    prefix='528250911',
+    format=True,
+)
+```
+
+Options can also be passed as a mapping:
+
+```python
+cpf_gen({'format': True, 'prefix': '528250911'})
 ```
 
 ## Usage
 
-### Object-Oriented Usage
+### Generator options
+
+All options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CPF in standard format (`000.000.000-00`). Non-boolean values are coerced with `bool()`. |
+| `prefix` | `str` | `''` | Partial start string (0–9 digits). Only digits are kept; missing characters are generated randomly and check digits are computed. Prefixes longer than 9 digits are truncated silently. |
+
+Prefix rules: the base (first 9 digits) cannot be all zeros; 9 repeated digits (e.g. `999999999`) are not allowed.
+
+### `cpf_gen` (helper function)
+
+Generates a valid CPF string. With no options, returns an 11-digit numeric CPF. This is a convenience wrapper around `CpfGenerator(options, ...).generate()`.
+
+- **`options`** (optional): `CpfGeneratorOptionsInput` — a `CpfGeneratorOptions` instance, a partial mapping, or `None`. See [Generator options](#generator-options).
+- **`format`**, **`prefix`** (keyword-only): Per-option overrides when `options` is omitted or to layer on top of a mapping.
+
+### `CpfGenerator` (class)
+
+For reusable defaults or per-call overrides, use the class:
 
 ```python
-generator = CpfGenerator()
-cpf = generator.generate()  # returns '47844241055'
+from cpf_gen import CpfGenerator
 
-# With options
-cpf = generator.generate(
-    format=True
-)  # returns '478.442.410-55'
+generator = CpfGenerator(format=True)
 
-cpf = generator.generate(
-    prefix='528250911'
-)  # returns '52825091138'
-
-cpf = generator.generate(
-    prefix='528250911',
-    format=True
-)  # returns '528.250.911-38'
+generator.generate()                  # e.g. '005.265.352-88'
+generator.generate(prefix='123456')   # override for this call only
+generator.options                   # current default options (CpfGeneratorOptions)
 ```
 
-The options can be provided to the constructor or the `generate()` method. If passed to the constructor, the options will be attached to the `CpfGenerator` instance. When passed to the `generate()` method, it only applies the options to that specific call.
+- **`__init__(options=None, *, format=None, prefix=None)`**: Optional default options (plain mapping, `CpfGeneratorOptions` instance, or keyword arguments).
+- **`generate(options=None, *, format=None, prefix=None)`**: Returns a valid CPF; per-call options override instance defaults for that call only.
+- **`options`**: Property returning the default options used when per-call options are not provided (same instance as used internally; mutating it affects future `generate` calls).
+
+Default options on the instance; per-call overrides:
 
 ```python
 generator = CpfGenerator(format=True)
 
-cpf1 = generator.generate()  # '478.442.410-55' (uses instance options)
-cpf2 = generator.generate(format=False)  # '47844241055' (overrides instance options)
-cpf3 = generator.generate()  # '123.456.789-01' (uses instance options again)
+generator.generate()              # formatted CPF
+generator.generate(format=False)  # this call only: unformatted
+generator.generate()              # formatted again (instance defaults preserved)
 ```
 
-### Functional programming
+### `CpfGeneratorOptions` (class)
 
-The helper function `cpf_gen()` is just a functional abstraction. Internally it creates an instance of `CpfGenerator` and calls the `generate()` method right away.
+Holds options (`format`, `prefix`) with validation and merge support:
 
 ```python
-cpf = cpf_gen()  # returns '47844241055'
+from cpf_gen import CpfGeneratorOptions
 
-cpf = cpf_gen(format=True)  # returns '478.442.410-55'
-
-cpf = cpf_gen(prefix='528250911')  # returns '52825091138'
-
-cpf = cpf_gen(prefix='528250911', format=True)  # returns '528.250.911-38'
+options = CpfGeneratorOptions(
+    prefix='123456',
+    format=True,
+)
+options.prefix   # '123456'
+options.format   # True
+options.set({'format': False})  # merge and return self
+options.all      # immutable shallow snapshot of current options
 ```
 
-### Generator Options
+- **`__init__(default_options=None, *overrides, format=None, prefix=None)`**: Options merged in order (later overrides win).
+- **`format`**, **`prefix`**: Properties with setters; `prefix` is validated (base ID ineligible, repeated digits).
+- **`set(options)`**: Update multiple options at once; omitted fields keep their current value; returns `self`.
+- **`all`**: Read-only snapshot of current options (`MappingProxyType`).
+- **`DEFAULT_FORMAT`**, **`DEFAULT_PREFIX`**: Class-level default constants.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `format` | `bool \| None` | `False` | Whether to format the output with dots and dash |
-| `prefix` | `str \| None` | `''` | If you have CPF initials and want to complete it with valid digits. The string provided must contain between 0 and 9 digits! |
+## API
 
-## Error Handling
+### Exports
 
-The package raises specific exceptions for different error scenarios:
+- **`cpf_gen`**: `(options=None, *, format=None, prefix=None) -> str`
+- **`CpfGenerator`**: Class to generate CPF with optional default options and per-call overrides.
+- **`CpfGeneratorOptions`**: Class holding options (`format`, `prefix`) with validation and merge.
+- **`CPF_LENGTH`**: `11` (constant).
+- **`CPF_PREFIX_MAX_LENGTH`**: `9` (constant).
+- **Types**: `CpfGeneratorOptionsInput`, `CpfGeneratorOptionsType`.
+- **Exceptions**: `CpfGeneratorTypeError`, `CpfGeneratorOptionsTypeError`, `CpfGeneratorException`, `CpfGeneratorOptionPrefixInvalidException`.
 
-### `CpfGeneratorPrefixLengthError`
+### Errors & Exceptions
 
-Raised when the prefix length exceeds the maximum allowed (9 digits).
+This package uses **TypeError** subclasses for invalid option types and **Exception** subclasses for invalid option values (e.g. `prefix`). You can catch specific classes or the base types.
+
+- **CpfGeneratorTypeError** (_abstract_) — base for option type errors
+- **CpfGeneratorOptionsTypeError** — an option has the wrong type (e.g. `prefix` not a string)
+- **CpfGeneratorException** (_abstract_) — base for option value exceptions
+- **CpfGeneratorOptionPrefixInvalidException** — prefix invalid (e.g. zeroed base ID, repeated digits)
 
 ```python
-from cpf_gen import CpfGenerator, CpfGeneratorPrefixLengthError
+from cpf_gen import (
+    cpf_gen,
+    CpfGeneratorOptionsTypeError,
+    CpfGeneratorOptionPrefixInvalidException,
+    CpfGeneratorException,
+)
 
+# Option type (e.g. `prefix` must be string)
 try:
-    generator = CpfGenerator(prefix="1234567890") # 10 digits (too many)
-except CpfGeneratorPrefixLengthError as e:
-    print(e)  # The prefix length must be less than or equal to 9. Got 10.
-```
+    cpf_gen(prefix=123)
+except CpfGeneratorOptionsTypeError as e:
+    print(e.option_name, e.expected_type, e.actual_type)
 
-### `CpfGeneratorPrefixNotValidError`
-
-Raised when the input is forbidden for some restriction, like repeated digits like `111.111.111`, `222.222.222`, `333.333.333` and so on.
-
-```python
-from cpf_gen import CpfGenerator, CpfGeneratorPrefixNotValidError
-
+# Invalid prefix (e.g. zeroed base ID)
 try:
-    generator = CpfGenerator(prefix="777777777")
-except CpfGeneratorPrefixNotValidError as e:
-    print(e)  # The prefix "777777777" is invalid. Repeated digits are not considered valid.
-```
+    cpf_gen(prefix='000000000')
+except CpfGeneratorOptionPrefixInvalidException as e:
+    print(e.reason, e.actual_input)
 
-### Catch any error from the package
-
-All errors extend from a common error instance `CpfGeneratorError`, so you can use this type to handle any error thrown by the module.
-
-```python
-from cpf_gen import CpfGeneratorError
-
+# Any exception from the package
 try:
-  # some risky code run
-except CpfGeneratorError as e:
-  # do something
+    cpf_gen(prefix='999999999')
+except CpfGeneratorException as e:
+    print(e)
 ```
-
-## Features
-
-- ✅ **Multiple Usage Patterns**: Supports both object-oriented and functional programming styles
-- ✅ **Flexible Options**: Configure formatting and prefix at instance or method level
-- ✅ **Valid CPF Generation**: Always generates CPFs with correct check digits
-- ✅ **Type Safety**: Built with Python 3.10+ type hints
-- ✅ **Zero Dependencies**: Only depends on `cpf-dv` for check digit calculation
-- ✅ **Comprehensive Error Handling**: Specific exceptions for different error scenarios
-
-## API Reference
-
-### CpfGenerator Class
-
-#### Constructor
-
-```python
-CpfGenerator(format: bool | None = None, prefix: str | None = None) -> CpfGenerator
-```
-
-Creates a new `CpfGenerator` instance with optional default options.
-
-**Parameters:**
-- `format` (bool | None): Whether to format the output with dots and dash. Defaults to `False`.
-- `prefix` (str | None): CPF prefix (0-9 digits). Defaults to empty string.
-
-**Returns:**
-- `CpfGenerator`: A new instance ready to generate CPFs
-
-#### Methods
-
-##### `generate(format: bool | None = None, prefix: str | None = None) -> str`
-
-Generates a valid CPF according to the given options.
-
-**Parameters:**
-- `format` (bool | None): Whether to format the output. If `None`, uses instance option.
-- `prefix` (str | None): CPF prefix (0-9 digits). If `None`, uses instance option.
-
-**Returns:**
-- `str`: A valid CPF string (formatted or unformatted)
-
-#### Properties
-
-##### `options: CpfGeneratorOptions`
-
-Direct access to the options manager for the CPF generator.
-
-```python
-generator = CpfGenerator()
-generator.options.format = True
-generator.options.prefix = "123456789"
-```
-
-### cpf_gen Function
-
-```python
-cpf_gen(format: bool | None = None, prefix: str | None = None) -> str
-```
-
-Functional wrapper that creates a `CpfGenerator` instance and calls `generate()` immediately.
-
-**Parameters:**
-- `format` (bool | None): Whether to format the output. Defaults to `False`.
-- `prefix` (str | None): CPF prefix (0-9 digits). Defaults to empty string.
-
-**Returns:**
-- `str`: A valid CPF string (formatted or unformatted)
-
-## Examples
-
-```python
-from cpf_gen import CpfGenerator, cpf_gen
-
-# Basic usage
-cpf1 = cpf_gen()  # '47844241055'
-cpf2 = cpf_gen(format=True)  # '478.442.410-55'
-
-# With prefix
-cpf3 = cpf_gen(prefix='123456789')  # '12345678901'
-cpf4 = cpf_gen(prefix='123456789', format=True)  # '123.456.789-01'
-
-# Using class-based approach
-generator = CpfGenerator(format=True)
-cpf5 = generator.generate()  # '478.442.410-55'
-cpf6 = generator.generate(format=False)  # '47844241055' (overrides instance option)
-
-# Modify options directly
-generator.options.prefix = "987654321"
-cpf7 = generator.generate()  # '987.654.321-XX' (formatted with prefix)
-```
-
-## Dependencies
-
-- **Python**: >= 3.10
-- **cpf-dv**: for check digit calculation
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -239,7 +192,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-gen/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](./CHANGELOG.md) for a list of changes and version history.
 
 ---
 
