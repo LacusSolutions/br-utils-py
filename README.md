@@ -7,18 +7,25 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Utility function/class to validate CPF (Brazilian personal ID).
+> 🌎 [Acessar documentação em português](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-val/README.pt.md)
 
-CPF validation follows the official rules established by Receita Federal:
-- The CPF must contain exactly 11 digits.
-- All digits cannot be identical (e.g., `111.111.111-11` is considered invalid).
-- The last two digits (10th and 11th) are check digits, calculated from the preceding nine digits.
+A Python utility to validate CPF (Brazilian Individual's Taxpayer ID).
 
 ## Python Support
 
 | ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
+
+## Features
+
+- ✅ **Fixed 11-digit CPF**: Validates the standard 11-digit Brazilian CPF via the official modulo-11 algorithm
+- ✅ **Flexible input**: Accepts `str` or a sequence of `str`; sequence elements are concatenated in order
+- ✅ **Format agnostic**: Strips every non-digit character before validation
+- ✅ **Repeated-digit rejection**: All-identical-digit CPFs (e.g. `111.111.111-11`, `00000000000`) are rejected
+- ✅ **Typed input validation**: Dedicated `TypeError` subclass for invalid input type
+- ✅ **Minimal dependencies**: [`cpf-dv`](https://pypi.org/project/cpf-dv/) for check-digit calculation and [`lacus.utils`](https://pypi.org/project/lacus.utils/) for type descriptions in error messages
+- ✅ **Dual API style**: Object-oriented (`CpfValidator`) and functional (`cpf_val()`)
 
 ## Installation
 
@@ -29,123 +36,124 @@ $ pip install cpf-val
 ## Import
 
 ```python
-# Using class-based resource
+from cpf_val import CpfValidator, cpf_val
+```
+
+## Quick start
+
+```python
 from cpf_val import CpfValidator
 
-# Or using function-based one
+validator = CpfValidator()
+
+validator.is_valid('12345678909')       # True
+validator.is_valid('123.456.789-09')    # True
+validator.is_valid('12345678910')       # False (invalid check digits)
+validator.is_valid('00000000000')       # False (repeated digits)
+```
+
+Functional helper:
+
+```python
 from cpf_val import cpf_val
+
+cpf_val('12345678909')      # True
+cpf_val('123.456.789-09')   # True
+cpf_val('12345678910')      # False
 ```
 
 ## Usage
 
-### Object-Oriented Usage
+The main entry points are the class `CpfValidator` and the helper `cpf_val()`.
+
+### `CpfValidator`
+
+- **`__init__`**: Takes no arguments. CPF validation has no configuration options.
+- **`is_valid(cpf_input)`**: Validates a CPF value.
+
+  Input is normalized to a string (sequences of strings are concatenated). Every non-digit character is then stripped. If the sanitized length is not exactly **11**, its base is an all-identical-digit sequence, or the check digits do not match (`CpfCheckDigits` from **`cpf-dv`**), the method returns `False` — no exception is thrown for validation failure.
+
+  If the input is not a `str` or a sequence of `str`, **`CpfValidatorInputTypeError`** is raised.
 
 ```python
+from cpf_val import CpfValidator
+
 validator = CpfValidator()
-cpf = '11144477735'
 
-print('Valid' if validator.is_valid(cpf) else 'Invalid')  # returns 'Valid'
-
-cpf = '111.444.777-35'
-print('Valid' if validator.is_valid(cpf) else 'Invalid')  # returns 'Valid'
-
-cpf = '11144477736'
-print('Valid' if validator.is_valid(cpf) else 'Invalid')  # returns 'Invalid'
+validator.is_valid('123.456.789-09')             # True
+validator.is_valid('12345678909')                # True
+validator.is_valid(['123', '456', '789', '09'])  # True
+validator.is_valid('12345678910')                # False (invalid check digits)
+validator.is_valid('11111111111')                # False (repeated digits)
 ```
 
-### Functional programming
+### Functional helper
 
-The helper function `cpf_val()` is just a functional abstraction. Internally it creates an instance of `CpfValidator` and calls the `is_valid()` method right away.
+`cpf_val()` builds a new `CpfValidator` and calls `is_valid(cpf_input)` once. It takes only the input value:
 
 ```python
-cpf = '11144477735'
+from cpf_val import cpf_val
 
-print('Valid' if cpf_val(cpf) else 'Invalid')      # returns 'Valid'
-
-print('Valid' if cpf_val('111.444.777-35') else 'Invalid')  # returns 'Valid'
-
-print('Valid' if cpf_val('11144477736') else 'Invalid')      # returns 'Invalid'
+cpf_val('11144477735')      # True
+cpf_val('111.444.777-35')   # True
+cpf_val('11144477736')      # False
 ```
 
-### Validation Examples
+### Input formats
+
+**String:** Plain digits or a formatted CPF (e.g. `123.456.789-09`, `499.784.420-90`, `011_258_960_00`). Non-digit characters are stripped before validation; the result must be exactly 11 digits.
+
+**Sequence of strings:** Each element must be a `str`; values are concatenated (e.g. per digit, grouped segments, or mixed with punctuation). Non-string elements raise **`CpfValidatorInputTypeError`**.
 
 ```python
-# Valid CPF numbers
-cpf_val('11144477735')      # returns True
-cpf_val('111.444.777-35')   # returns True
-cpf_val('12345678909')      # returns True
+from cpf_val import cpf_val
 
-# Invalid CPF numbers
-cpf_val('11144477736')      # returns False
-cpf_val('12345678901')      # returns False
-cpf_val('00000000000')      # returns False
-cpf_val('11111111111')      # returns False
-cpf_val('123')              # returns False (too short)
-cpf_val('')                 # returns False (empty)
+cpf_val(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '9'])  # True
+cpf_val(['123.456', '789-09'])  # True
 ```
 
-## Features
+### Errors & exceptions
 
-- ✅ **Format Agnostic**: Accepts CPF with or without formatting (dots, dashes)
-- ✅ **Strict Validation**: Validates both check digits according to Brazilian CPF algorithm
-- ✅ **Type Safety**: Built with Python 3.10+ type hints
-- ✅ **Lightweight**: Minimal dependencies, only requires `cpf-dv` for check digit calculation
-- ✅ **Dual API**: Both object-oriented and functional programming styles supported
+This package uses **TypeError** for invalid input types. Validation failures (wrong length, ineligible base such as repeated digits, invalid check digits) return `False` and do not throw.
 
-## API Reference
+- **Wrong input type** (not `str` or a sequence of `str`): **`CpfValidatorInputTypeError`** — extends **`CpfValidatorTypeError`** (extends built-in `TypeError`).
+- **`CpfValidatorException`** (_abstract_): base for non-type (business) errors; currently has no concrete subclass in this package.
 
-### CpfValidator Class
+```python
+from cpf_val import (
+    CpfValidatorInputTypeError,
+    CpfValidatorTypeError,
+    cpf_val,
+)
 
-#### `is_valid(cpf_string: str) -> bool`
+# Input type (e.g. integer not allowed)
+try:
+    cpf_val(12345678909)
+except CpfValidatorInputTypeError as e:
+    print(e)  # CPF input must be of type string or string[]. Got integer number.
 
-Validates a CPF string and returns `True` if valid, `False` otherwise.
+# Any type error from the package
+try:
+    cpf_val(None)
+except CpfValidatorTypeError as e:
+    pass  # handle
+```
 
-**Parameters:**
-- `cpf_string` (str): The CPF to validate (with or without formatting)
+## API
 
-**Returns:**
-- `bool`: `True` if the CPF is valid, `False` otherwise
+### Exports
 
-### cpf_val() Function
+All public symbols are available from the `cpf_val` package:
 
-#### `cpf_val(cpf_string: str) -> bool`
-
-Functional wrapper around `CpfValidator.is_valid()`.
-
-**Parameters:**
-- `cpf_string` (str): The CPF to validate (with or without formatting)
-
-**Returns:**
-- `bool`: `True` if the CPF is valid, `False` otherwise
-
-## Validation Algorithm
-
-The package validates CPF using the official Brazilian algorithm:
-
-1. **Length Check**: Ensures the CPF has exactly 11 digits
-2. **Repeated Digits Check**: Rejects CPFs with all digits being the same (e.g., 11111111111, 00000000000)
-3. **First Check Digit**: Calculates and validates the 10th digit
-4. **Second Check Digit**: Calculates and validates the 11th digit
-5. **Format Tolerance**: Automatically strips non-numeric characters before validation
-
-## Error Handling
-
-The validator is designed to be forgiving with input format but strict with validation:
-
-- Invalid formats (too short, too long) return `False`
-- Invalid check digits return `False`
-- Empty strings return `False`
-- Non-numeric strings (after stripping formatting) return `False`
-- CPFs with all digits the same return `False`
-
-## Dependencies
-
-- **Python**: >= 3.10
-- **cpf-dv**: for check digit calculation
+- **`cpf_val`**: `(cpf_input: CpfInput) -> bool` — convenience helper.
+- **`CpfValidator`**: Class to validate CPF (no options); accepts `CpfInput` in `is_valid()`.
+- **`CPF_LENGTH`**: `11` (constant).
+- **`CpfInput`**: Type alias — `str | Sequence[str]`.
+- **Exceptions**: `CpfValidatorTypeError`, `CpfValidatorInputTypeError`, `CpfValidatorException`.
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -154,7 +162,7 @@ We welcome contributions! Please see our [Contributing Guidelines](https://githu
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE) file for details.
 
 ## Changelog
 
