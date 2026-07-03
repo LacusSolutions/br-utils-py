@@ -61,10 +61,10 @@ where = [ "src/" ]
 
 [tool.pytest.ini_options]
 minversion = "9.0"
+addopts = [ "--import-mode=importlib" ]
 testpaths = [ "tests/" ]
-python_files = [ "*_test.py" ]
-python_classes = [ "*Test" ]
-python_functions = [ "test_*" ]
+python_files = [ "*.spec.py" ]
+python_functions = [ "describe_*", "it_*", "test_*" ]
 
 [tool.coverage.run]
 source = [ "src/" ]
