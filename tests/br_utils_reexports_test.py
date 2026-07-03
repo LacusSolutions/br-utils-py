@@ -5,10 +5,14 @@ class BrUtilsReexportsTest:
     def test_cpf_utils_reexports(self):
         from br_utils.cpf import (
             CpfFormatter,
-            CpfFormatterError,
-            CpfFormatterHiddenRangeError,
-            CpfFormatterInputLengthError,
+            CpfFormatterException,
+            CpfFormatterInputLengthException,
+            CpfFormatterInputTypeError,
             CpfFormatterOptions,
+            CpfFormatterOptionsForbiddenKeyCharacterException,
+            CpfFormatterOptionsHiddenRangeInvalidException,
+            CpfFormatterOptionsTypeError,
+            CpfFormatterTypeError,
             CpfGenerator,
             CpfGeneratorError,
             CpfGeneratorOptions,
@@ -23,10 +27,14 @@ class BrUtilsReexportsTest:
         )
 
         assert CpfFormatter is not None
-        assert CpfFormatterError is not None
-        assert CpfFormatterHiddenRangeError is not None
-        assert CpfFormatterInputLengthError is not None
+        assert CpfFormatterException is not None
+        assert CpfFormatterInputLengthException is not None
+        assert CpfFormatterInputTypeError is not None
         assert CpfFormatterOptions is not None
+        assert CpfFormatterOptionsForbiddenKeyCharacterException is not None
+        assert CpfFormatterOptionsHiddenRangeInvalidException is not None
+        assert CpfFormatterOptionsTypeError is not None
+        assert CpfFormatterTypeError is not None
         assert CpfGenerator is not None
         assert CpfGeneratorError is not None
         assert CpfGeneratorOptions is not None
