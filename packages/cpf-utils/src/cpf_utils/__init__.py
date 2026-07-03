@@ -18,10 +18,11 @@ from cpf_fmt import (
 )
 from cpf_gen import (
     CpfGenerator,
-    CpfGeneratorError,
+    CpfGeneratorException,
+    CpfGeneratorOptionPrefixInvalidException,
     CpfGeneratorOptions,
-    CpfGeneratorPrefixLengthError,
-    CpfGeneratorPrefixNotValidError,
+    CpfGeneratorOptionsTypeError,
+    CpfGeneratorTypeError,
     cpf_gen,
 )
 from cpf_val import CpfValidator, cpf_val
@@ -39,10 +40,11 @@ __all__ = [
     "CpfFormatterOptionsTypeError",
     "CpfFormatterTypeError",
     "CpfGenerator",
-    "CpfGeneratorError",
+    "CpfGeneratorException",
+    "CpfGeneratorOptionPrefixInvalidException",
     "CpfGeneratorOptions",
-    "CpfGeneratorPrefixLengthError",
-    "CpfGeneratorPrefixNotValidError",
+    "CpfGeneratorOptionsTypeError",
+    "CpfGeneratorTypeError",
     "CpfUtils",
     "CpfValidator",
     "cpf_fmt",

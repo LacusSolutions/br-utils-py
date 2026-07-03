@@ -12,6 +12,7 @@ from cpf_val import CpfValidator
 if TYPE_CHECKING:
     from cpf_fmt.types import CpfFormatterOptionsInput
     from cpf_fmt.types import CpfInput as CpfFormatterInput
+    from cpf_gen.types import CpfGeneratorOptionsInput
 
 
 class CpfUtils:
@@ -30,7 +31,9 @@ class CpfUtils:
         formatter: (
             CpfFormatter | CpfFormatterOptions | CpfFormatterOptionsInput | None
         ) = None,
-        generator: CpfGenerator | CpfGeneratorOptions | None = None,
+        generator: (
+            CpfGenerator | CpfGeneratorOptions | CpfGeneratorOptionsInput | None
+        ) = None,
         validator: CpfValidator | None = None,
     ) -> None:
         self._formatter = self._resolve_formatter(formatter)
@@ -54,7 +57,7 @@ class CpfUtils:
 
     @staticmethod
     def _resolve_generator(
-        value: CpfGenerator | CpfGeneratorOptions | None,
+        value: CpfGenerator | CpfGeneratorOptions | CpfGeneratorOptionsInput | None,
     ) -> CpfGenerator:
         if value is None:
             return CpfGenerator()
@@ -62,8 +65,8 @@ class CpfUtils:
         if isinstance(value, CpfGenerator):
             return value
 
-        if isinstance(value, CpfGeneratorOptions):
-            return CpfGenerator(format=value.format, prefix=value.prefix)
+        if isinstance(value, (CpfGeneratorOptions, Mapping)):
+            return CpfGenerator(value)
 
         return value  # type: ignore[return-value]
 
@@ -92,7 +95,10 @@ class CpfUtils:
         return self._generator
 
     @generator.setter
-    def generator(self, value: CpfGenerator | CpfGeneratorOptions | None) -> None:
+    def generator(
+        self,
+        value: CpfGenerator | CpfGeneratorOptions | CpfGeneratorOptionsInput | None,
+    ) -> None:
         self._generator = self._resolve_generator(value)
 
     @property
@@ -144,8 +150,27 @@ class CpfUtils:
 
         return formatter.format(cpf_input)
 
-    def generate(self, format: bool | None = None, prefix: str | None = None) -> str:
-        return self._generator.generate(format, prefix)
+    def generate(
+        self,
+        options: CpfGeneratorOptionsInput | None = None,
+        *,
+        format: bool | None = None,
+        prefix: str | None = None,
+    ) -> str:
+        generate_kwargs = _generate_forward_kwargs(format=format, prefix=prefix)
+
+        generator = self._generator
+
+        if options is not None:
+            if generate_kwargs:
+                return generator.generate(options, **generate_kwargs)
+
+            return generator.generate(options)
+
+        if generate_kwargs:
+            return generator.generate(**generate_kwargs)
+
+        return generator.generate()
 
     def is_valid(self, cpf_string: str) -> bool:
         return self._validator.is_valid(cpf_string)
@@ -191,6 +216,22 @@ def _format_forward_kwargs(
 
     if on_fail is not None:
         result["on_fail"] = on_fail
+
+    return result
+
+
+def _generate_forward_kwargs(
+    *,
+    format: bool | None,
+    prefix: str | None,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+
+    if format is not None:
+        result["format"] = format
+
+    if prefix is not None:
+        result["prefix"] = prefix
 
     return result
 

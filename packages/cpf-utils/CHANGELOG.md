@@ -6,14 +6,14 @@
 
 - ⚙️ **Flexible formatter API** — `format()` accepts an options object plus keyword overrides; supports `encode` and `str | Sequence[str]` input via upgraded `cpf-fmt` v2.
 - 🔧 **Component setters** — Replace `formatter`, `generator`, and `validator` on a `CpfUtils` instance (component instance, `*Options`, or mapping).
-- 📦 **Full re-exports** — Component classes, `*Options`, typed exceptions, and `cpf_fmt` / `cpf_gen` / `cpf_val` helpers from bundled v2 `cpf-fmt`.
+- 📦 **Full re-exports** — Component classes, `*Options`, typed exceptions, and `cpf_fmt` / `cpf_gen` / `cpf_val` helpers from bundled v2 components.
 
 ### BREAKING CHANGES
 
 - **Keyword-only constructor** — `CpfUtils` parameters are keyword-only (`formatter`, `generator`, `validator`); positional `CpfFormatterOptions` / `CpfGeneratorOptions` arguments no longer work.
-- **Dependencies** — Requires `cpf-fmt` v2; upgrade the CPF formatter stack together with this package.
-- **Legacy aliases** — Removed `CpfFormatterError`, `CpfFormatterInputLengthError`, and `CpfFormatterHiddenRangeError`; use the `*Exception` types from bundled components.
-- **Method signatures** — `format()` accepts an optional options object plus keyword overrides instead of v1 positional option parameters; `format()` accepts `str | Sequence[str]`.
+- **Dependencies** — Requires `cpf-fmt` and `cpf-gen` v2; upgrade the CPF stack together with this package.
+- **Legacy aliases** — Removed `CpfFormatterError`, `CpfGeneratorError`, and related alias names; use the `*Exception` types from bundled components.
+- **Method signatures** — `format()` and `generate()` accept an optional options object plus keyword overrides instead of v1 positional option parameters; `format()` accepts `str | Sequence[str]`.
 
 ### New features
 
