@@ -6,6 +6,13 @@
 
 - **requires-python** — Declares support for Python `>=3.10,<4.0`.
 
+### Patch Changes
+
+- Updated dependencies
+  - `cnpj-fmt`: 2.0.0 → 2.0.1
+  - `cnpj-gen`: 2.0.1 → 2.0.2
+  - `cnpj-val`: 2.0.0 → 2.0.1
+
 ## 2.0.0
 
 ### 🎉 v2 at a glance 🎊
