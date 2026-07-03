@@ -1,18 +1,29 @@
 from .cpf_gen import cpf_gen
 from .cpf_generator import CpfGenerator
-from .cpf_generator_options import CpfGeneratorOptions
-from .exceptions import (
-    CpfGeneratorError,
-    CpfGeneratorPrefixLengthError,
-    CpfGeneratorPrefixNotValidError,
+from .cpf_generator_options import (
+    CPF_LENGTH,
+    CPF_PREFIX_MAX_LENGTH,
+    CpfGeneratorOptions,
 )
+from .exceptions import (
+    CpfGeneratorException,
+    CpfGeneratorOptionPrefixInvalidException,
+    CpfGeneratorOptionsTypeError,
+    CpfGeneratorTypeError,
+)
+from .types import CpfGeneratorOptionsInput, CpfGeneratorOptionsType
 
 __all__ = [
+    "CPF_LENGTH",
+    "CPF_PREFIX_MAX_LENGTH",
     "CpfGenerator",
-    "CpfGeneratorError",
+    "CpfGeneratorException",
+    "CpfGeneratorOptionPrefixInvalidException",
     "CpfGeneratorOptions",
-    "CpfGeneratorPrefixLengthError",
-    "CpfGeneratorPrefixNotValidError",
+    "CpfGeneratorOptionsInput",
+    "CpfGeneratorOptionsType",
+    "CpfGeneratorOptionsTypeError",
+    "CpfGeneratorTypeError",
     "cpf_gen",
 ]
 
