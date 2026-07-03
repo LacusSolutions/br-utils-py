@@ -13,6 +13,6 @@ class CpfUtilsGeneratorTest:
 
         assert result == "123.456.789-01"
         utils.generator.generate.assert_called_once_with(
-            True,
-            "123456789",
+            format=True,
+            prefix="123456789",
         )
