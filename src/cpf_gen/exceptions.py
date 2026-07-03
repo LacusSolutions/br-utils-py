@@ -1,24 +1,106 @@
-class CpfGeneratorError(Exception):
-    """Base exception for all cpf-gen related errors."""
+"""Exception hierarchy for the ``cpf_gen`` package.
+
+The package distinguishes between **errors** and **exceptions**:
+
+- :class:`CpfGeneratorTypeError` (extends the native :class:`TypeError`)
+signals incorrect API usage (the option is of the wrong *type*).
+- :class:`CpfGeneratorException` (extends the native :class:`Exception`)
+  signals invalid or ineligible data (right type, bad value).
+"""
+
+from __future__ import annotations
+
+from abc import ABC
+from typing import Any
+
+from lacus.utils import describe_type
 
 
-class CpfGeneratorPrefixLengthError(CpfGeneratorError):
-    """Raised when the prefix length is too long."""
+def _describe_actual_type(value: Any) -> str:
+    """Return a basic type label for ``describe_type`` error messages."""
+    actual_type = describe_type(value)
 
-    def __init__(self, prefix_length: int, max_length: int) -> None:
-        self.prefix_length = prefix_length
-        self.max_length = max_length
+    if actual_type == "dict":
+        return "object"
+
+    return actual_type
+
+
+class CpfGeneratorTypeError(TypeError, ABC):
+    """Base error for all ``cpf-gen`` type-related errors.
+
+    This abstract class extends the native :class:`TypeError` and serves as the
+    base for all type validation errors in the CPF generator. It stores
+    ``actual_input``, ``actual_type``, and ``expected_type``.
+    """
+
+    def __init__(
+        self,
+        actual_input: Any,
+        actual_type: str,
+        expected_type: str,
+        message: str,
+    ) -> None:
+        super().__init__(message)
+        self.actual_input = actual_input
+        self.actual_type = actual_type
+        self.expected_type = expected_type
+
+
+class CpfGeneratorOptionsTypeError(CpfGeneratorTypeError):
+    """Error raised when a generator option has an invalid type.
+
+    The error message includes the ``option_name``, ``actual_type``, and
+    ``expected_type``.
+    """
+
+    def __init__(
+        self,
+        option_name: str,
+        actual_input: Any,
+        expected_type: str,
+    ) -> None:
+        actual_type = _describe_actual_type(actual_input)
 
         super().__init__(
-            f"The prefix length must be less than or equal to {max_length}. Got {prefix_length}."
+            actual_input,
+            actual_type,
+            expected_type,
+            f'CPF generator option "{option_name}" must be of type '
+            f"{expected_type}. Got {actual_type}.",
         )
+        self.option_name = option_name
 
 
-class CpfGeneratorPrefixNotValidError(CpfGeneratorError):
-    """Raised when the prefix is not valid (e.g., repeated digits)."""
+class CpfGeneratorException(Exception, ABC):
+    """Base exception for all ``cpf-gen`` rules-related errors.
 
-    def __init__(self, actual_prefix: str | list[str] | list[int], reason: str) -> None:
-        self.actual_prefix = actual_prefix
+    This abstract class extends the native :class:`Exception` and serves as the
+    base for all non-type-related errors in
+    :class:`~cpf_gen.cpf_generator.CpfGenerator` and its dependencies. Suitable
+    for validation errors, range errors, and other business logic exceptions
+    that are not type-related.
+    """
+
+
+class CpfGeneratorOptionPrefixInvalidException(CpfGeneratorException):
+    """Exception raised when the ``prefix`` option is invalid.
+
+    Carries ``actual_input`` and ``reason``. This is a business logic
+    exception; callers should catch it and handle it appropriately.
+    """
+
+    def __init__(self, actual_input: str, reason: str) -> None:
+        super().__init__(
+            f'CPF generator option "prefix" with value "{actual_input}" is invalid. {reason}'
+        )
+        self.actual_input = actual_input
         self.reason = reason
 
-        super().__init__(f'The prefix "{actual_prefix}" is invalid. {reason}')
+
+__all__ = [
+    "CpfGeneratorException",
+    "CpfGeneratorOptionPrefixInvalidException",
+    "CpfGeneratorOptionsTypeError",
+    "CpfGeneratorTypeError",
+]
