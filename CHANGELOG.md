@@ -1,5 +1,11 @@
 # cpf-val
 
+## 2.0.0
+
+### Improvements
+
+- **requires-python** — Declares support for Python `>=3.10,<4.0`.
+
 ## 1.0.2
 
 ### Patch Changes
