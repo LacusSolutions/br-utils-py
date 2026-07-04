@@ -145,9 +145,9 @@ options.all      # snapshot imutável e superficial das opções atuais
 
 Este pacote usa subclasses de **TypeError** para tipos de opção inválidos e subclasses de **Exception** para valores de opção inválidos (ex.: `prefix`). Você pode capturar classes específicas ou os tipos base.
 
-- **CpfGeneratorTypeError** (_abstrata_) — base para erros de tipo de opção
+- **CpfGeneratorTypeError** — base para erros de tipo de opção
 - **CpfGeneratorOptionsTypeError** — uma opção tem o tipo errado (ex.: `prefix` não é string)
-- **CpfGeneratorException** (_abstrata_) — base para exceções de valor de opção
+- **CpfGeneratorException** — base para exceções de valor de opção
 - **CpfGeneratorOptionPrefixInvalidException** — prefixo inválido (ex.: base zerada, dígitos repetidos)
 
 ```python
