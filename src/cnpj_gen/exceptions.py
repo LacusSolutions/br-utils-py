@@ -12,7 +12,6 @@ The package distinguishes between **errors** and **exceptions**:
 
 from __future__ import annotations
 
-from abc import ABC
 from typing import Any
 
 from lacus.utils import describe_type
@@ -28,10 +27,10 @@ def _describe_actual_type(value: Any) -> str:
     return actual_type
 
 
-class CnpjGeneratorTypeError(TypeError, ABC):
+class CnpjGeneratorTypeError(TypeError):
     """Base error for all ``cnpj-gen`` type-related errors.
 
-    This abstract class extends the native :class:`TypeError` and serves
+    This base class extends the native :class:`TypeError` and serves
     as the base for all type validation errors in the CNPJ generator. It
     stores ``actual_input``, ``actual_type``, and ``expected_type``.
     """
@@ -74,10 +73,10 @@ class CnpjGeneratorOptionsTypeError(CnpjGeneratorTypeError):
         self.option_name = option_name
 
 
-class CnpjGeneratorException(Exception, ABC):
+class CnpjGeneratorException(Exception):
     """Base exception for all ``cnpj-gen`` rules-related errors.
 
-    This abstract class extends the native :class:`Exception` and serves
+    This base class extends the native :class:`Exception` and serves
     as the base for all non-type-related errors in
     :class:`~cnpj_gen.cnpj_generator.CnpjGenerator` and its
     dependencies. Suitable for validation errors, range errors, and

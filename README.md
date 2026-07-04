@@ -154,9 +154,9 @@ options.all      # immutable shallow snapshot of current options
 
 This package uses **TypeError** subclasses for invalid option types and **Exception** subclasses for invalid option values (`prefix` or `type`). You can catch specific classes or the base types.
 
-- **CnpjGeneratorTypeError** (_abstract_) — base for option type errors
+- **CnpjGeneratorTypeError** — base for option type errors
 - **CnpjGeneratorOptionsTypeError** — an option has the wrong type (e.g. `prefix` not a string)
-- **CnpjGeneratorException** (_abstract_) — base for option value exceptions
+- **CnpjGeneratorException** — base for option value exceptions
 - **CnpjGeneratorOptionPrefixInvalidException** — prefix invalid (e.g. all-zero base/branch, repeated digits)
 - **CnpjGeneratorOptionTypeInvalidException** — `type` is not one of `'numeric'`, `'alphabetic'`, `'alphanumeric'`
 
