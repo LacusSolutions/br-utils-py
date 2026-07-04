@@ -18,7 +18,7 @@
 
 ### New features
 
-- **Exception hierarchy** — `CpfValidatorTypeError` (abstract), `CpfValidatorInputTypeError`, and `CpfValidatorException` (abstract base).
+- **Exception hierarchy** — `CpfValidatorTypeError`, `CpfValidatorInputTypeError`, and `CpfValidatorException` base classes for typed input errors.
 - **Sequence input** — A `Sequence[str]` is joined and validated like a single string via the `CpfInput` alias.
 - **`CPF_LENGTH` constant** — The `11`-digit CPF length constant is now part of the public API.
 
@@ -26,6 +26,7 @@
 
 - **requires-python** — Declares support for Python `>=3.10,<4.0`.
 - **Check digits** — Compares sanitized input to `CpfCheckDigits(...).cpf` from `cpf-dv` 2.x, which also rejects repeated-digit bases.
+- **Exception bases** — Typed error base classes no longer inherit unused `ABC`; aligns with sibling packages and README wording.
 
 ## 1.0.1
 
