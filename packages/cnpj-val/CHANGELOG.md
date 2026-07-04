@@ -1,5 +1,11 @@
 # cnpj-val
 
+## 2.0.2
+
+### Patch Changes
+
+- **Exception bases** — Typed error base classes no longer inherit `ABC`; aligns with `cpf-dv`/`cnpj-dv` and removes a misleading “abstract” label from the docs.
+
 ## 2.0.1
 
 ### Improvements
