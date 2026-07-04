@@ -104,7 +104,7 @@ cpf_val(['123.456', '789-09'])  # True
 Este pacote usa **TypeError** para tipos de entrada inválidos. Falhas de validação (comprimento incorreto, base inelegível como dígitos repetidos, dígitos verificadores inválidos) retornam `False` e não lançam exceção.
 
 - **Tipo de entrada incorreto** (não `str` nem sequência de `str`): **`CpfValidatorInputTypeError`** — estende **`CpfValidatorTypeError`** (estende `TypeError` nativo).
-- **`CpfValidatorException`** (_abstrata_): base para erros de regra de negócio (não relacionados a tipo); atualmente sem subclasse concreta neste pacote.
+- **`CpfValidatorException`**: base para erros de regra de negócio (não relacionados a tipo); atualmente sem subclasse concreta neste pacote.
 
 ```python
 from cpf_val import (

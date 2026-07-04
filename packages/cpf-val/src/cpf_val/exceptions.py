@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-from abc import ABC
 from typing import Any
 
 from lacus.utils import describe_type
 
 
-class CpfValidatorTypeError(TypeError, ABC):
+class CpfValidatorTypeError(TypeError):
     """Base error class for all ``cpf-val`` type-related errors.
 
-    This abstract class extends the native :class:`TypeError` and serves as the
+    This base class extends the native :class:`TypeError` and serves as the
     base for all type validation errors in the CPF validator.
     """
 
@@ -45,10 +44,10 @@ class CpfValidatorInputTypeError(CpfValidatorTypeError):
         )
 
 
-class CpfValidatorException(Exception, ABC):
+class CpfValidatorException(Exception):
     """Base exception for all ``cpf-val`` rules-related errors.
 
-    This abstract class extends the native :class:`Exception` and serves as the
+    This base class extends the native :class:`Exception` and serves as the
     base for all non-type-related errors in
     :class:`~cpf_val.cpf_validator.CpfValidator` and its dependencies. It is
     suitable for validation errors, range errors, and other business logic

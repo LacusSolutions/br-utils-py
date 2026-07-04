@@ -117,7 +117,7 @@ cpf_val(['123.456', '789-09'])  # True
 This package uses **TypeError** for invalid input types. Validation failures (wrong length, ineligible base such as repeated digits, invalid check digits) return `False` and do not throw.
 
 - **Wrong input type** (not `str` or a sequence of `str`): **`CpfValidatorInputTypeError`** — extends **`CpfValidatorTypeError`** (extends built-in `TypeError`).
-- **`CpfValidatorException`** (_abstract_): base for non-type (business) errors; currently has no concrete subclass in this package.
+- **`CpfValidatorException`**: base for non-type (business) errors; currently has no concrete subclass in this package.
 
 ```python
 from cpf_val import (
