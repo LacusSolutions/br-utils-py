@@ -10,7 +10,6 @@ signals incorrect API usage (the option is of the wrong *type*).
 
 from __future__ import annotations
 
-from abc import ABC
 from typing import Any
 
 from lacus.utils import describe_type
@@ -26,10 +25,10 @@ def _describe_actual_type(value: Any) -> str:
     return actual_type
 
 
-class CpfGeneratorTypeError(TypeError, ABC):
+class CpfGeneratorTypeError(TypeError):
     """Base error for all ``cpf-gen`` type-related errors.
 
-    This abstract class extends the native :class:`TypeError` and serves as the
+    This base class extends the native :class:`TypeError` and serves as the
     base for all type validation errors in the CPF generator. It stores
     ``actual_input``, ``actual_type``, and ``expected_type``.
     """
@@ -72,10 +71,10 @@ class CpfGeneratorOptionsTypeError(CpfGeneratorTypeError):
         self.option_name = option_name
 
 
-class CpfGeneratorException(Exception, ABC):
+class CpfGeneratorException(Exception):
     """Base exception for all ``cpf-gen`` rules-related errors.
 
-    This abstract class extends the native :class:`Exception` and serves as the
+    This base class extends the native :class:`Exception` and serves as the
     base for all non-type-related errors in
     :class:`~cpf_gen.cpf_generator.CpfGenerator` and its dependencies. Suitable
     for validation errors, range errors, and other business logic exceptions

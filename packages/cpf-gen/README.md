@@ -145,9 +145,9 @@ options.all      # immutable shallow snapshot of current options
 
 This package uses **TypeError** subclasses for invalid option types and **Exception** subclasses for invalid option values (e.g. `prefix`). You can catch specific classes or the base types.
 
-- **CpfGeneratorTypeError** (_abstract_) — base for option type errors
+- **CpfGeneratorTypeError** — base for option type errors
 - **CpfGeneratorOptionsTypeError** — an option has the wrong type (e.g. `prefix` not a string)
-- **CpfGeneratorException** (_abstract_) — base for option value exceptions
+- **CpfGeneratorException** — base for option value exceptions
 - **CpfGeneratorOptionPrefixInvalidException** — prefix invalid (e.g. zeroed base ID, repeated digits)
 
 ```python
