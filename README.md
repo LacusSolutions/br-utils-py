@@ -73,8 +73,9 @@ The main entry points are the class `CnpjFormatter`, the options class `CnpjForm
 
 ### `CnpjFormatterOptions`
 
-Holds all formatter settings. Construct with an optional options mapping or `CnpjFormatterOptions` instance, optional extra override objects (merged in order), and/or keyword arguments. Exposes properties: `hidden`, `hidden_key`, `hidden_start`, `hidden_end`, `dot_key`, `slash_key`, `dash_key`, `escape`, `encode`, `on_fail`.
+Holds all formatter settings, with validation and merge support. Exposes properties: `hidden`, `hidden_key`, `hidden_start`, `hidden_end`, `dot_key`, `slash_key`, `dash_key`, `escape`, `encode`, `on_fail`.
 
+- **`__init__(options=None, *extra_overrides, hidden=None, hidden_key=None, hidden_start=None, hidden_end=None, dot_key=None, slash_key=None, dash_key=None, escape=None, encode=None, on_fail=None)`**: Optional default options (plain mapping, `CnpjFormatterOptions` instance, or keyword arguments), plus extra override objects merged in order (later overrides win).
 - **`all`**: Returns a shallow copy of all current options.
 - **`copy()`**: Returns a shallow copy of this options instance.
 - **`set(options)`**: Updates multiple fields at once; returns `self`. Accepts a mapping or another `CnpjFormatterOptions` instance.
