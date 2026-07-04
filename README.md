@@ -132,7 +132,7 @@ options.set({'format': False})  # merge and return self
 options.all      # immutable shallow snapshot of current options
 ```
 
-- **`__init__(default_options=None, *overrides, format=None, prefix=None, type=None)`**: Options merged in order (later overrides win).
+- **`__init__(options=None, *extra_overrides, format=None, prefix=None, type=None)`**: Options merged in order (later overrides win).
 - **`format`**, **`prefix`**, **`type`**: Properties with setters; `prefix` is validated (base/branch ineligible, repeated digits).
 - **`set(options)`**: Update multiple options at once; omitted fields keep their current value; returns `self`.
 - **`all`**: Read-only snapshot of current options (`MappingProxyType`).
