@@ -57,8 +57,9 @@ Os pontos principais são a classe `CpfFormatter`, a classe de opções `CpfForm
 
 ### `CpfFormatterOptions`
 
-Armazena todas as configurações do formatador. Construa com um mapeamento opcional ou instância de `CpfFormatterOptions`, objetos extras de sobrescrita (mesclados em ordem) e/ou argumentos nomeados. Expõe propriedades: `hidden`, `hidden_key`, `hidden_start`, `hidden_end`, `dot_key`, `dash_key`, `escape`, `encode`, `on_fail`.
+Armazena todas as configurações do formatador, com validação e suporte a mesclagem. Expõe propriedades: `hidden`, `hidden_key`, `hidden_start`, `hidden_end`, `dot_key`, `dash_key`, `escape`, `encode`, `on_fail`.
 
+- **`__init__(options=None, *extra_overrides, hidden=None, hidden_key=None, hidden_start=None, hidden_end=None, dot_key=None, dash_key=None, escape=None, encode=None, on_fail=None)`**: Opções padrão opcionais (mapeamento simples, instância de `CpfFormatterOptions` ou argumentos nomeados), além de objetos extras de sobrescrita mesclados em ordem (as últimas sobrescritas prevalecem).
 - **`all`**: Retorna uma cópia superficial de todas as opções atuais.
 - **`copy()`**: Retorna uma cópia superficial desta instância de opções.
 - **`set(options)`**: Atualiza vários campos de uma vez; retorna `self`. Aceita um mapeamento ou outra instância de `CpfFormatterOptions`.
