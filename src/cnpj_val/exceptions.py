@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC
 from typing import Any
 
 from lacus.utils import describe_type
@@ -18,10 +17,10 @@ def _describe_actual_type(value: Any) -> str:
     return actual_type
 
 
-class CnpjValidatorTypeError(TypeError, ABC):
+class CnpjValidatorTypeError(TypeError):
     """Base error class for all ``cnpj-val`` type-related errors.
 
-    This abstract class extends the native :class:`TypeError` and serves as the
+    This base class extends the native :class:`TypeError` and serves as the
     base for all type validation errors in the CNPJ validator.
     """
 
@@ -79,10 +78,10 @@ class CnpjValidatorOptionsTypeError(CnpjValidatorTypeError):
         self.option_name = option_name
 
 
-class CnpjValidatorException(Exception, ABC):
+class CnpjValidatorException(Exception):
     """Base exception for all ``cnpj-val`` rules-related errors.
 
-    This abstract class extends the native :class:`Exception` and serves
+    This base class extends the native :class:`Exception` and serves
     as the base for all non-type-related errors in
     :class:`~cnpj_val.cnpj_validator.CnpjValidator` and its
     dependencies. It is suitable for validation errors, range errors, and other
