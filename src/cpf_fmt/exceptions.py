@@ -12,7 +12,6 @@ The package distinguishes between **errors** and **exceptions**:
 
 from __future__ import annotations
 
-from abc import ABC
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
@@ -22,10 +21,10 @@ if TYPE_CHECKING:
     from .types import CpfInput
 
 
-class CpfFormatterTypeError(TypeError, ABC):
+class CpfFormatterTypeError(TypeError):
     """Base error for all ``cpf-fmt`` type-related errors.
 
-    This abstract class extends the native :class:`TypeError` and serves
+    This base class extends the native :class:`TypeError` and serves
     as the base for all type validation errors in the CPF formatter. It
     ensures proper inheritance and stores the actual input, actual type,
     and expected type.
@@ -87,10 +86,10 @@ class CpfFormatterOptionsTypeError(CpfFormatterTypeError):
         self.option_name = option_name
 
 
-class CpfFormatterException(Exception, ABC):
+class CpfFormatterException(Exception):
     """Base exception for all ``cpf-fmt`` rules-related errors.
 
-    This abstract class extends the native :class:`Exception` and serves
+    This base class extends the native :class:`Exception` and serves
     as the base for all non-type-related errors in the
     :class:`~cpf_fmt.cpf_formatter.CpfFormatter` and its dependencies. It
     is suitable for validation errors, range errors, and other business
