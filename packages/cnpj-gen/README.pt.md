@@ -132,7 +132,7 @@ options.set({'format': False})  # mescla e retorna self
 options.all      # snapshot imutável e superficial das opções atuais
 ```
 
-- **`__init__(default_options=None, *overrides, format=None, prefix=None, type=None)`**: Opções mescladas em ordem (as últimas sobrescritas prevalecem).
+- **`__init__(options=None, *extra_overrides, format=None, prefix=None, type=None)`**: Opções mescladas em ordem (as últimas sobrescritas prevalecem).
 - **`format`**, **`prefix`**, **`type`**: Propriedades com setters; `prefix` é validado (base/filial inelegíveis, dígitos repetidos).
 - **`set(options)`**: Atualiza várias opções de uma vez; campos omitidos mantêm o valor atual; retorna `self`.
 - **`all`**: Snapshot somente leitura das opções atuais (`MappingProxyType`).
@@ -154,9 +154,9 @@ options.all      # snapshot imutável e superficial das opções atuais
 
 Este pacote usa subclasses de **TypeError** para tipos de opção inválidos e subclasses de **Exception** para valores de opção inválidos (`prefix` ou `type`). Você pode capturar classes específicas ou os tipos base.
 
-- **CnpjGeneratorTypeError** (_abstrata_) — base para erros de tipo de opção
+- **CnpjGeneratorTypeError** — base para erros de tipo de opção
 - **CnpjGeneratorOptionsTypeError** — uma opção tem o tipo errado (ex.: `prefix` não é string)
-- **CnpjGeneratorException** (_abstrata_) — base para exceções de valor de opção
+- **CnpjGeneratorException** — base para exceções de valor de opção
 - **CnpjGeneratorOptionPrefixInvalidException** — prefixo inválido (ex.: base/filial zerada, dígitos repetidos)
 - **CnpjGeneratorOptionTypeInvalidException** — `type` não é um de `'numeric'`, `'alphabetic'`, `'alphanumeric'`
 
