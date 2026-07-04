@@ -4,6 +4,7 @@
 
 ### Patch Changes
 
+- **Constructor parameter** — Rename `CnpjValidator.__init__` first parameter from `default_options` to `options`, matching `is_valid()`, `cnpj_val()`, and sibling packages.
 - **Exception bases** — Typed error base classes no longer inherit `ABC`; aligns with `cpf-dv`/`cnpj-dv` and removes a misleading “abstract” label from the docs.
 
 ## 2.0.1

@@ -35,7 +35,7 @@ class CnpjValidator:
 
     def __init__(
         self,
-        default_options: CnpjValidatorOptionsInput = None,
+        options: CnpjValidatorOptionsInput = None,
         *,
         case_sensitive: bool | None = None,
         type: CnpjType | None = None,
@@ -46,7 +46,7 @@ class CnpjValidator:
         overridden by the per-call ``options`` argument. Options control case
         sensitivity and whether the CNPJ input is alphanumeric or numeric.
 
-        When ``default_options`` is a :class:`CnpjValidatorOptions` instance,
+        When ``options`` is a :class:`CnpjValidatorOptions` instance,
         that instance is used directly (no copy is created). Mutating it later
         (e.g. via the :attr:`options` property or the original reference)
         affects future :meth:`is_valid` calls that do not pass per-call
@@ -59,11 +59,11 @@ class CnpjValidator:
             ``CnpjValidatorOptionTypeInvalidException``: If the ``type`` option
                 is not one of the allowed values.
         """
-        if isinstance(default_options, CnpjValidatorOptions):
-            self._options = default_options
+        if isinstance(options, CnpjValidatorOptions):
+            self._options = options
         else:
             self._options = CnpjValidatorOptions(
-                default_options,
+                options,
                 case_sensitive=case_sensitive,
                 type=type,
             )
