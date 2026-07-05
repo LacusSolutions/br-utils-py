@@ -18,7 +18,7 @@
 
 ### New features
 
-- **Exception hierarchy** — `CpfValidatorTypeError`, `CpfValidatorInputTypeError`, and `CpfValidatorException` base classes for typed input errors.
+- **Exception hierarchy** — `CpfValidatorTypeError` and `CpfValidatorInputTypeError` for typed input errors; `CpfValidatorException` as the base for non-type validation errors.
 - **Sequence input** — A `Sequence[str]` is joined and validated like a single string via the `CpfInput` alias.
 - **`CPF_LENGTH` constant** — The `11`-digit CPF length constant is now part of the public API.
 
