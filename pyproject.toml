@@ -1,7 +1,7 @@
 [project]
 name = "br-utilities"
 dynamic = [ "version" ]
-description = "Utility resources to deal with Brazilian-related data."
+description = "Utilities to deal with Brazilian-related data"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -44,8 +44,8 @@ classifiers = [
 ]
 requires-python = ">=3.10,<4.0"
 dependencies = [
-  "cnpj-utils>=2.0.0,<3.0.0",
-  "cpf-utils>=1.0.1,<2.0.0",
+  "cnpj-utils>=2.0.2,<2.1.0",
+  "cpf-utils>=2.0.0,<2.1.0",
 ]
 
   [[project.authors]]
@@ -56,7 +56,7 @@ dependencies = [
   content-type = "text/markdown"
 
   [project.urls]
-  Homepage = "https://cnpj-utils.vercel.app/"
+  Homepage = "https://br-utils.vercel.app/"
   Source = "https://github.com/LacusSolutions/br-utils-py"
   Tracker = "https://github.com/LacusSolutions/br-utils-py/issues"
 
