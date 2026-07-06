@@ -1,7 +1,7 @@
 [project]
 name = "cpf-utils"
 dynamic = [ "version" ]
-description = "Utility functions to deal with CPF data (Brazilian personal ID)"
+description = "Utilities to deal with CPF (Brazilian Individual's Taxpayer ID)"
 license = "MIT"
 license-files = [ "LICENSE" ]
 keywords = [
@@ -39,9 +39,9 @@ classifiers = [
 ]
 requires-python = ">=3.10,<4.0"
 dependencies = [
-  "cpf-fmt>=1.0.0,<2.0.0",
-  "cpf-gen>=1.0.1,<2.0.0",
-  "cpf-val>=1.0.1,<2.0.0",
+  "cpf-fmt>=2.0.1,<2.1.0",
+  "cpf-gen>=2.0.0,<2.1.0",
+  "cpf-val>=2.0.0,<2.1.0",
 ]
 
   [[project.authors]]
