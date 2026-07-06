@@ -11,7 +11,7 @@
 ### BREAKING CHANGES
 
 - **Keyword-only constructor** — `CpfUtils` parameters are keyword-only (`formatter`, `generator`, `validator`); positional `CpfFormatterOptions` / `CpfGeneratorOptions` arguments no longer work.
-- **Dependencies** — Requires `cpf-fmt` and `cpf-gen` v2; upgrade the CPF stack together with this package.
+- **Dependencies** — Requires `cpf-fmt`, `cpf-gen`, and `cpf-val` v2; upgrade the CPF stack together with this package.
 - **Legacy aliases** — Removed `CpfFormatterError`, `CpfGeneratorError`, and related alias names; use the `*Exception` types from bundled components.
 - **Method signatures** — `format()` and `generate()` accept an optional options object plus keyword overrides instead of v1 positional option parameters; `format()` accepts `str | Sequence[str]`.
 
