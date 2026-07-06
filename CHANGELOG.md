@@ -2,11 +2,17 @@
 
 ## 2.0.0
 
+### 🎉 v2 at a glance 🎊
+
+- 🆕 **Alphanumeric CNPJ** — `br_utils.cnpj` supports 14-character alphanumeric IDs via upgraded `cnpj-utils` v2.
+- 🏗️ **`BrUtils` v2** — Constructor accepts `cpf`/`cnpj` instances or config mappings (including `cnpj_validator`); property setters swap utils after construction.
+- 📦 **Full v2 re-exports** — `br_utils.cpf` and `br_utils.cnpj` expose the complete v2 component surface (classes, `*Options`, helpers, typed exceptions).
+
 ### BREAKING CHANGES
 
-- **CNPJ re-exports** — `br_utils.cnpj` now mirrors `cnpj-utils` v2 (`*Exception` types, validator options, and full component surface); legacy `*Error` alias names are removed.
-- **CPF re-exports** — `br_utils.cpf` now mirrors `cpf-utils` v2 (`*Exception` types and full component surface); legacy `*Error` alias names are removed.
-- **Dependencies** — Requires `cnpj-utils` v2 (with `cnpj-fmt`, `cnpj-gen`, and `cnpj-val` v2) and `cpf-utils` v2 (with `cpf-fmt` v2).
+- **CPF re-exports** — Legacy `*Error` alias names removed; `br_utils.cpf` mirrors `cpf-utils` v2 (`*Exception` types, `encode`, keyword-only options, `str | Sequence[str]` input).
+- **CNPJ re-exports** — Legacy `*Error` alias names removed; `br_utils.cnpj` mirrors `cnpj-utils` v2 (`CnpjValidatorOptions`, alphanumeric default generation, typed exceptions).
+- **Dependencies** — Requires `cpf-utils` `>=2.0.0,<2.1.0` and `cnpj-utils` `>=2.0.2,<2.1.0`.
 
 ### Improvements
 
