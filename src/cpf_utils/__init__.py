@@ -25,7 +25,13 @@ from cpf_gen import (
     CpfGeneratorTypeError,
     cpf_gen,
 )
-from cpf_val import CpfValidator, cpf_val
+from cpf_val import (
+    CpfValidator,
+    CpfValidatorException,
+    CpfValidatorInputTypeError,
+    CpfValidatorTypeError,
+    cpf_val,
+)
 
 from .cpf_utils import CpfUtils
 
@@ -47,6 +53,9 @@ __all__ = [
     "CpfGeneratorTypeError",
     "CpfUtils",
     "CpfValidator",
+    "CpfValidatorException",
+    "CpfValidatorInputTypeError",
+    "CpfValidatorTypeError",
     "cpf_fmt",
     "cpf_gen",
     "cpf_utils",
@@ -56,6 +65,6 @@ __all__ = [
 __version__ = "0.0.0"
 
 cpf_utils = CpfUtils()
-"""Default :class:`CpfUtils` instance with default formatter,
-generator, and validator options.
+"""Default :class:`CpfUtils` instance with default formatter, generator and
+validator options.
 """
