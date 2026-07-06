@@ -1,3 +1,9 @@
+"""CNPJ utilities re-exported from :mod:`cnpj_utils`.
+
+Re-exports component classes, options, exceptions, helpers, and the default
+:data:`cnpj_utils` instance of :class:`CnpjUtils`.
+"""
+
 from cnpj_utils import (
     CnpjFormatter,
     CnpjFormatterException,
@@ -50,6 +56,7 @@ __all__ = [
     "CnpjValidator",
     "CnpjValidatorException",
     "CnpjValidatorInputTypeError",
+    "CnpjValidatorOptionTypeInvalidException",
     "CnpjValidatorOptions",
     "CnpjValidatorOptionsTypeError",
     "CnpjValidatorTypeError",
