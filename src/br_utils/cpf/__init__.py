@@ -1,3 +1,9 @@
+"""CPF utilities re-exported from :mod:`cpf_utils`.
+
+Re-exports component classes, options, exceptions, helpers, and the default
+:data:`cpf_utils` instance of :class:`CpfUtils`.
+"""
+
 from cpf_utils import (
     CpfFormatter,
     CpfFormatterException,
@@ -16,6 +22,9 @@ from cpf_utils import (
     CpfGeneratorTypeError,
     CpfUtils,
     CpfValidator,
+    CpfValidatorException,
+    CpfValidatorInputTypeError,
+    CpfValidatorTypeError,
     cpf_fmt,
     cpf_gen,
     cpf_utils,
@@ -40,6 +49,9 @@ __all__ = [
     "CpfGeneratorTypeError",
     "CpfUtils",
     "CpfValidator",
+    "CpfValidatorException",
+    "CpfValidatorInputTypeError",
+    "CpfValidatorTypeError",
     "cpf_fmt",
     "cpf_gen",
     "cpf_utils",
