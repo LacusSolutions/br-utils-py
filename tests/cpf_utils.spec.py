@@ -804,12 +804,14 @@ def describe_cpf_utils():
         def describe_generate_contexts():
             @pytest.mark.parametrize("generate", GENERATE_FACTORIES)
             def it_matches_cpf_generator_generate_behavior(generate: GenerateFn):
-                generator = CpfGenerator()
+                validator = CpfValidator()
+                reference = CpfGenerator().generate()
 
                 result = generate()
 
-                assert re.fullmatch(r"^\d{11}$", result)
-                assert len(result) == len(generator.generate())
+                for value in (result, reference):
+                    assert re.fullmatch(r"^\d{11}$", value)
+                    assert validator.is_valid(value) is True
 
             @pytest.mark.parametrize("generate", GENERATE_FACTORIES)
             def it_forwards_generation_options(generate: GenerateFn):
