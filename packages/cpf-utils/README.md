@@ -7,13 +7,25 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Toolkit to deal with CPF data (Brazilian personal ID): validation, formatting and generation of valid IDs.
+> 🌎 [Acessar documentação em português](./README.pt.md)
+
+Utilities to deal with CPF (Brazilian Individual's Taxpayer ID). This package wraps [`cpf-fmt`](https://pypi.org/project/cpf-fmt), [`cpf-gen`](https://pypi.org/project/cpf-gen), and [`cpf-val`](https://pypi.org/project/cpf-val) in a single API and re-exports their public resources.
 
 ## Python Support
 
 | ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
+
+## Features
+
+- ✅ **Unified API**: One default instance with `format`, `generate`, and `is_valid`; or use the underlying `cpf_fmt`, `cpf_gen`, and `cpf_val` helpers
+- ✅ **Reusable instance**: `CpfUtils` class with optional default settings (formatter, generator, validator options or instances)
+- ✅ **Full re-exports**: All formatter, generator, and validator classes, options, and exceptions from the three component packages
+- ✅ **Type hints**: Built for Python 3.10+ with full type annotations
+- ✅ **Flexible input**: `format()` and `is_valid()` accept `str` or a sequence of `str` (elements concatenated in order)
+- ✅ **Per-call overrides**: Instance defaults plus keyword or mapping overrides on each method call
+- ✅ **Error handling**: Same type errors and exceptions as the underlying packages
 
 ## Installation
 
@@ -21,253 +33,213 @@ Toolkit to deal with CPF data (Brazilian personal ID): validation, formatting an
 $ pip install cpf-utils
 ```
 
-## Import
+This installs **`cpf-utils`** together with [`cpf-fmt`](https://pypi.org/project/cpf-fmt), [`cpf-gen`](https://pypi.org/project/cpf-gen), and [`cpf-val`](https://pypi.org/project/cpf-val). You do **not** need separate `pip install` calls for the component packages when using **`cpf-utils`**.
+
+## Quick Start
 
 ```python
-# Using class-based resource
-from cpf_utils import CpfUtils
+from cpf_utils import CpfUtils, cpf_fmt, cpf_gen, cpf_val, cpf_utils
+```
 
-# Or using function-based approach
-from cpf_utils import cpf_fmt, cpf_gen, cpf_val
+Basic usage with the default singleton:
 
-# Or using the default instance
+```python
 from cpf_utils import cpf_utils
+
+cpf = '12345678909'
+
+cpf_utils.format(cpf)                # '123.456.789-09'
+cpf_utils.format(cpf, hidden=True)   # '123.***.***-**'
+cpf_utils.format(                     # '123456789_09'
+    cpf,
+    dot_key='',
+    dash_key='_',
+)
+
+cpf_utils.generate()                   # e.g. '47844241055' (11-digit numeric)
+cpf_utils.generate(format=True)        # e.g. '478.442.410-55'
+cpf_utils.generate(prefix='528250911') # e.g. '52825091138'
+
+cpf_utils.is_valid('12345678909')      # True
+cpf_utils.is_valid('123.456.789-09')   # True
+cpf_utils.is_valid('12345678900')      # False
 ```
 
 ## Usage
 
-### Object-Oriented Usage
+You can work in three equivalent ways:
 
-The `CpfUtils` class provides a unified interface for all CPF operations:
+1. **`cpf_utils`** — pre-built singleton for quick one-off calls.
+2. **`CpfUtils`** — configurable instance with shared defaults across format, generate, and validate.
+3. **Component classes and helpers** — `CpfFormatter`, `CpfGenerator`, `CpfValidator`, and `cpf_fmt()`, `cpf_gen()`, `cpf_val()` (same classes used internally by `CpfUtils`).
+
+All three approaches expose the same options and behavior. For exhaustive option tables and component-specific details, see the README of each [bundled package](#bundled-packages).
+
+### Formatter options
+
+When calling `format(cpf_input, options=None, …)`, all options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `hidden` | `bool` | `False` | When `True`, mask digits in `hidden_start`–`hidden_end` with `hidden_key` |
+| `hidden_key` | `str` | `'*'` | Character(s) used to replace masked digits |
+| `hidden_start` | `int` | `3` | Start index (0–10, inclusive) of the range to hide |
+| `hidden_end` | `int` | `10` | End index (0–10, inclusive) of the range to hide |
+| `dot_key` | `str` | `'.'` | Dot delimiter (e.g. in `123.456.789`) |
+| `dash_key` | `str` | `'-'` | Dash delimiter (e.g. before check digits `…-09`) |
+| `escape` | `bool` | `False` | When `True`, escape HTML special characters in the result |
+| `encode` | `bool` | `False` | When `True`, URL-encode the result (similar to JavaScript `encodeURIComponent`) |
+| `on_fail` | `Callable` | returns `''` | Callback when sanitized input length ≠ 11; return value is used as result |
+
+### Generator options
+
+When calling `generate(options=None, …)`, all options are optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CPF in standard format (`000.000.000-00`) |
+| `prefix` | `str` | `''` | Partial start string (0–9 digits). Non-digits are stripped; missing characters are generated and check digits computed. Prefixes longer than 9 digits are truncated silently. |
+
+Prefix rules: the base (first 9 digits) cannot be all zeros; 9 repeated digits (e.g. `999999999`) are not allowed.
+
+### `cpf_utils` (default instance)
+
+The module-level `cpf_utils` is a pre-built `CpfUtils` instance. Use it for quick one-off calls:
+
+- **`format(cpf_input, options=None, …)`**: Formats a CPF string or sequence of strings. Delegates to the internal formatter. Input must be 11 digits (after sanitization); otherwise `on_fail` is used.
+- **`generate(options=None, …)`**: Generates a valid CPF. Delegates to the internal generator.
+- **`is_valid(cpf_input)`**: Returns `True` if the CPF is valid. Delegates to the internal validator. No per-call options — the CPF validator has none.
+
+### `CpfUtils` (class)
+
+For custom default formatter, generator, or validator, create your own instance:
 
 ```python
-cpf_utils = CpfUtils()
-cpf = '93247057062'
+from cpf_utils import CpfUtils
 
-# Format CPF
-print(cpf_utils.format(cpf))       # returns '932.470.570-62'
-
-# Validate CPF
-print(cpf_utils.is_valid(cpf))      # returns True
-
-# Generate CPF
-print(cpf_utils.generate())          # returns '65453043078'
-```
-
-#### With Configuration Options
-
-You can configure the formatter and generator options in the constructor:
-
-```python
-from cpf_fmt import CpfFormatterOptions
-from cpf_gen import CpfGeneratorOptions
-
-cpf_utils = CpfUtils(
-    formatter=CpfFormatterOptions(
-        hidden=True,
-        hidden_key='#',
-        hidden_start=3,
-        hidden_end=10
-    ),
-    generator=CpfGeneratorOptions(format=True)
+utils = CpfUtils(
+    formatter={'hidden': True, 'hidden_key': '#'},
+    generator={'format': True, 'prefix': '123'},
 )
 
-cpf = '93247057062'
-print(cpf_utils.format(cpf))       # returns '932.###.###-##'
-print(cpf_utils.generate())          # returns '730.085.350-06'
+utils.format('47844241055')        # '478.###.###-##'
+utils.generate()                   # e.g. '005.265.352-88'
+utils.is_valid('123.456.789-09')   # True
+
+# Access or replace internal instances
+utils.formatter  # CpfFormatter
+utils.generator  # CpfGenerator
+utils.validator  # CpfValidator
 ```
 
-The options can be provided to the constructor or the respective methods. If passed to the constructor, the options will be attached to the `CpfUtils` instance. When passed to the methods, it only applies the options to that specific call.
+- **`__init__(*, formatter=None, generator=None, validator=None)`**: Each keyword may be an options mapping, a `CpfFormatterOptions` / `CpfGeneratorOptions` instance (stored by reference — mutating it later affects subsequent calls with no per-call override), a component instance, or omitted for defaults. Passing `None` for a component creates a new instance with default options.
+- **`format(cpf_input, options=None, …)`**: Same as the default instance; per-call options override the formatter's defaults for that call only.
+- **`generate(options=None, …)`**: Same as the default instance; per-call options override the generator's defaults.
+- **`is_valid(cpf_input)`**: Same as the default instance. No per-call options.
+- **`formatter`**, **`generator`**, **`validator`**: Properties with getters and setters for the internal formatter, generator, and validator. Setters accept the same shapes as the constructor. To change a single option without replacing the instance, mutate the component's options (e.g. `utils.formatter.options.hidden = True`).
+
+Instance defaults and per-call overrides:
 
 ```python
-cpf_utils = CpfUtils(
-    formatter=CpfFormatterOptions(hidden=True)
+utils = CpfUtils(
+    formatter={'hidden': True, 'hidden_key': '#'},
+    generator={'format': True},
 )
 
-cpf = '93247057062'
-print(cpf_utils.format(cpf))                  # '932.***.***.***-**'
-print(cpf_utils.format(cpf, hidden=False))    # '932.470.570-62' (overrides instance options)
-print(cpf_utils.format(cpf))                  # '932.***.***.***-**' (uses instance options again)
+cpf = '12345678909'
+
+utils.format(cpf)                 # masked (instance formatter defaults)
+utils.format(cpf, hidden=False)   # this call only: unmasked
+utils.generate(format=False)      # this call only: compact output
 ```
 
-### Functional Programming
-
-The package also provides standalone functions for each operation:
+Options can also be passed as a mapping on each method:
 
 ```python
-cpf = '93247057062'
-
-# Format CPF
-print(cpf_fmt(cpf))                 # returns '932.470.570-62'
-
-# Validate CPF
-print(cpf_val(cpf))                 # returns True
-
-# Generate CPF
-print(cpf_gen())                     # returns '65453043078'
+utils.format(cpf, {'dot_key': '|'})
+utils.generate({'prefix': '123456', 'format': True})
 ```
 
-Or use the default instance:
+### Using the underlying helpers and classes
+
+You can use the re-exported formatter, generator, and validator directly:
 
 ```python
-from cpf_utils import cpf_utils
+from cpf_utils import (
+    cpf_fmt,
+    CpfFormatter,
+    cpf_gen,
+    CpfGenerator,
+    cpf_val,
+    CpfValidator,
+)
 
-cpf = '93247057062'
-print(cpf_utils.format(cpf))        # returns '932.470.570-62'
-print(cpf_utils.is_valid(cpf))      # returns True
-print(cpf_utils.generate())          # returns '65453043078'
+cpf_fmt('47844241055', dash_key='_')   # '478.442.410_55'
+cpf_gen(prefix='123456')               # e.g. '12345678901'
+cpf_val('123.456.789-09')              # True
+
+formatter = CpfFormatter({'hidden': True})
+formatter.format('47844241055')        # '478.***.***-**'
 ```
 
-## API Reference
+See [`cpf-fmt`](./../cpf-fmt/README.md), [`cpf-gen`](./../cpf-gen/README.md), and [`cpf-val`](./../cpf-val/README.md) for full option and error details.
 
-### Formatting (`cpf_fmt` / `CpfUtils.format`)
+## API
 
-Formats a CPF string with customizable delimiters and masking options.
+### Exports
+
+- **`cpf_utils`**: Pre-built `CpfUtils` instance with `format`, `generate`, and `is_valid`.
+- **`CpfUtils`**: Class to create a utils instance with optional default formatter, generator, and validator settings.
+- **Formatter**: `cpf_fmt`, `CpfFormatter`, `CpfFormatterOptions`, and formatter exceptions (see [cpf-fmt](./../cpf-fmt/README.md)).
+- **Generator**: `cpf_gen`, `CpfGenerator`, `CpfGeneratorOptions`, and generator exceptions (see [cpf-gen](./../cpf-gen/README.md)).
+- **Validator**: `cpf_val`, `CpfValidator`, and validator exceptions (see [cpf-val](./../cpf-val/README.md)).
+
+### Errors & Exceptions
+
+`CpfUtils` does not define its own exception types; it propagates errors from the bundled packages:
+
+- **Formatting**: `CpfFormatterInputTypeError`, `CpfFormatterOptionsTypeError`, `CpfFormatterOptionsHiddenRangeInvalidException`, `CpfFormatterOptionsForbiddenKeyCharacterException`, and related classes.
+- **Generation**: `CpfGeneratorOptionsTypeError`, `CpfGeneratorOptionPrefixInvalidException`, and related classes.
+- **Validation**: `CpfValidatorInputTypeError` and related classes.
+
+Invalid option types are **`TypeError`** subclasses; invalid option values are **`Exception`** subclasses. Validation failure returns `False`; formatting length failure is handled by **`on_fail`** (default returns an empty string).
 
 ```python
-cpf_utils.format(
-    cpf_string: str,
-    hidden: bool | None = None,
-    hidden_key: str | None = None,
-    hidden_start: int | None = None,
-    hidden_end: int | None = None,
-    dot_key: str | None = None,
-    dash_key: str | None = None,
-    escape: bool | None = None,
-    on_fail: Callable | None = None,
-) -> str
+from cpf_utils import CpfUtils, cpf_fmt
+from cpf_fmt import CpfFormatterInputTypeError
+from cpf_val import CpfValidatorInputTypeError
+
+try:
+    CpfUtils().format(12345)
+except CpfFormatterInputTypeError as e:
+    print(e)
+
+try:
+    CpfUtils().is_valid(12345678909)
+except CpfValidatorInputTypeError as e:
+    print(e)
+
+# Custom on_fail for invalid length
+def custom_fail(value, exception=None):
+    return f'Invalid CPF: {value}'
+
+cpf_fmt('123', on_fail=custom_fail)  # 'Invalid CPF: 123'
+cpf_fmt('123')                       # '' (default on_fail)
 ```
 
-**Parameters:**
+### Bundled packages
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `hidden` | `bool \| None` | `False` | Whether to hide digits with a mask |
-| `hidden_key` | `str \| None` | `'*'` | Character to replace hidden digits |
-| `hidden_start` | `int \| None` | `3` | Starting index for hidden range (0-10) |
-| `hidden_end` | `int \| None` | `10` | Ending index for hidden range (0-10) |
-| `dot_key` | `str \| None` | `'.'` | String to replace dot characters |
-| `dash_key` | `str \| None` | `'-'` | String to replace dash character |
-| `escape` | `bool \| None` | `False` | Whether to HTML escape the result |
-| `on_fail` | `Callable \| None` | `lambda value, error=None: value` | Fallback function for invalid input |
+| Package | Main resources | README |
+|---------|----------------|--------|
+| [`cpf-fmt`](https://pypi.org/project/cpf-fmt) | `CpfFormatter`, `CpfFormatterOptions`, `cpf_fmt()` | [docs](./../cpf-fmt/README.md) |
+| [`cpf-gen`](https://pypi.org/project/cpf-gen) | `CpfGenerator`, `CpfGeneratorOptions`, `cpf_gen()` | [docs](./../cpf-gen/README.md) |
+| [`cpf-val`](https://pypi.org/project/cpf-val) | `CpfValidator`, `cpf_val()` | [docs](./../cpf-val/README.md) |
 
-**Examples:**
-
-```python
-cpf = '93247057062'
-
-# Basic formatting
-print(cpf_fmt(cpf))                 # '932.470.570-62'
-
-# With hidden digits
-print(cpf_fmt(cpf, hidden=True))    # '932.***.***.***-**'
-
-# Custom delimiters
-print(cpf_fmt(cpf, dot_key='', dash_key='_'))  # '932470570_62'
-
-# Custom hidden range
-print(cpf_fmt(cpf, hidden=True, hidden_start=0, hidden_end=5, hidden_key='#'))  # '###.##0.570-62'
-```
-
-### Generation (`cpf_gen` / `CpfUtils.generate`)
-
-Generates valid CPF numbers with optional formatting and prefix completion.
-
-```python
-cpf_utils.generate(
-    format: bool | None = None,
-    prefix: str | None = None,
-) -> str
-```
-
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `format` | `bool \| None` | `False` | Whether to format the output |
-| `prefix` | `str \| None` | `''` | Prefix to complete with valid digits (1-9 digits) |
-
-**Examples:**
-
-```python
-# Generate random CPF
-print(cpf_gen())                     # '65453043078'
-
-# Generate formatted CPF
-print(cpf_gen(format=True))          # '730.085.350-06'
-
-# Complete a prefix
-print(cpf_gen(prefix='456237'))      # '45623741038'
-
-# Complete and format
-print(cpf_gen(prefix='456237410', format=True))  # '456.237.410-38'
-```
-
-### Validation (`cpf_val` / `CpfUtils.is_valid`)
-
-Validates CPF numbers using the official algorithm.
-
-```python
-cpf_utils.is_valid(cpf_string: str) -> bool
-```
-
-**Examples:**
-
-```python
-# Valid CPF
-print(cpf_val('93247057062'))        # True
-print(cpf_val('932.470.570-62'))     # True
-
-# Invalid CPF
-print(cpf_val('93247057063'))        # False
-```
-
-## Advanced Usage
-
-### Accessing Individual Components
-
-You can access the individual formatter, generator, and validator instances:
-
-```python
-cpf_utils = CpfUtils()
-
-# Access individual components
-formatter = cpf_utils.formatter
-generator = cpf_utils.generator
-validator = cpf_utils.validator
-
-# Use them directly
-formatter.format('93247057062', hidden=True)
-generator.generate(format=True)
-validator.is_valid('93247057062')
-```
-
-### Custom Error Handling
-
-```python
-cpf = '123'  # Invalid length
-
-# Custom fallback
-def custom_fail(value, error=None):
-    return f"Invalid CPF: {value}"
-
-print(cpf_fmt(cpf, on_fail=custom_fail))  # 'Invalid CPF: 123'
-
-# Return original value (default behavior)
-print(cpf_fmt(cpf))  # '123'
-```
-
-## Dependencies
-
-This package is built on top of the following specialized packages:
-
-- [`cpf-fmt`](https://pypi.org/project/cpf-fmt) - CPF formatting
-- [`cpf-gen`](https://pypi.org/project/cpf-gen) - CPF generation
-- [`cpf-val`](https://pypi.org/project/cpf-val) - CPF validation
+All of the above are pulled in as dependencies of **`cpf-utils`**. For exhaustive option tables, exception lists, and edge-case behavior, see each package README.
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -280,7 +252,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/cpf-utils/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](./CHANGELOG.md) for a list of changes and version history.
 
 ---
 

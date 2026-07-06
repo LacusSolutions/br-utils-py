@@ -13,14 +13,15 @@ if TYPE_CHECKING:
     from cpf_fmt.types import CpfFormatterOptionsInput
     from cpf_fmt.types import CpfInput as CpfFormatterInput
     from cpf_gen.types import CpfGeneratorOptionsInput
+    from cpf_val.types import CpfInput as CpfValidatorInput
 
 
 class CpfUtils:
-    """Unified API for CPF (Cadastro de Pessoa Física) formatting,
-    generation, and validation.
+    """Unified API for CPF (Cadastro da Pessoa Física) formatting, generation
+    and validation.
 
-    Wraps a configurable formatter, generator, and validator so you can
-    format, generate, and validate CPF values from a single instance.
+    Wraps a configurable formatter, generator, and validator so you can format,
+    generate, and validate CPF values from a single instance.
     """
 
     __slots__ = ("_formatter", "_generator", "_validator")
@@ -36,6 +37,29 @@ class CpfUtils:
         ) = None,
         validator: CpfValidator | None = None,
     ) -> None:
+        """Create a new :class:`CpfUtils` with customized options.
+
+        Each of ``formatter``, ``generator``, and ``validator`` can be omitted
+        (defaults are used), or provided as an instance,
+        :class:`CpfFormatterOptions` / :class:`CpfGeneratorOptions`, or a plain
+        mapping of options.
+
+        When a component instance is passed, it is used directly (same
+        reference). When ``None`` is passed for a component, a new instance
+        with default options is created.
+
+        Raises:
+            ``CpfFormatterOptionsTypeError``: If formatter options have an
+                invalid type.
+            ``CpfFormatterOptionsHiddenRangeInvalidException``: If formatter
+                ``hidden_start`` or ``hidden_end`` are out of valid range.
+            ``CpfFormatterOptionsForbiddenKeyCharacterException``: If any
+                formatter key option contains a disallowed character.
+            ``CpfGeneratorOptionsTypeError``: If generator options have an
+                invalid type.
+            ``CpfGeneratorOptionPrefixInvalidException``: If generator
+                ``prefix`` is invalid.
+        """
         self._formatter = self._resolve_formatter(formatter)
         self._generator = self._resolve_generator(generator)
         self._validator = self._resolve_validator(validator)
@@ -87,6 +111,29 @@ class CpfUtils:
         self,
         value: CpfFormatter | CpfFormatterOptions | CpfFormatterOptionsInput | None,
     ) -> None:
+        """Set the active formatter used by this utils instance.
+
+        It is flexible and can handle any of these inputs:
+
+        1. A complete new instance of :class:`CpfFormatter`
+        2. An instance of :class:`CpfFormatterOptions`
+        3. A partial mapping with options for the formatter
+        4. ``None`` creates a brand new :class:`CpfFormatter` with default
+           options
+
+        Note that this resets the formatter instance completely. Any previous
+        options will be overridden. To alter only a single option or a few
+        options of the existing instance, access it directly (e.g.
+        ``utils.formatter.options.hidden = True``).
+
+        Raises:
+            ``CpfFormatterOptionsTypeError``: If options have an invalid
+                type.
+            ``CpfFormatterOptionsHiddenRangeInvalidException``: If
+                ``hidden_start`` or ``hidden_end`` are out of valid range.
+            ``CpfFormatterOptionsForbiddenKeyCharacterException``: If any key
+                option contains a disallowed character.
+        """
         self._formatter = self._resolve_formatter(value)
 
     @property
@@ -99,6 +146,27 @@ class CpfUtils:
         self,
         value: CpfGenerator | CpfGeneratorOptions | CpfGeneratorOptionsInput | None,
     ) -> None:
+        """Set the active generator used by this utils instance.
+
+        It is flexible and can handle any of these inputs:
+
+        1. A complete new instance of :class:`CpfGenerator`
+        2. An instance of :class:`CpfGeneratorOptions`
+        3. A partial mapping with options for the generator
+        4. ``None`` creates a brand new :class:`CpfGenerator` with
+           default options
+
+        Note that this resets the generator instance completely. Any
+        previous options will be overridden. To alter only a single
+        option or a few options of the existing instance, access it
+        directly (e.g. ``utils.generator.options.format = True``).
+
+        Raises:
+            ``CpfGeneratorOptionsTypeError``: If options have an invalid
+                type.
+            ``CpfGeneratorOptionPrefixInvalidException``: If ``prefix`` is
+                invalid.
+        """
         self._generator = self._resolve_generator(value)
 
     @property
@@ -108,6 +176,15 @@ class CpfUtils:
 
     @validator.setter
     def validator(self, value: CpfValidator | None) -> None:
+        """Set the active validator used by this utils instance.
+
+        It is flexible and can handle any of these inputs:
+
+        1. A complete new instance of :class:`CpfValidator`
+        2. ``None`` creates a brand new :class:`CpfValidator`
+
+        Note that this resets the validator instance completely.
+        """
         self._validator = self._resolve_validator(value)
 
     def format(
@@ -125,6 +202,37 @@ class CpfUtils:
         encode: bool | None = None,
         on_fail: Any | None = None,
     ) -> str:
+        """Format a CPF value into a human-readable string.
+
+        Normalizes and optionally masks, HTML-escapes, or URL-encodes the
+        input. Delegates to the instance formatter; per-call options override
+        the formatter's defaults for this call only.
+
+        Input is normalized by stripping non-digit characters. If the result
+        length is not exactly 11, the configured ``on_fail`` callback is
+        invoked with the original value and an error; its return value is
+        used as the result.
+
+        When valid, the result may be further transformed according to options:
+
+        - If ``hidden`` is ``True``, characters between ``hidden_start`` and
+          ``hidden_end`` (inclusive) are replaced with ``hidden_key``.
+        - If ``escape`` is ``True``, HTML special characters are escaped.
+        - If ``encode`` is ``True``, the string is URL-encoded.
+
+        Per-call ``options`` are merged over the instance default options for
+        this call only; the instance defaults are unchanged.
+
+        Raises:
+            ``CpfFormatterInputTypeError``: If the input is not a string or
+                sequence of strings.
+            ``CpfFormatterOptionsTypeError``: If any option has an invalid
+                type.
+            ``CpfFormatterOptionsHiddenRangeInvalidException``: If
+                ``hidden_start`` or ``hidden_end`` are out of valid range.
+            ``CpfFormatterOptionsForbiddenKeyCharacterException``: If any key
+                option contains a disallowed character.
+        """
         format_kwargs = _format_forward_kwargs(
             hidden=hidden,
             hidden_key=hidden_key,
@@ -157,6 +265,22 @@ class CpfUtils:
         format: bool | None = None,
         prefix: str | None = None,
     ) -> str:
+        """Generate a valid 11-digit CPF, optionally with a prefix and
+        formatting.
+
+        Builds an 11-digit CPF from the configured ``prefix`` (if any), a
+        random sequence of digits, and two computed check digits. If ``format``
+        is enabled, the result is returned as ``XXX.XXX.XXX-XX``.
+
+        Delegates to the instance generator; per-call options override the
+        generator's defaults for this call only.
+
+        Raises:
+            ``CpfGeneratorOptionsTypeError``: If any option has an invalid
+                type.
+            ``CpfGeneratorOptionPrefixInvalidException``: If ``prefix`` is
+                invalid.
+        """
         generate_kwargs = _generate_forward_kwargs(format=format, prefix=prefix)
 
         generator = self._generator
@@ -172,8 +296,16 @@ class CpfUtils:
 
         return generator.generate()
 
-    def is_valid(self, cpf_string: str) -> bool:
-        return self._validator.is_valid(cpf_string)
+    def is_valid(self, cpf_input: CpfValidatorInput) -> bool:
+        """Return whether the given value is a valid CPF.
+
+        Delegates to the instance validator.
+
+        Raises:
+            ``CpfValidatorInputTypeError``: If the input is not a string or
+                sequence of strings.
+        """
+        return self._validator.is_valid(cpf_input)
 
 
 def _format_forward_kwargs(
@@ -216,6 +348,18 @@ def _format_forward_kwargs(
 
     if on_fail is not None:
         result["on_fail"] = on_fail
+
+    if not result:
+        return result
+
+    for key, value in (
+        ("hidden_start", hidden_start),
+        ("hidden_end", hidden_end),
+        ("dot_key", dot_key),
+        ("dash_key", dash_key),
+    ):
+        if key not in result:
+            result[key] = value
 
     return result
 
