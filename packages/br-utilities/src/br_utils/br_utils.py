@@ -25,24 +25,17 @@ from .cpf import (
 )
 
 
-def _resolve_cpf(value: CpfUtils | Mapping[str, Any] | None) -> CpfUtils:
-    if isinstance(value, CpfUtils):
+def _resolve_utils(
+    utils_cls: type[CpfUtils] | type[CnpjUtils],
+    value: CpfUtils | CnpjUtils | Mapping[str, Any] | None,
+) -> CpfUtils | CnpjUtils:
+    if isinstance(value, utils_cls):
         return value
 
     if value is None:
-        return CpfUtils()
+        return utils_cls()
 
-    return CpfUtils(**value)
-
-
-def _resolve_cnpj(value: CnpjUtils | Mapping[str, Any] | None) -> CnpjUtils:
-    if isinstance(value, CnpjUtils):
-        return value
-
-    if value is None:
-        return CnpjUtils()
-
-    return CnpjUtils(**value)
+    return utils_cls(**value)
 
 
 class BrUtils:
@@ -125,14 +118,14 @@ class BrUtils:
                 ``prefix`` is invalid.
         """
         if cpf is not None:
-            self._cpf = _resolve_cpf(cpf)
+            self._cpf = _resolve_utils(CpfUtils, cpf)
         elif cpf_formatter is not None or cpf_generator is not None:
             self._cpf = CpfUtils(formatter=cpf_formatter, generator=cpf_generator)
         else:
             self._cpf = CpfUtils()
 
         if cnpj is not None:
-            self._cnpj = _resolve_cnpj(cnpj)
+            self._cnpj = _resolve_utils(CnpjUtils, cnpj)
         elif (
             cnpj_formatter is not None
             or cnpj_generator is not None
@@ -187,7 +180,7 @@ class BrUtils:
             ``CnpjValidatorOptionTypeInvalidException``: If validator
                 ``type`` is not allowed.
         """
-        self._cnpj = _resolve_cnpj(value)
+        self._cnpj = _resolve_utils(CnpjUtils, value)
 
     @property
     def cpf(self) -> CpfUtils:
@@ -224,7 +217,7 @@ class BrUtils:
             ``CpfGeneratorOptionPrefixInvalidException``: If generator
                 ``prefix`` is invalid.
         """
-        self._cpf = _resolve_cpf(value)
+        self._cpf = _resolve_utils(CpfUtils, value)
 
 
 __all__ = ["BrUtils"]
