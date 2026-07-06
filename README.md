@@ -7,13 +7,28 @@
 [![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
 [![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
 
-Unified toolkit to deal with Brazilian documents (CPF and CNPJ): validation, formatting, and generation of valid IDs.
+> 🚀 **Full support for the [new alphanumeric CNPJ format](https://github.com/user-attachments/files/23937961/calculodvcnpjalfanaumerico.pdf).**
+
+> 🌎 [Acessar documentação em português](./README.pt.md)
+
+A Python toolkit to handle the main operations with Brazilian-related data: CPF (Individual's Taxpayer ID) and CNPJ (Business Tax ID). It provides a top-level `BrUtils` wrapper around [`cpf-utils`](https://pypi.org/project/cpf-utils) and [`cnpj-utils`](https://pypi.org/project/cnpj-utils), exposing all bundled resources under a unified import path.
 
 ## Python Support
 
 | ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
+
+## Features
+
+- ✅ **Unified top-level API**: One `BrUtils` instance with `cpf` and `cnpj` domain accessors
+- ✅ **Bundled domains**: [`cpf-utils`](https://pypi.org/project/cpf-utils) and [`cnpj-utils`](https://pypi.org/project/cnpj-utils) installed together
+- ✅ **Alphanumeric CNPJ**: Full support for the new alphanumeric CNPJ format (introduced in 2026)
+- ✅ **Configurable defaults**: Set formatter, generator, and (for CNPJ) validator options on each domain instance
+- ✅ **Per-call overrides**: Override any component option for a single method call
+- ✅ **Dual API style**: Top-level façade (`BrUtils`), domain aggregators (`CpfUtils`, `CnpjUtils`), standalone components, and functional helpers
+- ✅ **Shared submodules**: CPF symbols under `br_utils.cpf`; CNPJ symbols under `br_utils.cnpj`
+- ✅ **Typed error handling**: Dedicated exception hierarchies from bundled packages (`TypeError` / `Exception` model from cpf-utils and cnpj-utils v2)
 
 ## Installation
 
@@ -21,333 +36,22 @@ Unified toolkit to deal with Brazilian documents (CPF and CNPJ): validation, for
 $ pip install br-utilities
 ```
 
+This installs **`br-utilities`** together with [`cpf-utils`](https://pypi.org/project/cpf-utils) and [`cnpj-utils`](https://pypi.org/project/cnpj-utils) (which in turn pull in the CPF and CNPJ component packages). You do **not** need separate `pip install` calls for the domain packages when using **`br-utilities`**.
+
 ## Import
 
+Pick the API that fits your use case.
+
+**Top-level façade and domain singletons:**
+
 ```python
-# Using class-based resource
-from br_utils import BrUtils
-
-# Or import CPF/CNPJ utilities directly
-from br_utils import CpfUtils, CnpjUtils
-
-# Or using function-based approach
-from br_utils import cpf_fmt, cpf_gen, cpf_val, cnpj_fmt, cnpj_gen, cnpj_val
-
-# Or using the default instance
-from br_utils import br_utils
+from br_utils import BrUtils, br_utils, CpfUtils, CnpjUtils, cpf_utils, cnpj_utils
 ```
 
-## Usage
-
-### Object-Oriented Usage
-
-The `BrUtils` class provides a unified interface for all CPF and CNPJ operations:
+**CPF components and helpers** (`br_utils.cpf`):
 
 ```python
-br_utils = BrUtils()
-
-# CPF Operations
-cpf = '93247057062'
-print(br_utils.cpf.format(cpf))       # returns '932.470.570-62'
-print(br_utils.cpf.is_valid(cpf))     # returns True
-print(br_utils.cpf.generate())        # returns '65453043078'
-
-# CNPJ Operations
-cnpj = '11222333000181'
-print(br_utils.cnpj.format(cnpj))     # returns '11.222.333/0001-81'
-print(br_utils.cnpj.is_valid(cnpj))   # returns True
-print(br_utils.cnpj.generate())       # returns '12345678000195'
-```
-
-#### With Configuration Options
-
-You can configure the formatter and generator options for both CPF and CNPJ in the constructor:
-
-```python
-from br_utils import BrUtils
-from br_utils.cpf import CpfFormatterOptions, CpfGeneratorOptions
-from br_utils.cnpj import CnpjFormatterOptions, CnpjGeneratorOptions
-
-br_utils = BrUtils(
-    cpf_formatter=CpfFormatterOptions(hidden=True, hidden_key='#'),
-    cpf_generator=CpfGeneratorOptions(format=True),
-    cnpj_formatter=CnpjFormatterOptions(hidden=True, hidden_key='X'),
-    cnpj_generator=CnpjGeneratorOptions(format=True),
-)
-
-# CPF with hidden digits
-cpf = '93247057062'
-print(br_utils.cpf.format(cpf))       # returns '932.###.###-##'
-print(br_utils.cpf.generate())        # returns '730.085.350-06'
-
-# CNPJ with hidden digits
-cnpj = '11222333000181'
-print(br_utils.cnpj.format(cnpj))     # returns '11.222.XXX/XXXX-XX'
-print(br_utils.cnpj.generate())       # returns '12.345.678/0001-95'
-```
-
-### Using Individual Utilities
-
-You can also use the individual `CpfUtils` and `CnpjUtils` classes directly:
-
-```python
-from br_utils import CpfUtils, CnpjUtils
-
-cpf_utils = CpfUtils()
-cnpj_utils = CnpjUtils()
-
-# CPF operations
-print(cpf_utils.format('93247057062'))     # '932.470.570-62'
-print(cpf_utils.is_valid('93247057062'))   # True
-print(cpf_utils.generate())                # '65453043078'
-
-# CNPJ operations
-print(cnpj_utils.format('11222333000181')) # '11.222.333/0001-81'
-print(cnpj_utils.is_valid('11222333000181')) # True
-print(cnpj_utils.generate())               # '12345678000195'
-```
-
-### Functional Programming
-
-The package also provides standalone functions for each operation:
-
-```python
-from br_utils import cpf_fmt, cpf_gen, cpf_val, cnpj_fmt, cnpj_gen, cnpj_val
-
-# CPF Functions
-cpf = '93247057062'
-print(cpf_fmt(cpf))                 # '932.470.570-62'
-print(cpf_val(cpf))                 # True
-print(cpf_gen())                    # '65453043078'
-
-# CNPJ Functions
-cnpj = '11222333000181'
-print(cnpj_fmt(cnpj))               # '11.222.333/0001-81'
-print(cnpj_val(cnpj))               # True
-print(cnpj_gen())                   # '12345678000195'
-```
-
-Or use the default instance:
-
-```python
-from br_utils import br_utils
-
-# CPF
-print(br_utils.cpf.format('93247057062'))     # '932.470.570-62'
-print(br_utils.cpf.is_valid('93247057062'))   # True
-print(br_utils.cpf.generate())                # '65453043078'
-
-# CNPJ
-print(br_utils.cnpj.format('11222333000181')) # '11.222.333/0001-81'
-print(br_utils.cnpj.is_valid('11222333000181')) # True
-print(br_utils.cnpj.generate())               # '12345678000195'
-```
-
-## API Reference
-
-### BrUtils Class
-
-The `BrUtils` class consolidates CPF and CNPJ utilities in a single class.
-
-```python
-BrUtils(
-    cpf_formatter: CpfFormatterOptions | None = None,
-    cpf_generator: CpfGeneratorOptions | None = None,
-    cnpj_formatter: CnpjFormatterOptions | None = None,
-    cnpj_generator: CnpjGeneratorOptions | None = None,
-)
-```
-
-**Properties:**
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `cpf` | `CpfUtils` | Instance of `CpfUtils` for CPF operations |
-| `cnpj` | `CnpjUtils` | Instance of `CnpjUtils` for CNPJ operations |
-
-### CPF Operations
-
-#### Formatting (`cpf_fmt` / `br_utils.cpf.format`)
-
-Formats a CPF string with customizable delimiters and masking options.
-
-```python
-br_utils.cpf.format(
-    cpf_string: str,
-    hidden: bool | None = None,
-    hidden_key: str | None = None,
-    hidden_start: int | None = None,
-    hidden_end: int | None = None,
-    dot_key: str | None = None,
-    dash_key: str | None = None,
-    escape: bool | None = None,
-    on_fail: Callable | None = None,
-) -> str
-```
-
-**Examples:**
-
-```python
-cpf = '93247057062'
-
-# Basic formatting
-print(cpf_fmt(cpf))                 # '932.470.570-62'
-
-# With hidden digits
-print(cpf_fmt(cpf, hidden=True))    # '932.***.***.***-**'
-
-# Custom delimiters
-print(cpf_fmt(cpf, dot_key='', dash_key='_'))  # '932470570_62'
-```
-
-#### Generation (`cpf_gen` / `br_utils.cpf.generate`)
-
-Generates valid CPF numbers with optional formatting and prefix completion.
-
-```python
-br_utils.cpf.generate(
-    format: bool | None = None,
-    prefix: str | None = None,
-) -> str
-```
-
-**Examples:**
-
-```python
-# Generate random CPF
-print(cpf_gen())                     # '65453043078'
-
-# Generate formatted CPF
-print(cpf_gen(format=True))          # '730.085.350-06'
-
-# Complete a prefix
-print(cpf_gen(prefix='456237'))      # '45623741038'
-```
-
-#### Validation (`cpf_val` / `br_utils.cpf.is_valid`)
-
-Validates CPF numbers using the official algorithm.
-
-```python
-br_utils.cpf.is_valid(cpf_string: str) -> bool
-```
-
-**Examples:**
-
-```python
-print(cpf_val('93247057062'))        # True
-print(cpf_val('932.470.570-62'))     # True
-print(cpf_val('93247057063'))        # False
-```
-
-### CNPJ Operations
-
-#### Formatting (`cnpj_fmt` / `br_utils.cnpj.format`)
-
-Formats a CNPJ string with customizable delimiters and masking options.
-
-```python
-br_utils.cnpj.format(
-    cnpj_string: str,
-    hidden: bool | None = None,
-    hidden_key: str | None = None,
-    hidden_start: int | None = None,
-    hidden_end: int | None = None,
-    dot_key: str | None = None,
-    slash_key: str | None = None,
-    dash_key: str | None = None,
-    escape: bool | None = None,
-    on_fail: Callable | None = None,
-) -> str
-```
-
-**Examples:**
-
-```python
-cnpj = '11222333000181'
-
-# Basic formatting
-print(cnpj_fmt(cnpj))                 # '11.222.333/0001-81'
-
-# With hidden digits
-print(cnpj_fmt(cnpj, hidden=True))    # '11.222.XXX/XXXX-XX'
-
-# Custom delimiters
-print(cnpj_fmt(cnpj, dot_key='', slash_key='-', dash_key=''))  # '11222333-000181'
-```
-
-#### Generation (`cnpj_gen` / `br_utils.cnpj.generate`)
-
-Generates valid CNPJ numbers with optional formatting and prefix completion.
-
-```python
-br_utils.cnpj.generate(
-    format: bool | None = None,
-    prefix: str | None = None,
-) -> str
-```
-
-**Examples:**
-
-```python
-# Generate random CNPJ
-print(cnpj_gen())                     # '12345678000195'
-
-# Generate formatted CNPJ
-print(cnpj_gen(format=True))          # '12.345.678/0001-95'
-
-# Complete a prefix
-print(cnpj_gen(prefix='11222333'))    # '11222333000181'
-```
-
-#### Validation (`cnpj_val` / `br_utils.cnpj.is_valid`)
-
-Validates CNPJ numbers using the official algorithm.
-
-```python
-br_utils.cnpj.is_valid(cnpj_string: str) -> bool
-```
-
-**Examples:**
-
-```python
-print(cnpj_val('11222333000181'))     # True
-print(cnpj_val('11.222.333/0001-81')) # True
-print(cnpj_val('11111111111111'))     # False
-```
-
-## Advanced Usage
-
-### Accessing Individual Components
-
-You can access the individual formatter, generator, and validator instances for both CPF and CNPJ:
-
-```python
-br_utils = BrUtils()
-
-# Access CPF components
-cpf_formatter = br_utils.cpf.formatter
-cpf_generator = br_utils.cpf.generator
-cpf_validator = br_utils.cpf.validator
-
-# Access CNPJ components
-cnpj_formatter = br_utils.cnpj.formatter
-cnpj_generator = br_utils.cnpj.generator
-cnpj_validator = br_utils.cnpj.validator
-
-# Use them directly
-cpf_formatter.format('93247057062', hidden=True)
-cnpj_generator.generate(format=True)
-```
-
-### Importing from Submodules
-
-You can also import directly from the `cpf` and `cnpj` submodules:
-
-```python
-# Import CPF resources
 from br_utils.cpf import (
-    CpfUtils,
     CpfFormatter,
     CpfFormatterOptions,
     CpfGenerator,
@@ -357,31 +61,485 @@ from br_utils.cpf import (
     cpf_gen,
     cpf_val,
 )
+```
 
-# Import CNPJ resources
+**CNPJ components and helpers** (`br_utils.cnpj`):
+
+```python
 from br_utils.cnpj import (
-    CnpjUtils,
     CnpjFormatter,
     CnpjFormatterOptions,
     CnpjGenerator,
     CnpjGeneratorOptions,
     CnpjValidator,
+    CnpjValidatorOptions,
     cnpj_fmt,
     cnpj_gen,
     cnpj_val,
 )
 ```
 
-## Dependencies
+Functional helpers (`cpf_fmt`, `cnpj_fmt`, and related symbols) are **not** re-exported from the package root — import them from `br_utils.cpf` or `br_utils.cnpj`.
 
-This package is built on top of the following specialized packages:
+## Quick start
 
-- [`cpf-utils`](https://pypi.org/project/cpf-utils) - CPF utilities (formatting, generation, validation)
-- [`cnpj-utils`](https://pypi.org/project/cnpj-utils) - CNPJ utilities (formatting, generation, validation)
+**With `br_utils` (default singleton):**
+
+```python
+from br_utils import br_utils
+
+cpf = '11144477735'
+cnpj = '03603568000195'
+
+br_utils.cpf.format(cpf)      # '111.444.777-35'
+br_utils.cpf.is_valid(cpf)    # True
+br_utils.cpf.generate()       # e.g. '11508890048'
+
+br_utils.cnpj.format(cnpj)    # '03.603.568/0001-95'
+br_utils.cnpj.is_valid(cnpj)  # True
+br_utils.cnpj.generate()      # e.g. '1GJTR3J3XSSA96'
+```
+
+**With domain aggregators:**
+
+```python
+from br_utils import CpfUtils, CnpjUtils
+
+cpf = '11144477735'
+cnpj = '03603568000195'
+
+CpfUtils().format(cpf)      # '111.444.777-35'
+CnpjUtils().format(cnpj)    # '03.603.568/0001-95'
+CpfUtils().is_valid(cpf)    # True
+CnpjUtils().is_valid(cnpj)  # True
+```
+
+**With functional helpers:**
+
+```python
+from br_utils.cpf import cpf_fmt, cpf_val
+from br_utils.cnpj import cnpj_fmt, cnpj_val
+
+cpf = '11144477735'
+cnpj = '03603568000195'
+
+cpf_fmt(cpf)     # '111.444.777-35'
+cpf_val(cpf)     # True
+cnpj_fmt(cnpj)   # '03.603.568/0001-95'
+cnpj_val(cnpj)   # True
+```
+
+## Usage
+
+You can work in four equivalent ways:
+
+1. **`br_utils`** — pre-built `BrUtils` singleton with shared defaults across both CPF and CNPJ domains.
+2. **`BrUtils`** — create your own instance with custom default CPF and CNPJ settings.
+3. **Domain aggregators** — `CpfUtils` and `CnpjUtils` directly (same classes used internally by `BrUtils`).
+4. **Component classes and functional helpers** — `CpfFormatter`, `CnpjGenerator`, `cpf_fmt()`, `cnpj_gen()`, and related symbols.
+
+All approaches expose the same options and behavior within each domain. For full option tables and component-specific details, see the README of each [bundled package](#bundled-packages).
+
+### `br_utils` (default instance)
+
+The module-level `br_utils` is a pre-built `BrUtils` instance. Use it for quick one-off calls:
+
+- **`cpf`**: Access the CPF utilities (`CpfUtils`). Use `br_utils.cpf.format()`, `br_utils.cpf.generate()`, `br_utils.cpf.is_valid()` with the same options as in [cpf-utils](../cpf-utils/README.md).
+- **`cnpj`**: Access the CNPJ utilities (`CnpjUtils`). Use `br_utils.cnpj.format()`, `br_utils.cnpj.generate()`, `br_utils.cnpj.is_valid()` with the same options as in [cnpj-utils](../cnpj-utils/README.md).
+
+### `BrUtils` (class)
+
+For custom default CPF or CNPJ utils, create your own instance:
+
+```python
+from br_utils import BrUtils
+
+utils = BrUtils(
+    cpf={
+        'formatter': {'hidden': True, 'hidden_key': '#'},
+        'generator': {'format': True},
+    },
+    cnpj={
+        'formatter': {'hidden': True},
+        'generator': {'type': 'numeric', 'format': True},
+        'validator': {'type': 'numeric'},
+    },
+)
+
+utils.cpf.format('11144477735')        # '111.###.###-##'
+utils.cpf.generate()                   # e.g. '005.265.352-88'
+utils.cnpj.format('03603568000195')    # '03.603.***/****-**'
+utils.cnpj.generate()                  # e.g. '73.008.535/0005-06'
+
+# Access internal domain instances
+utils.cpf    # CpfUtils
+utils.cnpj   # CnpjUtils
+```
+
+- **`__init__(…)`**: All arguments are keyword-only and optional.
+  - **`cpf`** / **`cnpj`**: A pre-built `CpfUtils` / `CnpjUtils` instance **or** a configuration mapping spread into the corresponding utils constructor. Within that mapping, each resource key (`formatter`, `generator`, and `validator` for CNPJ) accepts either an options object or a mapping of option values.
+  - **`cpf_formatter`**, **`cpf_generator`**, **`cnpj_formatter`**, **`cnpj_generator`**, **`cnpj_validator`**: Flat convenience arguments when only individual components need customization. They are ignored when the corresponding `cpf` or `cnpj` argument is provided.
+- **`cpf`**, **`cnpj`**: Properties with getters and setters for the domain utils instances. Setters accept a utils instance, a configuration mapping, or `None` to reset to defaults (replaces the entire instance; does not merge).
+- **`__slots__`**: `('cpf', 'cnpj')` — dynamic attributes are not allowed on `BrUtils` instances.
+
+Flat constructor options (alternative to nested `cpf` / `cnpj` mappings):
+
+```python
+from br_utils import BrUtils
+from br_utils.cpf import CpfFormatterOptions, CpfGeneratorOptions
+from br_utils.cnpj import CnpjFormatterOptions, CnpjGeneratorOptions, CnpjValidatorOptions
+
+utils = BrUtils(
+    cpf_formatter=CpfFormatterOptions(hidden=True, hidden_key='#'),
+    cpf_generator=CpfGeneratorOptions(format=True),
+    cnpj_formatter=CnpjFormatterOptions(hidden=True, hidden_key='#'),
+    cnpj_generator=CnpjGeneratorOptions(format=True, type='numeric'),
+    cnpj_validator=CnpjValidatorOptions(type='numeric'),
+)
+```
+
+### Instance defaults and per-call overrides
+
+```python
+from br_utils import BrUtils
+
+utils = BrUtils(
+    cpf={
+        'formatter': {'hidden': True, 'hidden_key': '#'},
+        'generator': {'format': True},
+    },
+    cnpj={
+        'formatter': {'hidden': True, 'hidden_key': '#'},
+        'generator': {'format': True},
+        'validator': {'type': 'numeric'},
+    },
+)
+
+cpf = '11144477735'
+cnpj = '03603568000195'
+
+utils.cpf.format(cpf)                  # '111.###.###-##'
+utils.cpf.format(cpf, hidden=False)    # '111.444.777-35'
+utils.cpf.generate(format=False)       # e.g. '58450042259'
+
+utils.cnpj.format(cnpj)                  # '03.603.###/####-##'
+utils.cnpj.format(cnpj, hidden=False)    # '03.603.568/0001-95'
+utils.cnpj.is_valid('1QB5UKALPYFP59')    # False
+utils.cnpj.is_valid(                     # True
+    '1QB5UKALPYFP59',
+    type='alphanumeric',
+)
+```
+
+Passing a `CnpjFormatterOptions`, `CnpjGeneratorOptions`, or `CnpjValidatorOptions` instance to the `BrUtils` constructor stores that object by reference — mutating it later affects subsequent calls with no per-call override.
+
+### CPF operations
+
+CPF methods are accessed via `utils.cpf`, `CpfUtils`, or the `cpf_*()` helpers from `br_utils.cpf`. CPF uses the v2 API from [`cpf-utils`](../cpf-utils/README.md): `str` or sequence input for `format()` / `is_valid()`, mapping or keyword overrides per call, and structured exceptions.
+
+#### Formatting (`format` / `cpf_fmt`)
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `hidden` | `bool` | `False` | When `True`, mask digits in `hidden_start`–`hidden_end` with `hidden_key` |
+| `hidden_key` | `str` | `'*'` | Character(s) used to replace masked digits |
+| `hidden_start` | `int` | `3` | Start index (0–10, inclusive) of the range to hide |
+| `hidden_end` | `int` | `10` | End index (0–10, inclusive) of the range to hide |
+| `dot_key` | `str` | `'.'` | Dot delimiter (e.g. in `123.456.789`) |
+| `dash_key` | `str` | `'-'` | Dash delimiter (e.g. before check digits `…-09`) |
+| `escape` | `bool` | `False` | When `True`, escape HTML special characters in the result |
+| `encode` | `bool` | `False` | When `True`, URL-encode the result (similar to JavaScript `encodeURIComponent`) |
+| `on_fail` | `Callable` | returns `''` | Callback when sanitized input length ≠ 11; return value is used as result |
+
+Default **`on_fail`** returns an empty string. Invalid length does **not** throw from `format()`.
+
+```python
+from br_utils import br_utils
+from br_utils.cpf import cpf_fmt
+
+cpf = '11144477735'
+
+br_utils.cpf.format(cpf)                                        # '111.444.777-35'
+br_utils.cpf.format(cpf, hidden=True, hidden_key='#')           # '111.###.###-##'
+br_utils.cpf.format(cpf, dot_key='', dash_key='_')              # '111444777_35'
+
+cpf_fmt(cpf, hidden=True)                                       # '111.***.***-**'
+```
+
+#### Generation (`generate` / `cpf_gen`)
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CPF in standard format (`000.000.000-00`) |
+| `prefix` | `str` | `''` | Partial start string (0–9 digits). Non-digits are stripped; missing characters are generated and check digits computed. Prefixes longer than 9 digits are truncated silently. |
+
+Prefix rules: the base (first 9 digits) cannot be all zeros; 9 repeated digits (e.g. `999999999`) are not allowed.
+
+```python
+from br_utils import br_utils
+from br_utils.cpf import cpf_gen
+
+br_utils.cpf.generate()                      # e.g. '11508890048'
+br_utils.cpf.generate(format=True)             # e.g. '661.134.831-00'
+br_utils.cpf.generate(prefix='123456789')    # '12345678909'
+cpf_gen(prefix='123456789', format=True)     # '123.456.789-09'
+```
+
+#### Validation (`is_valid` / `cpf_val`)
+
+Accepts formatted or unformatted CPF strings (or a sequence of strings). Returns **`True`** or **`False`** without throwing for invalid CPF. No validator options exist.
+
+```python
+from br_utils import br_utils
+from br_utils.cpf import cpf_val
+
+br_utils.cpf.is_valid('11144477735')      # True
+br_utils.cpf.is_valid('111.444.777-35')   # True
+br_utils.cpf.is_valid('11144477736')      # False
+cpf_val('11144477735')                    # True
+```
+
+### CNPJ operations
+
+CNPJ methods are accessed via `utils.cnpj`, `CnpjUtils`, or the `cnpj_*()` helpers from `br_utils.cnpj`. CNPJ uses the v2 API from [`cnpj-utils`](../cnpj-utils/README.md).
+
+#### Formatting (`format` / `cnpj_fmt`)
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `hidden` | `bool` | `False` | When `True`, mask characters in `hidden_start`–`hidden_end` with `hidden_key` |
+| `hidden_key` | `str` | `'*'` | Character(s) used to replace masked characters |
+| `hidden_start` | `int` | `5` | Start index (0–13, inclusive) of the range to hide |
+| `hidden_end` | `int` | `13` | End index (0–13, inclusive) of the range to hide |
+| `dot_key` | `str` | `'.'` | Dot delimiter (e.g. in `12.345.678`) |
+| `slash_key` | `str` | `'/'` | Slash delimiter (e.g. before branch `…/0001-90`) |
+| `dash_key` | `str` | `'-'` | Dash delimiter (e.g. before check digits `…-90`) |
+| `escape` | `bool` | `False` | When `True`, escape HTML special characters in the result |
+| `encode` | `bool` | `False` | When `True`, URL-encode the result (similar to JavaScript `encodeURIComponent`) |
+| `on_fail` | `Callable` | returns `''` | Callback when sanitized input length ≠ 14; return value is used as result |
+
+Default **`on_fail`** returns an empty string. Wrong input types throw **`CnpjFormatterInputTypeError`**.
+
+```python
+from br_utils import br_utils
+from br_utils.cnpj import cnpj_fmt
+
+cnpj = '03603568000195'
+
+br_utils.cnpj.format(cnpj)              # '03.603.568/0001-95'
+br_utils.cnpj.format('12ABC34500DE99')   # '12.ABC.345/00DE-99'
+br_utils.cnpj.format(                     # '03.603.###/####-##'
+    cnpj,
+    hidden=True,
+    hidden_key='#',
+)
+br_utils.cnpj.format(                     # '03603568|0001_95'
+    cnpj,
+    dot_key='',
+    slash_key='|',
+    dash_key='_',
+)
+
+cnpj_fmt(cnpj)   # '03.603.568/0001-95'
+```
+
+#### Generation (`generate` / `cnpj_gen`)
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `bool` | `False` | When `True`, return the generated CNPJ in standard format (`00.000.000/0000-00`) |
+| `prefix` | `str` | `''` | Partial start string (0–12 alphanumeric chars). Missing characters are generated and check digits computed. |
+| `type` | `'numeric'` \| `'alphabetic'` \| `'alphanumeric'` | `'alphanumeric'` | Character set for the randomly generated part. **Check digits are always numeric.** |
+
+Prefix rules: base ID (first 8 chars) and branch ID (chars 9–12) cannot be all zeros; 12 repeated digits (e.g. `111111111111`) are also not allowed.
+
+```python
+from br_utils import br_utils
+from br_utils.cnpj import cnpj_gen
+
+br_utils.cnpj.generate()               # e.g. '1GJTR3J3XSSA96'
+br_utils.cnpj.generate(format=True)    # e.g. 'V1.J0V.8WE/DVZ7-50'
+br_utils.cnpj.generate(                # e.g. '12345678855883'
+    prefix='12345678',
+    type='numeric',
+)
+cnpj_gen(type='numeric')               # e.g. '65453043000178'
+```
+
+#### Validation (`is_valid` / `cnpj_val`)
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `case_sensitive` | `bool` | `True` | When `False`, lowercase letters are accepted for alphanumeric CNPJ (input is uppercased before validation). |
+| `type` | `'numeric'` \| `'alphanumeric'` | `'alphanumeric'` | `'numeric'`: only digits (0–9); `'alphanumeric'`: digits and letters (0–9, A–Z). |
+
+```python
+from br_utils import br_utils
+from br_utils.cnpj import cnpj_val
+
+br_utils.cnpj.is_valid('98765432000198')   # True
+br_utils.cnpj.is_valid('98765432000199')   # False
+br_utils.cnpj.is_valid('1QB5UKALPYFP59')   # True
+br_utils.cnpj.is_valid('1QB5UKALpyfp59')   # False
+br_utils.cnpj.is_valid(                     # True
+    '1QB5UKALpyfp59',
+    case_sensitive=False,
+)
+br_utils.cnpj.is_valid(                     # False
+    '1QB5UKALPYFP59',
+    type='numeric',
+)
+
+cnpj_val('98765432000198')                         # True
+cnpj_val('1QB5UKALpyfp59', case_sensitive=False)   # True
+cnpj_val('1QB5UKALPYFP59', type='numeric')         # False
+```
+
+Invalid CNPJ returns **`False`** without throwing. Wrong input types throw **`CnpjValidatorInputTypeError`**.
+
+### Domain aggregators (standalone)
+
+Use `CpfUtils` or `CnpjUtils` directly when you only need one domain:
+
+```python
+from br_utils import CpfUtils, CnpjUtils
+
+cpf_utils = CpfUtils(
+    formatter={'hidden': True},
+    generator={'format': True},
+)
+
+cnpj_utils = CnpjUtils(
+    formatter={'hidden': True},
+    generator={'format': True},
+    validator={'type': 'numeric'},
+)
+
+cpf_utils.format('11144477735')       # '111.***.***-**'
+cnpj_utils.format('03603568000195')   # '03.603.***/****-**'
+```
+
+The module-level `cpf_utils` and `cnpj_utils` singletons (re-exported from the dependencies) are also available from the package root:
+
+```python
+from br_utils import cpf_utils, cnpj_utils
+
+cpf_utils.format('11144477735')   # '111.444.777-35'
+cnpj_utils.format('03603568000195')   # '03.603.568/0001-95'
+```
+
+### Accessing components
+
+Each domain aggregator exposes its internal formatter, generator, and validator:
+
+```python
+from br_utils import BrUtils
+
+utils = BrUtils()
+
+utils.cpf.formatter.format('11144477735', hidden=True)   # '111.***.***-**'
+utils.cpf.generator.generate(format=True)                # e.g. '545.507.690-68'
+utils.cpf.validator.is_valid('11144477735')              # True
+
+utils.cnpj.formatter.format('12ABC34500DE99')    # '12.ABC.345/00DE-99'
+utils.cnpj.generator.generate(format=True)       # e.g. '8O.BE5.2KL/UI0Y-06'
+utils.cnpj.validator.is_valid('03603568000195')  # True
+```
+
+### Mixing styles
+
+Use `BrUtils` where a shared configuration helps, and standalone components or helpers elsewhere — they are the same underlying classes:
+
+```python
+from br_utils import BrUtils
+from br_utils.cnpj import CnpjFormatter
+from br_utils.cpf import cpf_fmt
+from br_utils.cnpj import cnpj_val
+
+utils = BrUtils(cnpj={'validator': {'type': 'numeric'}})
+
+# Via façade
+utils.cpf.format('11144477735')   # '111.444.777-35'
+
+# Via component returned by the façade
+utils.cnpj.formatter.format('12ABC34500DE99')   # '12.ABC.345/00DE-99'
+
+# Via a separate component instance
+CnpjFormatter().format('03603568000195')   # '03.603.568/0001-95'
+
+# Via functional helpers
+cpf_fmt('11144477735')           # '111.444.777-35'
+cnpj_val('98.765.432/0001-98')   # True
+```
+
+## API
+
+### Exports
+
+**Package root** (`br_utils`):
+
+- **`br_utils`**: Pre-built `BrUtils` instance with `cpf` and `cnpj`.
+- **`BrUtils`**: Class to create an instance with optional default CPF and CNPJ utils settings.
+- **`CpfUtils`**, **`cpf_utils`**: CPF domain aggregator and its default singleton (from `cpf-utils`).
+- **`CnpjUtils`**, **`cnpj_utils`**: CNPJ domain aggregator and its default singleton (from `cnpj-utils`).
+
+**`br_utils.cpf`** — all exports from [cpf-utils](../cpf-utils/README.md) (e.g. `cpf_fmt`, `cpf_gen`, `cpf_val`, formatter/generator/validator classes, options, exceptions).
+
+**`br_utils.cnpj`** — all exports from [cnpj-utils](../cnpj-utils/README.md) (e.g. `cnpj_fmt`, `cnpj_gen`, `cnpj_val`, formatter/generator/validator classes, options, exceptions).
+
+### Errors & Exceptions
+
+`BrUtils` does not define its own exception types; it propagates errors from the bundled packages:
+
+- **CPF formatting**: `CpfFormatterInputTypeError`, `CpfFormatterOptionsTypeError`, `CpfFormatterOptionsHiddenRangeInvalidException`, `CpfFormatterOptionsForbiddenKeyCharacterException`, and related classes.
+- **CPF generation**: `CpfGeneratorOptionsTypeError`, `CpfGeneratorOptionPrefixInvalidException`, and related classes.
+- **CPF validation**: `CpfValidatorInputTypeError` and related classes.
+- **CNPJ formatting**: `CnpjFormatterInputTypeError`, `CnpjFormatterOptionsTypeError`, `CnpjFormatterOptionsHiddenRangeInvalidException`, `CnpjFormatterOptionsForbiddenKeyCharacterException`, and related classes.
+- **CNPJ generation**: `CnpjGeneratorOptionsTypeError`, `CnpjGeneratorOptionPrefixInvalidException`, `CnpjGeneratorOptionTypeInvalidException`, and related classes.
+- **CNPJ validation**: `CnpjValidatorInputTypeError`, `CnpjValidatorOptionsTypeError`, `CnpjValidatorOptionTypeInvalidException`, and related classes.
+
+Invalid option types are **`TypeError`** subclasses; invalid option values are **`Exception`** subclasses. CPF and CNPJ validation failures return `False`. Formatting length failures are handled by **`on_fail`** (default: return `''`).
+
+```python
+from br_utils import BrUtils
+from br_utils.cnpj import CnpjFormatterInputTypeError, CnpjValidatorInputTypeError
+
+br_utils = BrUtils()
+
+try:
+    br_utils.cnpj.format(12345)   # raises CnpjFormatterInputTypeError
+except CnpjFormatterInputTypeError as e:
+    print(e)
+
+try:
+    br_utils.cnpj.is_valid(12345678000198)   # raises CnpjValidatorInputTypeError
+except CnpjValidatorInputTypeError as e:
+    print(e)
+
+cpf_out = br_utils.cpf.format(     # 'invalid'
+    'short',
+    on_fail=lambda value, exception=None: 'invalid',
+)
+cnpj_out = br_utils.cnpj.format(   # 'invalid'
+    'short',
+    on_fail=lambda value, exception=None: 'invalid',
+)
+```
+
+For exhaustive exception lists and edge-case behavior, see each [bundled package](#bundled-packages) README.
+
+### Bundled packages
+
+| Package | Main resources | README |
+|---------|----------------|--------|
+| [`cpf-utils`](https://pypi.org/project/cpf-utils) | `CpfUtils`, `CpfFormatter`, `CpfGenerator`, `CpfValidator`, `cpf_fmt()`, `cpf_gen()`, `cpf_val()` | [docs](../cpf-utils/README.md) |
+| [`cnpj-utils`](https://pypi.org/project/cnpj-utils) | `CnpjUtils`, `CnpjFormatter`, `CnpjGenerator`, `CnpjValidator`, `cnpj_fmt()`, `cnpj_gen()`, `cnpj_val()` | [docs](../cnpj-utils/README.md) |
+
+All CPF symbols are available under **`br_utils.cpf`**; all CNPJ symbols under **`br_utils.cnpj`**. Interactive demos: [CPF](https://cpf-utils.vercel.app/) and [CNPJ](https://cnpj-utils.vercel.app/).
 
 ## Contribution & Support
 
-We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. But if you find this project helpful, please consider:
+We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
 - ⭐ Starring the repository
 - 🤝 Contributing to the codebase
@@ -394,7 +552,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/LacusSolutions/br-utils-py/blob/main/packages/br-utilities/CHANGELOG.md) for a list of changes and version history.
+See [CHANGELOG](./CHANGELOG.md) for a list of changes and version history.
 
 ---
 
