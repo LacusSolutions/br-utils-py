@@ -203,7 +203,7 @@ class BrUtils:
         previous options will be overridden. To alter only a single option or
         a few options of the existing instance, access it directly and use the
         CPF utilities' setters and methods (for example,
-        ``utils.cpf.formatter.hidden = True``).
+        ``utils.cpf.formatter.options.hidden = True``).
 
         Raises:
             ``CpfFormatterOptionsTypeError``: If formatter options have an
