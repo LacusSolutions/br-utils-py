@@ -160,7 +160,7 @@ class BrUtils:
         previous options will be overridden. To alter only a single option or
         a few options of the existing instance, access it directly and use the
         CNPJ utilities' setters and methods (for example,
-        ``utils.cnpj.generator.type = 'numeric'``).
+        ``utils.cnpj.generator.options.type = 'numeric'``).
 
         Raises:
             ``CnpjFormatterOptionsTypeError``: If formatter options have an
