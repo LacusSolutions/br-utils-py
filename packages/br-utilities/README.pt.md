@@ -180,7 +180,6 @@ utils.cnpj   # CnpjUtils
   - **`cpf`** / **`cnpj`**: Uma instância pronta de `CpfUtils` / `CnpjUtils` **ou** um mapeamento de configuração repassado ao construtor do utils correspondente. Dentro desse mapeamento, cada chave de recurso (`formatter`, `generator` e `validator` para CNPJ) aceita um objeto de opções ou um mapeamento de valores de opção.
   - **`cpf_formatter`**, **`cpf_generator`**, **`cnpj_formatter`**, **`cnpj_generator`**, **`cnpj_validator`**: Argumentos planos de conveniência quando apenas componentes individuais precisam de customização. São ignorados quando o argumento `cpf` ou `cnpj` correspondente é fornecido.
 - **`cpf`**, **`cnpj`**: Propriedades com getters e setters das instâncias de utils de domínio. Os setters aceitam uma instância de utils, um mapeamento de configuração ou `None` para voltar aos padrões (substitui a instância inteira; não faz merge).
-- **`__slots__`**: `('cpf', 'cnpj')` — atributos dinâmicos não são permitidos em instâncias de `BrUtils`.
 
 Opções planas no construtor (alternativa aos mapeamentos aninhados `cpf` / `cnpj`):
 

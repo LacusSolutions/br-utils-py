@@ -180,7 +180,6 @@ utils.cnpj   # CnpjUtils
   - **`cpf`** / **`cnpj`**: A pre-built `CpfUtils` / `CnpjUtils` instance **or** a configuration mapping spread into the corresponding utils constructor. Within that mapping, each resource key (`formatter`, `generator`, and `validator` for CNPJ) accepts either an options object or a mapping of option values.
   - **`cpf_formatter`**, **`cpf_generator`**, **`cnpj_formatter`**, **`cnpj_generator`**, **`cnpj_validator`**: Flat convenience arguments when only individual components need customization. They are ignored when the corresponding `cpf` or `cnpj` argument is provided.
 - **`cpf`**, **`cnpj`**: Properties with getters and setters for the domain utils instances. Setters accept a utils instance, a configuration mapping, or `None` to reset to defaults (replaces the entire instance; does not merge).
-- **`__slots__`**: `('cpf', 'cnpj')` — dynamic attributes are not allowed on `BrUtils` instances.
 
 Flat constructor options (alternative to nested `cpf` / `cnpj` mappings):
 
