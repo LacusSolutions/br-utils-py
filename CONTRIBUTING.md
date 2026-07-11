@@ -156,8 +156,13 @@ br-utils-py/python/
 ├── require                 # Install monorepo dependencies (editable)
 ├── run                     # Main monorepo run script
 ├── setup.cfg               # Black configuration
+├── AGENTS.md               # Agent/contributor baseline rules
+├── CLAUDE.md               # Pointer to AGENTS.md
+├── context/                # Task-specific contributor/agent harnesses
 └── README.md               # Project documentation
 ```
+
+Two package folders do not match their import name: `utils` → `lacus.utils` and `br-utilities` → `br_utils`. All other folders match their import namespace (e.g. `cnpj-gen` → `cnpj_gen`).
 
 ## Contributing Guidelines
 
@@ -166,7 +171,7 @@ br-utils-py/python/
 We welcome contributions in the following areas:
 
 - **🐛 Bug Fixes**: Fix issues and improve stability
-- **✨ New Features**: Add new document types, processors, or functionality
+- **✨ New Features**: Add new formatting, validation, or generation options and capabilities
 - **📚 Documentation**: Improve docs, examples, and guides
 - **🧪 Tests**: Add or extend behavioral specs for new or existing features
 - **⚡ Performance**: Optimize validation and formatting performance
@@ -182,6 +187,8 @@ We welcome contributions in the following areas:
 ### Cross-language parity
 
 The Python packages mirror the JavaScript and PHP implementations in the broader `br-utils` monorepo. When changing public API behavior, check the corresponding suites under `js/packages/` and `php/packages/` and follow the business rules documented in their `AGENTS.md` files.
+
+Python-specific conventions (architecture, options classes, exception hierarchy, docstrings, tests, changelogs, packaging, and CI) are documented in [`AGENTS.md`](AGENTS.md) and the task-specific harnesses under [`context/`](context/). Read the relevant harness before making changes.
 
 ## Development Workflow
 
@@ -532,6 +539,7 @@ Add any other context or screenshots about the feature request.
 
 - **GitHub Issues**: For bugs and feature requests
 - **Documentation**: Check the README, package READMEs, and inline docstrings
+- **Contributor & agent guides**: [`AGENTS.md`](AGENTS.md) for baseline rules and the task-specific harnesses under [`context/`](context/)
 
 ## License
 
