@@ -103,10 +103,10 @@ Generates a random character sequence of the given length and type.
 
 We welcome contributions! Please see our [Contributing Guidelines](https://github.com/LacusSolutions/br-utils-py/blob/main/CONTRIBUTING.md) for details. If you find this project helpful, please consider:
 
-- Starring the repository
-- Contributing to the codebase
-- [Suggesting new features](https://github.com/LacusSolutions/br-utils-py/issues)
-- [Reporting bugs](https://github.com/LacusSolutions/br-utils-py/issues)
+- ⭐ Starring the repository
+- 🤝 Contributing to the codebase
+- 💡 [Suggesting new features](https://github.com/LacusSolutions/br-utils-py/issues)
+- 🐛 [Reporting bugs](https://github.com/LacusSolutions/br-utils-py/issues)
 
 ## License
 
