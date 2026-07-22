@@ -1,23 +1,10 @@
 ![cnpj-utils para Python](https://br-utils.vercel.app/img/cover_cnpj-utils.jpg)
 
-[![PyPI Version](https://img.shields.io/pypi/v/cnpj-utils)](https://pypi.org/project/cnpj-utils)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/cnpj-utils)](https://pypi.org/project/cnpj-utils)
-[![Python Version](https://img.shields.io/pypi/pyversions/cnpj-utils)](https://www.python.org/)
-[![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/br-utils-py/ci.yml?label=ci/cd)](https://github.com/LacusSolutions/br-utils-py/actions)
-[![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
-[![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
-
 > 🚀 **Suporte total ao [novo formato alfanumérico de CNPJ](https://github.com/user-attachments/files/23937961/calculodvcnpjalfanaumerico.pdf).**
 
 > 🌎 [Access documentation in English](./README.md)
 
 Utilitários para lidar com CNPJ (Cadastro Nacional da Pessoa Jurídica). Este pacote envolve [`cnpj-fmt`](https://pypi.org/project/cnpj-fmt), [`cnpj-gen`](https://pypi.org/project/cnpj-gen) e [`cnpj-val`](https://pypi.org/project/cnpj-val) em uma única API e reexporta os recursos públicos deles.
-
-## Suporte a Python
-
-| ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-| --- | --- | --- | --- | --- |
-| Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
 
 ## Recursos
 
