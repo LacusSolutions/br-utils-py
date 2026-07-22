@@ -22,7 +22,12 @@ The root `README.md` at `python/README.md` documents the `br-utilities` project.
 
 ### Portuguese parity
 
-English `README.md` is the source of truth for structure and content. Any change to a package's `README.md` must be reflected in that package's `README.pt.md` (faithful translation). Most packages have both; `utils` (foundation) has English only.
+English `README.md` is the source of truth for structure and content. Any change to a package's `README.md` must be reflected in that package's `README.pt.md` (faithful translation), **except** the English-only elements listed below. Most packages have both; `utils` (foundation) has English only.
+
+**Omit from `README.pt.md` (English `README.md` only):**
+
+- The **badges row** (PyPI / CI / license shields). Keep the cover image (or H1) and optional callouts.
+- The **`## Python Support`** section (and its Portuguese heading `## Suporte a Python`). Do not translate or recreate the Python version badge table in Portuguese docs.
 
 ### Changelog links
 
@@ -56,10 +61,10 @@ Special sections (only when relevant): `## Calculation algorithm` for DV package
 
 ```
 [Cover image OR H1 title]
-[Badges row]
+[Badges row]            ← English README.md only; omit from README.pt.md
 [Optional blockquote callouts]
 [One-paragraph description]
-## Python Support
+## Python Support       ← English README.md only; omit from README.pt.md
 ## Features
 ## Installation
 ## Quick Start
@@ -83,7 +88,9 @@ Made with ❤️ by Lacus Solutions
 
 Use the package folder slug (e.g. `cnpj-gen`). Foundation packages use an H1 instead.
 
-### Badges (six, in this order)
+### Badges (six, in this order) — English only
+
+> Include only in `README.md`. Never add these shields to `README.pt.md`.
 
 Replace `<pypi-name>` with the PyPI distribution name (`cnpj-gen`, `lacus.utils`, `br-utilities`):
 
@@ -110,7 +117,9 @@ Feature announcement (when applicable) and the Portuguese doc link:
 
 > A Python **{noun}** to **{primary action}** **{subject}** ({expanded name}).
 
-## Python Support
+## Python Support — English only
+
+> Include only in `README.md`. Omit from `README.pt.md` (do not add `## Suporte a Python`).
 
 Use the Python version badge table (not plain text). Copy from `packages/cnpj-gen/README.md` and adjust versions to match `requires-python`:
 
@@ -200,7 +209,7 @@ Made with ❤️ by [Lacus Solutions](https://github.com/LacusSolutions)
 
 | Rule | Detail |
 |------|--------|
-| Language | English in `README.md`; mirror structure faithfully in `README.pt.md` |
+| Language | English in `README.md`; mirror structure in `README.pt.md` except badges and `## Python Support` / `## Suporte a Python` (English only) |
 | Voice | Direct, technical, third-person; present tense |
 | Formatting | Backticks for identifiers, options, types; **bold** for symbol names in prose |
 | Code | Python fenced blocks; `# 'result'` comments with realistic domain values |
@@ -221,6 +230,7 @@ Made with ❤️ by [Lacus Solutions](https://github.com/LacusSolutions)
 - [ ] Leaf README links present (aggregators)
 - [ ] CHANGELOG footer links to ./CHANGELOG.md
 - [ ] README.pt.md present (except utils) and updated when README.md changes
+- [ ] README.pt.md omits badges row and ## Suporte a Python
 - [ ] Footer boilerplate unchanged
 ```
 

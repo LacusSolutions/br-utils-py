@@ -1,23 +1,10 @@
 ![br-utils para Python](https://br-utils.vercel.app/img/cover_br-utils.jpg)
 
-[![PyPI Version](https://img.shields.io/pypi/v/br-utilities)](https://pypi.org/project/br-utilities)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/br-utilities)](https://pypi.org/project/br-utilities)
-[![Python Version](https://img.shields.io/pypi/pyversions/br-utilities)](https://www.python.org/)
-[![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/br-utils-py/ci.yml?label=ci/cd)](https://github.com/LacusSolutions/br-utils-py/actions)
-[![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
-[![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
-
 > 🚀 **Suporte total ao [novo formato alfanumérico de CNPJ](https://github.com/user-attachments/files/23937961/calculodvcnpjalfanaumerico.pdf).**
 
 > 🌎 [Access documentation in English](./README.md)
 
 Kit de utilitários em Python para as principais operações com dados brasileiros: CPF (Cadastro de Pessoa Física) e CNPJ (Cadastro Nacional da Pessoa Jurídica). Oferece um wrapper de alto nível `BrUtils` em torno de [`cpf-utils`](https://pypi.org/project/cpf-utils) e [`cnpj-utils`](https://pypi.org/project/cnpj-utils), expondo todos os recursos empacotados em um caminho de importação unificado.
-
-## Suporte a Python
-
-| ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-| --- | --- | --- | --- | --- |
-| Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
 
 ## Recursos
 
