@@ -1,21 +1,8 @@
 ![cpf-gen para Python](https://br-utils.vercel.app/img/cover_cpf-gen.jpg)
 
-[![PyPI Version](https://img.shields.io/pypi/v/cpf-gen)](https://pypi.org/project/cpf-gen)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/cpf-gen)](https://pypi.org/project/cpf-gen)
-[![Python Version](https://img.shields.io/pypi/pyversions/cpf-gen)](https://www.python.org/)
-[![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/br-utils-py/ci.yml?label=ci/cd)](https://github.com/LacusSolutions/br-utils-py/actions)
-[![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py)
-[![Project License](https://img.shields.io/github/license/LacusSolutions/br-utils-py)](https://github.com/LacusSolutions/br-utils-py/blob/main/LICENSE)
-
 > 🌎 [Access documentation in English](./README.md)
 
 Utilitário em Python para gerar CPFs válidos (Cadastro de Pessoa Física).
-
-## Suporte a Python
-
-| ![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white) | ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) | ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) | ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) |
-|--- | --- | --- | --- | --- |
-| Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ | Passing ✔ |
 
 ## Recursos
 
